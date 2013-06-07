@@ -13,4 +13,4 @@ Git @ OSC 的功能
 帮助
 -------------
 >在使用 Git @ OSC 的过程中有任何不明白的问题，可以点击[帮助](http://git.oschina.net/oschina/git-osc/wikis/help)查看简要的帮助说明，也欢迎您到[开源中国社区](http://www.oschina.net)上提问。
->[ProGit](http://git.oschina.net/mirrors/progit) 是一本权威的git书籍，[点击这里开始阅读](http://git.oschina.net/mirrors/progit/blob/master/zh/02-git-basics/01-chapter2.markdown)。
+>[ProGit](http://git.oschina.net/mirrors/progit) 是一本权威的git书籍，[点击这里开始阅读(中文版)](http://git.oschina.net/progit)。
