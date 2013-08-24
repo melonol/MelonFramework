@@ -9,12 +9,4 @@ class Melon {
 		
 	}
 }
-DB('table')->query();
-DB::query();
 
-class DB {
-	
-	function __construct() {
-		echo 'melon db';
-	}
-}
