@@ -1,7 +1,8 @@
 <?php
 
-namespace Melon;
 define( 'IN_MELON', true );
+
+namespace Melon;
 
 class Melon {
 	
@@ -10,3 +11,6 @@ class Melon {
 	}
 }
 
+class _Loader {
+	
+}
