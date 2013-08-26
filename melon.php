@@ -1,8 +1,7 @@
 <?php
-
-define( 'IN_MELON', true );
-
 namespace Melon;
+
+define( 'IN_MELON', false );
 
 class Melon {
 	
@@ -11,6 +10,6 @@ class Melon {
 	}
 }
 
-class _Loader {
-	
-}
+require './Melon/Exception/BaseException.php';
+require './Melon/Exception/SourceException.php';
+

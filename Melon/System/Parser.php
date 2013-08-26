@@ -1,12 +1,13 @@
 <?php
-defined('IN_MELON') or die('Permission denied');
 
 namespace Melon\System;
 
+defined('IN_MELON') or die('Permission denied');
+
 /**
- * 加载文件类
+ * 路径解释器
  */
-class Loader {
+class PathParser {
 	
 	static private $_cache = array();
 	
@@ -14,31 +15,18 @@ class Loader {
 		;
 	}
 	
-	static public function includeReiteration() {
-		
-	}
-	
-	static public function requireReiteration() {
-		
-	}
-	
-	static public function includeOnce() {
-		
-	}
-	
-	static public function requireOnce() {
+	/**
+	 * 解释一个路径
+	 * 
+	 * @param string $path
+	 * @return array
+	 * @throw Exception\SourceException
+	 */
+	static public function parse( $path = '' ) {
 		
 	}
 	
 	static private function _debugBacktrace() {
-		
-	}
-	
-	static private function _permissionValidation() {
-		
-	}
-	
-	static public function addPermissionValidator() {
 		
 	}
 
