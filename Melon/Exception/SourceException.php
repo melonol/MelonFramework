@@ -6,4 +6,7 @@ defined('IN_MELON') or die('Permission denied');
 
 class SourceException extends BaseException {
 	
+	public function toString() {
+		return '';
+	}
 }
