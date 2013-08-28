@@ -1,7 +1,12 @@
 <?php
-defined('IN_MELON') or die('Permission denied');
 
 namespace Melon\Loader;
+use Melon\System;
+
+
+defined( 'IN_MELON' ) or die( 'Permission denied' );
+
+echo System\PathTrace::parse( '.' );
 
 /**
  * 

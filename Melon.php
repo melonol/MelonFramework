@@ -13,7 +13,6 @@ class Melon {
 
 require './Melon/Exception/BaseException.php';
 require './Melon/Exception/SourceException.php';
-require './Melon/System/PathParser.php';
+require './Melon/System/PathTrace.php';
 
-
-System\PathParser::parse( 'D:\apmserv\www\htdocs\7725\p7725svr\read.txt' );
+include System\PathTrace::parse( './Melon/Loader/BaseLoader.php' );
