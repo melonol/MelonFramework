@@ -11,8 +11,8 @@ class Melon {
 	}
 }
 
-require './Melon/Exception/BaseException.php';
-require './Melon/Exception/SourceException.php';
-require './Melon/System/PathTrace.php';
+require 'Melon/Exception/BaseException.php';
+require 'Melon/Exception/SourceException.php';
+require 'Melon/System/PathTrace.php';
 
 include System\PathTrace::parse( './Melon/Loader/BaseLoader.php' );
