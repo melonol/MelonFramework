@@ -13,12 +13,11 @@ require ROOT . '/Melon/System/PathTrace.php';
 
 class Base {
 	
+	final protected function __construct() {
+		;
+	}
+
 	final static public function load( $file ) {
 		include_once System\PathTrace::parse( $file, false, array( 'Melon\Base::load' ) );
 	}
 }
-$s = microtime(true);
-for( $i = 0; $i < 100; $i++ ) {
-	Base::load( './Melon/Loader/BaseLoader.php' );
-}
-echo number_format( microtime(true) - $s, 3 );
