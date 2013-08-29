@@ -20,28 +20,45 @@ class PathTrace {
 	 * @param string $path
 	 * @return string|array|false
 	 */
-	public function parse( $path = '', $get_trace = false, array $ignore_trace = array() ) {
-		// 获得backstrace列表
-		$debug_backtrace = debug_backtrace();
-		// 第一个backstrace就是调用import的来源脚本
-		$source = $debug_backtrace[0];
-		
-		$str_first = isset( $path[0] ) ? $path[0] : '';
-		$str_second = isset( $path[1] ) ? $path[1] : '';
-		$is_absolute = ( $str_first === '/' ||
-				//windows盘符
-				( stripos( 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $str_first ) !== false &&
-					$str_second === ':' ) );
-		$real_path = $path;
-		if( ! $is_absolute ) {
-			// 得到调用源的目录路径，和文件路径结合，就可以算出完整路径
-			$source_dir = dirname( $source['file'] );
-			$real_path = $source_dir . '/' . $path;
+	public function parse( $path, $getTrace = false, array $ignoreTrace = array() ) {
+		if( empty( $path ) ) {
+			return false;
 		}
-		return realpath( $real_path );
+		$strFirst = isset( $path[0] ) ? $path[0] : '';
+		$strSecond = isset( $path[1] ) ? $path[1] : '';
+		$isAbsolute = ( $strFirst === '/' ||
+				//windows盘符
+				( stripos( 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $strFirst ) !== false &&
+					$strSecond === ':' ) );
+		$realPath = $path;
+		if( ! $isAbsolute ) {
+			// 通过方法栈得到最近调用源的目录路径，和相对文件路径结合，就可以算出完整路径
+			$callerTrace = self::_getCallerTrace( $ignoreTrace );
+			// 如果有方法使用eval，它在方法栈中的file路径可能会像这样：
+			// /MelonFramework/Melon.php(21) : eval()'d code
+			// 不过没关系，dirname会帮我们处理掉
+			$sourceDir = dirname( $callerTrace['file'] );
+			$realPath = $sourceDir . '/' . $path;
+		}
+		return realpath( $realPath );
 	}
 	
-	private function _debugBacktrace( array $ignore_trace = array() ) {
-		
+	private function _getCallerTrace( array $ignoreTrace = array() ) {
+		$debugBacktrace = debug_backtrace();
+		// 总是把自己忽略掉
+		array_shift( $debugBacktrace );
+		if( empty( $ignoreTrace ) ) {
+			return ( isset( $debugBacktrace[0] ) ? $debugBacktrace[0] : false );
+		}
+		foreach( $debugBacktrace as $trace ) {
+			$func = $trace['function'];
+			if( isset( $trace['class'] ) ) {
+				$method = $trace['class'] . $trace['type'] . $func;
+			}
+			if( ! in_array( $method, $ignoreTrace ) ) {
+				return $trace;
+			}
+		}
+		return false;
 	}
 }
