@@ -20,44 +20,44 @@ class PathTrace {
 	 * @param string $path
 	 * @return string|array|false
 	 */
-	public function parse( $path, $getTrace = false, array $ignoreTrace = array() ) {
+	public function parse( $path, $getLoader = false, array $ignoreTrace = array() ) {
 		if( empty( $path ) ) {
 			return false;
 		}
-		$strFirst = isset( $path[0] ) ? $path[0] : '';
-		$strSecond = isset( $path[1] ) ? $path[1] : '';
+		$strFirst = ( isset( $path[0] ) ? $path[0] : '' );
+		$strSecond = ( isset( $path[1] ) ? $path[1] : '' );
 		$isAbsolute = ( $strFirst === '/' ||
 			//windows盘符
 			( stripos( 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $strFirst ) !== false &&
 				$strSecond === ':' ) );
 		$_path = $path;
-		$callerTrace = array();
+		$loaderTrace = array();
 		if( ! $isAbsolute ) {
 			// 通过方法栈得到最近调用源的目录路径，和相对文件路径结合，就可以算出完整路径
-			$callerTrace = self::_getCallerTrace( $ignoreTrace );
+			$loaderTrace = self::_getLoaderTrace( $ignoreTrace );
 			// 如果有方法使用eval，它在方法栈中的file路径可能会像这样：
 			// /MelonFramework/Melon.php(21) : eval()'d code
 			// 不过没关系，dirname会帮我们处理掉
-			$sourceDir = dirname( $callerTrace['file'] );
+			$sourceDir = dirname( $loaderTrace['file'] );
 			$_path = $sourceDir . DS . $path;
 		}
 		$realPath = realpath( $_path );
-		if( $realPath !== false && $getTrace === true ) {
-			$callerTrace = empty( $callerTrace ) ?
-				self::_getCallerTrace( $ignoreTrace ) : $callerTrace;
-			if( ! empty( $callerTrace ) ) {
+		if( $realPath !== false && $getLoader === true ) {
+			$loaderTrace = ( empty( $loaderTrace ) ?
+				self::_getLoaderTrace( $ignoreTrace ) : $loaderTrace );
+			if( ! empty( $loaderTrace ) ) {
 				return array(
-					'caller' => $callerTrace['file'],
-					'call' => $realPath,
+					'loader' => $loaderTrace['file'],
+					'load' => $realPath,
 				);
 			}
 		}
 		return $realPath;
 	}
 	
-	private function _getCallerTrace( array $ignoreTrace = array() ) {
+	private function _getLoaderTrace( array $ignoreTrace = array() ) {
 		$debugBacktrace = debug_backtrace();
-		// 总是把自己忽略掉
+		// 总是把调用自己的栈忽略掉
 		array_shift( $debugBacktrace );
 		if( empty( $ignoreTrace ) ) {
 			return self::_getTraceByFiltrator( $debugBacktrace, 0 );

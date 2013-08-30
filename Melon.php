@@ -18,22 +18,24 @@ class Base {
 	}
 
 	final static public function load( $file ) {
-		return System\PathTrace::parse( $file, true, array( 'Melon\Base::load' ) );
+		return System\PathTrace::parse( $file, true, array( 'Melon\System\PathTrace::parse' ) );
 	}
 	
 	final static public function callApp() {
 		
 	}
 	
-	final static public function respondApp() {
+	static public function respondApp() {
 		
 	}
 	
 	static public function lang() {
-		print_r( debug_backtrace() );
+		
 	}
 	
 	static public function cache() {
 		
 	}
 }
+
+include ROOT . '/Melon/Loader/BaseLoader.php';
