@@ -8,7 +8,7 @@ define( 'DS', DIRECTORY_SEPARATOR );
 const ROOT = __DIR__;
 
 require ROOT . '/Melon/Exception/BaseException.php';
-require ROOT . '/Melon/Exception/SourceException.php';
+require ROOT . '/Melon/Exception/RuntimeException.php';
 require ROOT . '/Melon/System/PathTrace.php';
 
 class Base {
@@ -38,4 +38,3 @@ class Base {
 	}
 }
 
-include ROOT . '/Melon/Loader/BaseLoader.php';

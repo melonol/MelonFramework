@@ -1,7 +1,6 @@
 <?php
 
 namespace Melon\System;
-use Melon\Exception;
 
 defined( 'IN_MELON' ) or die( 'Permission denied' );
 
@@ -39,7 +38,7 @@ class PathTrace {
 			// /MelonFramework/Melon.php(21) : eval()'d code
 			// 不过没关系，dirname会帮我们处理掉
 			$sourceDir = dirname( $loaderTrace['file'] );
-			$_path = $sourceDir . DS . $path;
+			$_path = $sourceDir . DIRECTORY_SEPARATOR . $path;
 		}
 		$realPath = realpath( $_path );
 		if( $realPath !== false && $getLoader === true ) {
