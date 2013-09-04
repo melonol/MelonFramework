@@ -38,3 +38,4 @@ class Base {
 	}
 }
 
+print_r( System\PathTrace::parse( 'Melon/System/PathTrace.php', true ) );

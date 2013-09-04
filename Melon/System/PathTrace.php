@@ -16,49 +16,73 @@ class PathTrace {
 	}
 	
 	/**
-	 * 解释一个路径
+	 * 解释一个文件或目录路径的真实路径。
 	 * 
-	 * @param string $path
+	 * @param string $target_path 相对或绝对文件、目录路径
+	 * <p>相对路径是相对于执行这个<b>parse</b>方法的文件所在目录路径来说的。
+	 * 比如在<b>/MelonFramework/Melon.php</b>文件中：
+	 * <code>
+	 * echo PathTrace::parse( './Melon/System/PathTrace.php' );
+	 * // 输出：/MelonFramework/System/PathTrace.php
+	 * </code></p>
+	 * 
+	 * @param boolean $getSource [optional] 是否获取调用者的文件路径。一般它用来做一些权限之类的验证
+	 * <p>
+	 * 在<b>/MelonFramework/Melon.php</b>文件中：
+	 * <code>
+	 * print_r( PathTrace::parse( './Melon/System/PathTrace.php', true ) );
+	 * // 输出：
+	 * Array
+	 * (
+	 *		[source] => /MelonFramework/Melon.php
+	 *		[target] => /MelonFramework/Melon/System/PathTrace.php
+	 * )
+	 * </code></p>
+	 * 
+	 * @param array $ignoreTrace [optional] 格式请看<b>self::_getSourceTrace</b>
+	 * <p>如果提供这项参数，并且<i>$getSource</i>设置为<b>true</b>，
+	 * 在调用栈中向上查找<b>source</b>信息的时候，将会忽略包含<i>$ignoreTrace</i>中的方法的栈</p>
+	 * 
 	 * @return string|array|false
 	 */
-	public function parse( $path, $getLoader = false, array $ignoreTrace = array() ) {
-		if( empty( $path ) ) {
+	public function parse( $target_path, $getSource = false, array $ignoreTrace = array() ) {
+		if( empty( $target_path ) ) {
 			return false;
 		}
-		$_path = $path;
+		$_target_path = $target_path;
 		// 初始化一个变量来保存调用者的栈信息
-		$loaderTrace = array();
+		$sourceTrace = array();
 		// 第一步要做的就是要判断这是绝对路径还是相对路径，这样好分别处理
-		$isAbsolute = self::_isAbsolutePath( $path );
+		$isAbsolute = self::_isAbsolutePath( $target_path );
 		if( ! $isAbsolute ) {
 			// 通过栈得到最近调用源的目录路径，和相对文件路径结合，就可以算出绝对路径
-			$loaderTrace = self::_getLoaderTrace( $ignoreTrace );
+			$sourceTrace = self::_getSourceTrace( $ignoreTrace );
 			// 如果有方法使用eval，它在栈中的file路径可能会像这样：
 			//	/MelonFramework/Melon.php(21) : eval()'d code
 			// 不过没关系，dirname会帮我们处理掉特殊的部分
-			$sourceDir = dirname( $loaderTrace['file'] );
-			$_path = $sourceDir . DIRECTORY_SEPARATOR . $path;
+			$sourceDir = dirname( $sourceTrace['file'] );
+			$_target_path = $sourceDir . DIRECTORY_SEPARATOR . $target_path;
 		}
 		// 路径计算完毕，我用realpath来检查有效性，顺便格式化它
-		$realPath = realpath( $_path );
+		$realPath = realpath( $_target_path );
 		// 客户端可能要求获取调用者的路径
 		// 如果调用者和被调用者任意一个路径不存在，统一返回假
-		if( $realPath !== false && $getLoader === true ) {
-			$loaderTrace = ( empty( $loaderTrace ) ?
-				self::_getLoaderTrace( $ignoreTrace ) : $loaderTrace );
-			if( ! empty( $loaderTrace ) ) {
-				$loaderFile = $loaderTrace['file'];
+		if( $realPath !== false && $getSource === true ) {
+			$sourceTrace = ( empty( $sourceTrace ) ?
+				self::_getSourceTrace( $ignoreTrace ) : $sourceTrace );
+			if( ! empty( $sourceTrace ) ) {
+				$sourceFile = $sourceTrace['file'];
 				// 处理eval调用本方法时，file出现的特殊字符
 				// 因为要保留文件名，我用了正则表达式过滤它们
 				// 这是优雅但不太好的解决办法，正则不会很快
 				// 更好的解决办法是：不要使用eval
-				if ( strpos( $loaderFile, 'eval()\'d code' ) !== false ) {
+				if ( strpos( $sourceFile, 'eval()\'d code' ) !== false ) {
 					$evalExp = '/\(\d+\)\s:\seval\(\)\'d\scode/';
-					$loaderFile = preg_replace( $evalExp, '', $loaderFile );
+					$sourceFile = preg_replace( $evalExp, '', $sourceFile );
 				}
 				return array(
-					'loader' => $loaderTrace['file'],
-					'load' => $realPath,
+					'source' => $sourceTrace['file'],
+					'target' => $realPath,
 				);
 			}
 			return false;
@@ -66,6 +90,11 @@ class PathTrace {
 		return $realPath;
 	}
 	
+	/**
+	 * 
+	 * @param type $path
+	 * @return type
+	 */
 	private function _isAbsolutePath( $path = '' ) {
 		// 主流的系统我见过有两种绝对路径：
 		//	一种是以/号开头的，而另一种是字母和:号开头（猜猜看它们可能是什么系统？\偷笑）
@@ -78,7 +107,7 @@ class PathTrace {
 		return $isAbsolute;
 	}
 	
-	private function _getLoaderTrace( array $ignoreTrace = array() ) {
+	private function _getSourceTrace( array $ignoreTrace = array() ) {
 		$debugBacktrace = debug_backtrace();
 		// 总是把调用自己的栈忽略掉
 		array_shift( $debugBacktrace );
