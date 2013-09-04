@@ -11,7 +11,7 @@ defined( 'IN_MELON' ) or die( 'Permission denied' );
  */
 class PathTrace {
 	
-	public function __construct() {
+	private function __construct() {
 		;
 	}
 	
@@ -21,7 +21,7 @@ class PathTrace {
 	 * @param string $path
 	 * @return string|array|false
 	 */
-	public function parse( $path, $getLoader = false, array $ignoreTrace = array() ) {
+	public static function parse( $path, $getLoader = false, array $ignoreTrace = array() ) {
 		if( empty( $path ) ) {
 			return false;
 		}
@@ -29,15 +29,14 @@ class PathTrace {
 		// 初始化一个变量来保存调用者的栈信息
 		$loaderTrace = array();
 		// 第一步要做的就是要判断这是绝对路径还是相对路径，这样好分别处理
-		$isAbsolute = self::_isAbsolutePath( $path );
-		if( ! $isAbsolute ) {
+		if( ! self::_isAbsolutePath( $_path ) ) {
 			// 通过栈得到最近调用源的目录路径，和相对文件路径结合，就可以算出绝对路径
 			$loaderTrace = self::_getLoaderTrace( $ignoreTrace );
 			// 如果有方法使用eval，它在栈中的file路径可能会像这样：
 			//	/MelonFramework/Melon.php(21) : eval()'d code
 			// 不过没关系，dirname会帮我们处理掉特殊的部分
 			$sourceDir = dirname( $loaderTrace['file'] );
-			$_path = $sourceDir . DIRECTORY_SEPARATOR . $path;
+			$_path = $sourceDir . DIRECTORY_SEPARATOR . $_path;
 		}
 		// 路径计算完毕，我用realpath来检查有效性，顺便格式化它
 		$realPath = realpath( $_path );
@@ -66,7 +65,7 @@ class PathTrace {
 		return $realPath;
 	}
 	
-	private function _isAbsolutePath( $path = '' ) {
+	private static function _isAbsolutePath( $path = '' ) {
 		// 主流的系统我见过有两种绝对路径：
 		//	一种是以/号开头的，而另一种是字母和:号开头（猜猜看它们可能是什么系统？\偷笑）
 		// 如果你还见过其它的形式，或者有更好的判断绝对路径的方法，请告诉我
@@ -78,7 +77,7 @@ class PathTrace {
 		return $isAbsolute;
 	}
 	
-	private function _getLoaderTrace( array $ignoreTrace = array() ) {
+	private static function _getLoaderTrace( array $ignoreTrace = array() ) {
 		$debugBacktrace = debug_backtrace();
 		// 总是把调用自己的栈忽略掉
 		array_shift( $debugBacktrace );
@@ -97,7 +96,7 @@ class PathTrace {
 		return false;
 	}
 	
-	private function _getTraceByFiltrator( array $debugBacktrace, $index ) {
+	private static function _getTraceByFiltrator( array $debugBacktrace, $index ) {
 		if( ! isset( $debugBacktrace[ $index ] ) ) {
 			return false;
 		}
