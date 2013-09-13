@@ -5,13 +5,18 @@ namespace Melon\System;
 defined( 'IN_MELON' ) or die( 'Permission denied' );
 
 /**
- * 路径解释器
- * 我认为这能够有效降低系统逻辑的耦合性
- * PathTrace是整个框架的核心部分，而事实上它真的很好用
+ * 路径跟踪器
+ * 
+ * 使用它可以跟踪并解释某次方法调用的所在路径，或者解释一个相对于调用方法所属文件路径的真实路径（绝对路径）
+ * 我把PathTrace当作一个魔术类，能根据逻辑的上下文的产生对应的结果
+ * 
+ * 听起来有点绕，基本上你不需要理解它，交给Melon来做就可以了
+ * 本类使用debug_backtrace函数抓取调用方法栈信息，我把类设置为最简单管理的纯静态
+ * 因为debug_backtrace很灵活，却非常难把握，不当或过度使用将会让你的代码陷于泥潭中
  */
 class PathTrace {
 	
-	public function __construct() {
+	private function __construct() {
 		;
 	}
 	
@@ -45,21 +50,18 @@ class PathTrace {
 	 * 
 	 * @return string|array|false
 	 */
-	public function parse( $target_path, $getSource = false, array $ignoreTrace = array() ) {
+	public function parse( $target_path, $getSource = false ) {
 		if( empty( $target_path ) ) {
 			return false;
 		}
 		$_target_path = $target_path;
+		$ignoreTrace = array( 'Melon\System\PathTrace::parse' );
 		// 初始化一个变量来保存调用者的栈信息
 		$sourceTrace = array();
 		// 第一步要做的就是要判断这是绝对路径还是相对路径，这样好分别处理
-		$isAbsolute = self::_isAbsolutePath( $target_path );
-		if( ! $isAbsolute ) {
+		if( ! self::_isAbsolutePath( $target_path ) ) {
 			// 通过栈得到最近调用源的目录路径，和相对文件路径结合，就可以算出绝对路径
 			$sourceTrace = self::_getSourceTrace( $ignoreTrace );
-			// 如果有方法使用eval，它在栈中的file路径可能会像这样：
-			//	/MelonFramework/Melon.php(21) : eval()'d code
-			// 不过没关系，dirname会帮我们处理掉特殊的部分
 			$sourceDir = dirname( $sourceTrace['file'] );
 			$_target_path = $sourceDir . DIRECTORY_SEPARATOR . $target_path;
 		}
@@ -70,30 +72,32 @@ class PathTrace {
 		if( $realPath !== false && $getSource === true ) {
 			$sourceTrace = ( empty( $sourceTrace ) ?
 				self::_getSourceTrace( $ignoreTrace ) : $sourceTrace );
-			if( ! empty( $sourceTrace ) ) {
-				$sourceFile = $sourceTrace['file'];
-				// 处理eval调用本方法时，file出现的特殊字符
-				// 因为要保留文件名，我用了正则表达式过滤它们
-				// 这是优雅但不太好的解决办法，正则不会很快
-				// 更好的解决办法是：不要使用eval
-				if ( strpos( $sourceFile, 'eval()\'d code' ) !== false ) {
-					$evalExp = '/\(\d+\)\s:\seval\(\)\'d\scode/';
-					$sourceFile = preg_replace( $evalExp, '', $sourceFile );
-				}
-				return array(
-					'source' => $sourceTrace['file'],
-					'target' => $realPath,
-				);
+			if( empty( $sourceTrace ) ) {
+				return false;
 			}
-			return false;
+			return array(
+				'source' => $sourceTrace['file'],
+				'target' => $realPath,
+			);
 		}
 		return $realPath;
 	}
 	
 	/**
+	 * 获取调用自己的方法的所在文件
 	 * 
-	 * @param type $path
-	 * @return type
+	 * @return string|false
+	 */
+	public function getSourceFile() {
+		$sourceTrace = self::_getSourceTrace( array( 'Melon\System\PathTrace::getSourceFile' ) );
+		return empty( $sourceTrace ) ? false : $sourceTrace['file'];
+	}
+	
+	/**
+	 * 判断一个路径是否为绝对的
+	 * 
+	 * @param string $path 被判断的路径
+	 * @return boolean
 	 */
 	private function _isAbsolutePath( $path = '' ) {
 		// 主流的系统我见过有两种绝对路径：
@@ -107,25 +111,60 @@ class PathTrace {
 		return $isAbsolute;
 	}
 	
+	/**
+	 * 通过php提供的debug_backtrace函数中获取调用源的栈
+	 * 
+	 * 为了方便处理，它总是把调用自己的栈忽略掉
+	 * 
+	 * @param array $ignoreTrace [optional] 忽略哪些栈，$ignoreTrace的元素是方法名
+	 * 如果是函数，则方法名为栈的function值；如果是方法，则由栈的class、type、function连接得出
+	 * @return array|false
+	 */
 	private function _getSourceTrace( array $ignoreTrace = array() ) {
 		$debugBacktrace = debug_backtrace();
 		// 总是把调用自己的栈忽略掉
 		array_shift( $debugBacktrace );
+		
+		$sourceTrace = array();
 		if( empty( $ignoreTrace ) ) {
-			return self::_getTraceByFiltrator( $debugBacktrace, 0 );
+			$sourceTrace = self::_getTraceByFiltrator( $debugBacktrace, 0 );
+		} else {
+			foreach( $debugBacktrace as $index => $backtrace ) {
+				$func = $backtrace['function'];
+				if( isset( $backtrace['class'] ) ) {
+					$func = $backtrace['class'] . $backtrace['type'] . $func;
+				}
+				if( ! in_array( $func, $ignoreTrace ) ) {
+					$sourceTrace = self::_getTraceByFiltrator( $debugBacktrace, $index );
+				}
+			}
 		}
-		foreach( $debugBacktrace as $index => $backtrace ) {
-			$func = $backtrace['function'];
-			if( isset( $backtrace['class'] ) ) {
-				$func = $backtrace['class'] . $backtrace['type'] . $func;
+		if( ! empty( $sourceTrace ) ) {
+			$sourceFile = &$sourceTrace['file'];
+			// 如果有方法使用eval，它在栈中的file路径可能会像这样：
+			//	/MelonFramework/Melon.php(21) : eval()'d code
+			// 我用了正则表达式过滤它们,这是优雅但不太好的解决办法，正则不会很快
+			// 更好的解决办法是：不要使用eval
+			if ( strpos( $sourceFile, 'eval()\'d code' ) !== false ) {
+				$evalExp = '/\(\d+\)\s:\seval\(\)\'d\scode/';
+				$sourceFile = preg_replace( $evalExp, '', $sourceFile );
 			}
-			if( ! in_array( $func, $ignoreTrace ) ) {
-				return self::_getTraceByFiltrator( $debugBacktrace, $index );
-			}
+			return $sourceTrace;
 		}
 		return false;
 	}
 	
+	/**
+	 * 根据索引获取某个栈
+	 * 
+	 * 由于PHP提供的内部调用方法（比如call_user_func）不会产生栈来源
+	 * 不过会一次产生两个栈信息，其中一个是正常的，另一个是没有file值的
+	 * 这会对我们的操作产生影响，我们需要一个过滤器把它过滤掉
+	 * 
+	 * @param array $debugBacktrace 来自debug_backtrace方法的栈
+	 * @param int $index 栈索引
+	 * @return array|boolean
+	 */
 	private function _getTraceByFiltrator( array $debugBacktrace, $index ) {
 		if( ! isset( $debugBacktrace[ $index ] ) ) {
 			return false;

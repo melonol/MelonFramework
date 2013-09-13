@@ -3,7 +3,6 @@ namespace Melon;
 use Melon\System;
 
 define( 'IN_MELON', true );
-define( 'DS', DIRECTORY_SEPARATOR );
 
 const ROOT = __DIR__;
 
@@ -11,17 +10,23 @@ require ROOT . '/Melon/Exception/BaseException.php';
 require ROOT . '/Melon/Exception/RuntimeException.php';
 require ROOT . '/Melon/System/PathTrace.php';
 
+spl_autoload_register('\Melon\Base::autoload');
+
 class Base {
+	
+	private static $_includePath = array(
+		
+	);
 	
 	final protected function __construct() {
 		;
 	}
 
-	final static public function load( $file ) {
-		return System\PathTrace::parse( $file, true, array( 'Melon\System\PathTrace::parse' ) );
+	final public static function load( $file ) {
+		return System\PathTrace::parse( $file, true );
 	}
 	
-	final static public function callApp() {
+	final public static function callApp() {
 		
 	}
 	
@@ -36,6 +41,20 @@ class Base {
 	static public function cache() {
 		
 	}
+	
+	final public static function setIncludePath($path) {
+		$this->_includePath[] = $path;
+	}
+	
+	final public static function autoLoad($class) {
+//		foreach( $this->_includePath ) {
+//			
+//		}
+	}
+	
+	public static function run() {
+		print_r( System\PathTrace::getSourceFile() );
+	}
 }
 
-print_r( System\PathTrace::parse( 'Melon/System/PathTrace.php', true ) );
+//new Melon\File\Load();

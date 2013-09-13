@@ -11,16 +11,29 @@ print_r( \Melon\Base::load( 'D:\apmserv\www\htdocs\7725\p7725svr\read.txt' ) );
 /**
  * 
  */
-abstract class BaseLoader {
+class File {
 	
-	abstract public function load();
-	
-	protected function _debugBacktrace() {
+	function load() {
 		
 	}
 	
-	protected function _permissionValidation() {
+	function exists() {
 		
 	}
-
+	
+	function read() {
+		
+	}
+	
+	function write() {
+		
+	}
+	
+	function move() {
+		
+	}
+	
+	function copy() {
+		
+	}
 }
