@@ -24,16 +24,15 @@ class PathTrace {
 	 * 解释一个文件或目录路径的真实路径。
 	 * 
 	 * @param string $target_path 相对或绝对文件、目录路径
-	 * <p>相对路径是相对于执行这个<b>parse</b>方法的文件所在目录路径来说的。
-	 * 比如在<b>/MelonFramework/Melon.php</b>文件中：
+	 * 相对路径是相对于执行这个 parse 方法的文件所在目录路径来说的。
+	 * 比如在 /MelonFramework/Melon.php 文件中：
 	 * <code>
 	 * echo PathTrace::parse( './Melon/System/PathTrace.php' );
 	 * // 输出：/MelonFramework/System/PathTrace.php
-	 * </code></p>
+	 * </code>
 	 * 
 	 * @param boolean $getSource [optional] 是否获取调用者的文件路径。一般它用来做一些权限之类的验证
-	 * <p>
-	 * 在<b>/MelonFramework/Melon.php</b>文件中：
+	 * 在 /MelonFramework/Melon.php 文件中：
 	 * <code>
 	 * print_r( PathTrace::parse( './Melon/System/PathTrace.php', true ) );
 	 * // 输出：
@@ -42,15 +41,15 @@ class PathTrace {
 	 *		[source] => /MelonFramework/Melon.php
 	 *		[target] => /MelonFramework/Melon/System/PathTrace.php
 	 * )
-	 * </code></p>
+	 * </code>
 	 * 
-	 * @param array $ignoreTrace [optional] 格式请看<b>self::_getSourceTrace</b>
-	 * <p>如果提供这项参数，并且<i>$getSource</i>设置为<b>true</b>，
-	 * 在调用栈中向上查找<b>source</b>信息的时候，将会忽略包含<i>$ignoreTrace</i>中的方法的栈</p>
+	 * @param array $ignoreTrace [optional] 格式请看 self::_getSourceTrace 
+	 * 如果提供这项参数，并且 $getSource 设置为 true ，
+	 * 在调用栈中向上查找 source 信息的时候，将会忽略包含 $ignoreTrace 中的方法的栈
 	 * 
 	 * @return string|array|false
 	 */
-	public function parse( $target_path, $getSource = false ) {
+	public static function parse( $target_path, $getSource = false, array $ignoreTrace = array() ) {
 		if( empty( $target_path ) ) {
 			return false;
 		}
@@ -59,7 +58,7 @@ class PathTrace {
 		// 初始化一个变量来保存调用者的栈信息
 		$sourceTrace = array();
 		// 第一步要做的就是要判断这是绝对路径还是相对路径，这样好分别处理
-		if( ! self::_isAbsolutePath( $target_path ) ) {
+		if( ! self::_isAbsolutePath( $_target_path ) ) {
 			// 通过栈得到最近调用源的目录路径，和相对文件路径结合，就可以算出绝对路径
 			$sourceTrace = self::_getSourceTrace( $ignoreTrace );
 			$sourceDir = dirname( $sourceTrace['file'] );
@@ -99,7 +98,7 @@ class PathTrace {
 	 * @param string $path 被判断的路径
 	 * @return boolean
 	 */
-	private function _isAbsolutePath( $path = '' ) {
+	private static function _isAbsolutePath( $path = '' ) {
 		// 主流的系统我见过有两种绝对路径：
 		//	一种是以/号开头的，而另一种是字母和:号开头（猜猜看它们可能是什么系统？\偷笑）
 		// 如果你还见过其它的形式，或者有更好的判断绝对路径的方法，请告诉我
@@ -120,7 +119,7 @@ class PathTrace {
 	 * 如果是函数，则方法名为栈的function值；如果是方法，则由栈的class、type、function连接得出
 	 * @return array|false
 	 */
-	private function _getSourceTrace( array $ignoreTrace = array() ) {
+	private static function _getSourceTrace( array $ignoreTrace = array() ) {
 		$debugBacktrace = debug_backtrace();
 		// 总是把调用自己的栈忽略掉
 		array_shift( $debugBacktrace );
@@ -165,7 +164,7 @@ class PathTrace {
 	 * @param int $index 栈索引
 	 * @return array|boolean
 	 */
-	private function _getTraceByFiltrator( array $debugBacktrace, $index ) {
+	private static function _getTraceByFiltrator( array $debugBacktrace, $index ) {
 		if( ! isset( $debugBacktrace[ $index ] ) ) {
 			return false;
 		}
