@@ -62,7 +62,7 @@ class PathTrace {
 			// 通过栈得到最近调用源的目录路径，和相对文件路径结合，就可以算出绝对路径
 			$sourceTrace = self::_getSourceTrace( $ignoreTrace );
 			$sourceDir = dirname( $sourceTrace['file'] );
-			$_target_path = $sourceDir . DIRECTORY_SEPARATOR . $target_path;
+			$_target_path = $sourceDir . DIRECTORY_SEPARATOR . $_target_path;
 		}
 		// 路径计算完毕，我用realpath来检查有效性，顺便格式化它
 		$realPath = realpath( $_target_path );
@@ -135,6 +135,7 @@ class PathTrace {
 				}
 				if( ! in_array( $func, $ignoreTrace ) ) {
 					$sourceTrace = self::_getTraceByFiltrator( $debugBacktrace, $index );
+					break;
 				}
 			}
 		}
@@ -162,7 +163,7 @@ class PathTrace {
 	 * 
 	 * @param array $debugBacktrace 来自debug_backtrace方法的栈
 	 * @param int $index 栈索引
-	 * @return array|boolean
+	 * @return array|false
 	 */
 	private static function _getTraceByFiltrator( array $debugBacktrace, $index ) {
 		if( ! isset( $debugBacktrace[ $index ] ) ) {

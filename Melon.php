@@ -10,7 +10,9 @@ require ROOT . '/Melon/Exception/BaseException.php';
 require ROOT . '/Melon/Exception/RuntimeException.php';
 require ROOT . '/Melon/System/PathTrace.php';
 
-spl_autoload_register('\Melon\Base::autoload');
+spl_autoload_register(function($classname) {
+	echo System\PathTrace::getSourceFile();exit;
+});
 
 class Base {
 	
@@ -23,7 +25,7 @@ class Base {
 	}
 
 	final public static function load( $file ) {
-		return System\PathTrace::parse( $file, true );
+		return System\PathTrace::parse( $file, false );
 	}
 	
 	final public static function callApp() {
@@ -57,4 +59,4 @@ class Base {
 	}
 }
 
-//new Melon\File\Load();
+include Base::load('./Melon/System/Loader.php');
