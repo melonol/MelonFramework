@@ -1,9 +1,10 @@
 <?php
 
-define( 'IN_MELON', true );
-require __DIR__ . '/../../common_inc.php';
-require_once MELON_ROOT . '/Melon/System/PathTrace.php';
-use Melon\System;
+define('IN_MELON', true);
+define('MELON_ROOT', '/www/Melon/MelonFramework/');
+
+require_once MELON_ROOT . '/Melon/PathTrace.php';
+use Melon;
 
 class PathTraceTest extends PHPUnit_Framework_TestCase {
 	
@@ -20,10 +21,14 @@ class PathTraceTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testParse() {
 		$file = basename($this->_realpath);
-		$method_str = '\Melon\System\PathTrace::parse';
+		$method_str = '\Melon\PathTrace::parse';
+//		$function = new ReflectionFunction('title');
+//		echo $function->invokeArgs(array('Dr', 'Phil'));
+
+		error_log(\Melon\PathTrace::parse( $file ), 3, 'err.txt');
 		//期望正确
 		$this->assertEquals(
-			\Melon\System\PathTrace::parse( $file ),
+			\Melon\PathTrace::parse( $file ),
 			$this->_realpath
 		);
 		$this->assertEquals(
@@ -55,7 +60,7 @@ class PathTraceTest extends PHPUnit_Framework_TestCase {
 				continue;
 			}
 			$this->assertFalse(
-				\Melon\System\PathTrace::parse( $file ), $file
+				\Melon\PathTrace::parse( $file ), $file
 			);
 			$this->assertFalse(
 				call_user_func( $method_str, $file ), $file
