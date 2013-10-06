@@ -1,10 +1,8 @@
 <?php
-
 define('IN_MELON', true);
 define('MELON_ROOT', '/www/Melon/MelonFramework/');
 
-require_once MELON_ROOT . '/Melon/PathTrace.php';
-use Melon;
+require_once MELON_ROOT . '/Melon/File/PathTrace.php';
 
 class PathTraceTest extends PHPUnit_Framework_TestCase {
 	
@@ -20,15 +18,12 @@ class PathTraceTest extends PHPUnit_Framework_TestCase {
 	 * 比如call_user_func、eval
 	 */
 	public function testParse() {
-		$file = basename($this->_realpath);
-		$method_str = '\Melon\PathTrace::parse';
-//		$function = new ReflectionFunction('title');
-//		echo $function->invokeArgs(array('Dr', 'Phil'));
-
-		error_log(\Melon\PathTrace::parse( $file ), 3, 'err.txt');
+		$file = basename( $this->_realpath );
+		$method_str = '\Melon\File\PathTrace::parse';
+		
 		//期望正确
 		$this->assertEquals(
-			\Melon\PathTrace::parse( $file ),
+			\Melon\File\PathTrace::parse( $file ),
 			$this->_realpath
 		);
 		$this->assertEquals(
@@ -54,14 +49,15 @@ class PathTraceTest extends PHPUnit_Framework_TestCase {
 		
 		//期望失败
 		//随便拿几个文件和目录
-		$dir = scandir( MELON_ROOT );
+		$dir = scandir( MELON_ROOT . '/Melon' );
 		foreach( $dir as $file ) {
 			if( $file == '.' || $file == '..' ) {
 				continue;
 			}
 			$this->assertFalse(
-				\Melon\PathTrace::parse( $file ), $file
+				\Melon\File\PathTrace::parse( $file ), $file
 			);
+			error_log( call_user_func( $method_str, $file ), 3, 'err.txt' );
 			$this->assertFalse(
 				call_user_func( $method_str, $file ), $file
 			);

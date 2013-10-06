@@ -5,9 +5,9 @@ call_user_func( function() {
 	
 	require __DIR__ . '/Melon/Exception/BaseException.php';
 	require __DIR__ . '/Melon/Exception/RuntimeException.php';
-	require __DIR__ . '/Melon/PathTrace.php';
 	require __DIR__ . '/Melon/Helper/Set.php';
 	require __DIR__ . '/Melon/Helper/RecursiveSet.php';
+	require __DIR__ . '/Melon/File/PathTrace.php';
 	require __DIR__ . '/Melon/File/LoaderSet.php';
 	spl_autoload_register( '\Melon::autoload' );
 } );
@@ -44,3 +44,6 @@ class Melon {
 		print_r( \Melon\PathTrace::getSourceFile() );
 	}
 }
+
+$arr  = array( 'k1' => null );
+echo isset( $arr['k1'] ) ? '1' : '0';

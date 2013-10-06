@@ -1,15 +1,38 @@
 <?php
-/**
- * 
- * 参考了PHP Slim框架的Set类的接口，作者写得很好，几乎完美了，我简单的借鉴一下 :)
- * Slim官网：http://www.slimframework.com/
- */
 
 namespace Melon\Helper;
 
 defined( 'IN_MELON' ) or die( 'Permission denied' );
 
-class Set implements \ArrayAccess, \Countable, \IteratorAggregate {
+/**
+ * 使用SPL接口模拟数组行为的类
+ * 参考了PHP Slim框架的Set类的接口，作者写得很好，我简单的借鉴一下 :)
+ * 
+ * 它可以产生一个类似数组的对象：
+ * <code>
+ * $arr = new \Melon\Helper\Set();
+ * // 使用方法添加元素
+ * $arr->set( 'k1', 1 );
+ * // 使用对象属性添加元素
+ * $arr->k2 = 2;
+ * // 使用中括号添加元素
+ * $arr['k3'] = 3;
+ * 
+ * // 输出
+ * print_r( $arr->getItems() );
+ * Array
+ * (
+ *     [k1] => 1
+ *     [k2] => 2
+ *     [k3] => 3
+ * )
+ * // 同时你也可以使用foreach来遍历它
+ * foreach( $arr as $key => $value );
+ * // 也很容易获取它的元素总数
+ * count( $arr );
+ * </code>
+ */
+class Set implements \ArrayAccess, \IteratorAggregate, \Countable {
 	
 	// 替换模式
 	// 你可以查看Set::set或者Set::setItems方法了解
@@ -29,6 +52,15 @@ class Set implements \ArrayAccess, \Countable, \IteratorAggregate {
 	 */
 	protected $_array;
 	
+	/**
+	 * 
+	 * @param array $items
+	 * @param enum $replaceMode [可选] 替换模式，如果存在相同键名元素时被触发
+	 * 替换模式分别有：
+	 * 1. Set::REPLACE_NOT			不进行替换
+	 * 2. Set::REPLACE_ABSOLUTE		[默认] 严格，无条件替换原来的值
+	 * 3. Set::REPLACE_RELAXED		宽松，如果$value能够被PHP empty转为假值（null、''、0、false、空数组），则不替换
+	 */
 	public function __construct( array $items = array(), $replaceMode = self::REPLACE_ABSOLUTE ) {
 		$this->_replaceMode = $replaceMode;
 		$this->setItems( $items );
@@ -49,23 +81,17 @@ class Set implements \ArrayAccess, \Countable, \IteratorAggregate {
 	 * 
 	 * @param mixed $key 键名
 	 * @param mixed $value 值
-	 * @param enum $replaceMode [可选] 替换模式，如果存在相同键名元素时被触发
-	 * 替换模式分别有：
-	 * 1. Set::REPLACE_NOT			不进行替换
-	 * 2. Set::REPLACE_ABSOLUTE		[默认] 严格，无条件替换原来的值
-	 * 3. Set::REPLACE_RELAXED		宽松，如果$value能够被PHP empty转为假值（null、''、0、false、空数组），则不替换
 	 * @return Set $this
 	 * @see Set::setItems
 	 */
-	public function set( $key, $value, $replaceMode = null ) {
+	public function set( $key, $value ) {
 		$normalizeKey = $this->_normalizeKey( $key );
 		if( ! isset( $this->_array[ $normalizeKey ] ) ) {
 			$this->_array[ $normalizeKey ] = $value;
 			return;
 		}
-		$_replaceMode = ( is_null( $replaceMode ) ? $this->_replaceMode : $replaceMode );
 		//替换模式
-		switch( $_replaceMode ) {
+		switch( $this->_replaceMode ) {
 			case self::REPLACE_NOT :
 				//它不用做任何事情
 				break;
@@ -86,16 +112,11 @@ class Set implements \ArrayAccess, \Countable, \IteratorAggregate {
 	 * 设置一组元素
 	 * 
 	 * @param array $items 包含常规的键值对元素的数组，程序会将其合并到当前数组里
-	 * @param enum $replaceMode [optional] 替换模式，如果存在相同键名元素时被触发
-	 * 替换模式分别有：
-	 * 1. Set::REPLACE_NOT			不进行替换
-	 * 2. Set::REPLACE_ABSOLUTE		[默认] 严格，无条件替换原来的值
-	 * 3. Set::REPLACE_RELAXED		宽松，如果$value能够被PHP empty转为假值（null、''、0、false、空数组），则不替换
 	 * @return Set $this
 	 */
-	public function setItems( array $items, $replaceMode = null ) {
+	public function setItems( array $items ) {
 		foreach( $items as $key => $value ) {
-			$this->set( $key, $value, $replaceMode );
+			$this->set( $key, $value );
 		}
 		return $this;
 	}
@@ -104,7 +125,7 @@ class Set implements \ArrayAccess, \Countable, \IteratorAggregate {
 	 * 获取元素
 	 * 
 	 * @param mixed $key
-	 * @return mixed
+	 * @return mixed 如果元素不存在则返回null
 	 */
 	public function get( $key ) {
 		$normalizeKey = $this->_normalizeKey( $key );
