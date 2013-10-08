@@ -1,30 +1,57 @@
 <?php
 
-call_user_func( function() {
-	define( 'IN_MELON', true );
-	
-	require __DIR__ . '/Melon/Exception/BaseException.php';
-	require __DIR__ . '/Melon/Exception/RuntimeException.php';
-	require __DIR__ . '/Melon/Helper/Set.php';
-	require __DIR__ . '/Melon/Helper/RecursiveSet.php';
-	require __DIR__ . '/Melon/File/PathTrace.php';
-	require __DIR__ . '/Melon/File/LoaderSet.php';
-	spl_autoload_register( '\Melon::autoload' );
-} );
-
+define( 'IN_MELON', true );
 
 class Melon {
 	
-	const ROOT = __DIR__;
-	
-	private static $_autoload = null;
-	
+	static protected $_loaderSet;
+
+	private $_autoload = array(
+	);
+
 	final protected function __construct() {
 		;
 	}
+	
+	static public function init() {
+		if( defined( 'MELON_INIT' ) ) {
+			return;
+		}
+		
+		$melonRoot = __DIR__ . DIRECTORY_SEPARATOR . 'Melon' . DIRECTORY_SEPARATOR;
+		static::_initLoader( array(
+			$melonRoot . 'Exception' . DIRECTORY_SEPARATOR . 'BaseException.php',
+			$melonRoot . 'Exception' . DIRECTORY_SEPARATOR . 'RuntimeException.php',
+			$melonRoot . 'Helper' . DIRECTORY_SEPARATOR . 'Set.php',
+			$melonRoot . 'Helper' . DIRECTORY_SEPARATOR . 'RecursiveSet.php',
+			$melonRoot . 'File' . DIRECTORY_SEPARATOR . 'PathTrace.php',
+			$melonRoot . 'File' . DIRECTORY_SEPARATOR . 'LoaderSet.php',
+		) );
+		
+		define( 'MELON_INIT', true );
+	}
+	
+	static private function _initLoader( $autoload ) {
+		self::$_loaderSet = new \Melon\File\LoaderSet( $loads,
+			\Melon\File\LoaderSet::REPLACE_NOT );
+		foreach( $autoload as $script ) {
+			require $script;
+			self::$_loaderSet->set( $script, true );
+		}
+		spl_autoload_register( '\Melon::autoload' );
+	}
 
-	final public static function load( $file ) {
+	final static public function load( $file ) {
 		return PathTrace::parse( $file, false );
+	}
+	
+	final static public function autoLoad( $class ) {
+		echo $class;
+		exit;
+	}
+	
+	static public function env() {
+		print_r( self::$_loaderSet );
 	}
 	
 	static public function lang() {
@@ -35,15 +62,15 @@ class Melon {
 		
 	}
 	
-	final public static function autoLoad( $class ) {
-		echo $class;
-		exit;
-	}
-	
-	public static function run() {
-		print_r( \Melon\PathTrace::getSourceFile() );
+	static public function run() {
+		print_r( \Melon\File\PathTrace::getSourceFile() );
 	}
 }
 
-$arr  = array( 'k1' => null );
-echo isset( $arr['k1'] ) ? '1' : '0';
+class cms extends Melon {
+	static public function init() {
+		parent::init();
+	}
+}
+Melon::init();
+cms::init();
