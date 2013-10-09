@@ -35,7 +35,6 @@ defined( 'IN_MELON' ) or die( 'Permission denied' );
 class Set implements \ArrayAccess, \IteratorAggregate, \Countable {
 	
 	// 替换模式
-	// 你可以查看Set::set或者Set::setItems方法了解
 	const REPLACE_NOT = 1;
 	const REPLACE_RELAXED = 2;
 	const REPLACE_ABSOLUTE = 3;

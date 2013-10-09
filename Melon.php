@@ -32,12 +32,13 @@ class Melon {
 	}
 	
 	static private function _initLoader( $autoload ) {
-		self::$_loaderSet = new \Melon\File\LoaderSet( $loads,
-			\Melon\File\LoaderSet::REPLACE_NOT );
+        $scripts = array();
 		foreach( $autoload as $script ) {
 			require $script;
-			self::$_loaderSet->set( $script, true );
+            $scripts[ $script ] = true;
 		}
+		self::$_loaderSet = new \Melon\File\LoaderSet( $scripts,
+			\Melon\File\LoaderSet::REPLACE_NOT );
 		spl_autoload_register( '\Melon::autoload' );
 	}
 
@@ -73,4 +74,3 @@ class cms extends Melon {
 	}
 }
 Melon::init();
-cms::init();
