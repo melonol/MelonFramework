@@ -90,6 +90,7 @@ class Set implements \ArrayAccess, \IteratorAggregate, \Countable {
 			return;
 		}
 		//替换模式
+		//TODO::相同键名的抛出一个警告
 		switch( $this->_replaceMode ) {
 			case self::REPLACE_NOT :
 				//它不用做任何事情
