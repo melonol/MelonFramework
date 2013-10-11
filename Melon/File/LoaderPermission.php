@@ -14,6 +14,9 @@ defined( 'IN_MELON' ) or die( 'Permission denied' );
  * 程序给出一组包含路径，当加载的目标文件路径存在这组包含路径中的时候，就会要求检查权限
  * 当目标路径名称含有某个特定的前缀时，它属于同级目录下的特定脚本文件私有的
  * 除了这些脚本文件外，其它人没有权限去读取它们
+ * 
+ * 类中所使用到的路径参数都必需是一组标准的，没有冗余的系统路径格式
+ * 因为程序不会做任何处理，减少realpath的调用
  */
 class LoaderPermission {
 	
@@ -33,29 +36,12 @@ class LoaderPermission {
 	 * 构造函数
 	 * 
 	 * @param array $includePath 包含路径数组，如果'目标路径'存在包含路径中，则'载入者路径'会被检查文件读取权限
-	 * 即是说包含路径是一组被管辖的范围
+	 * 即是说包含路径是一组被管辖的范围，标准的系统路径格式
 	 * @param string $privatePre 私有权限的前缀标识符
 	 */
 	public function __construct( array $includePath, $privatePre = '_' ) {
-		$this->_setIncludePath( $includePath );
+		$this->_includePath[] = $includePath;
 		$this->_privatePre = $privatePre;
-	}
-	
-	/**
-	 * 设置包含路径
-	 * 
-	 * @param array $includePath 包含路径数组，每个路径必需是有效的，否则会被抛出异常
-	 * @throws Exception\RuntimeException
-	 * @return void
-	 */
-	protected function _setIncludePath( array $includePath ) {
-		foreach( $includePath as $path ) {
-			$realPath = realpath( $path );
-			if( $realPath === false ) {
-				throw new Exception\RuntimeException( "{$path}不是一个有效的路径" );
-			}
-			$this->_includePath[] = $realPath;
-		}
 	}
 	
 	/**
@@ -84,18 +70,12 @@ class LoaderPermission {
 	 * 
 	 * 另外载入者路径和目标路径都必需是有效的，否则会被抛出异常
 	 * 
-	 * @param string $source 载入者路径
-	 * @param string $target 目标路径
+	 * @param string $source 载入者路径，标准的系统路径格式
+	 * @param string $target 目标路径，标准的系统路径格式
 	 * @return boolean
 	 * @throws Exception\RuntimeException
 	 */
 	public function verify( $source, $target ) {
-		$_source = realpath( $source );
-		$_target = realpath( $target );
-		if( ! $_source || ! $_target ) {
-			$errorFile = ( $_source ? $target : $source );
-			throw new Exception\RuntimeException( "{$errorFile}不是一个有效的文件" );
-		}
 		// 准备开始检查权限，我设定如果满足要求，就立刻让程序返回
 		// 可能违背了结构化编程原则，但如果要在这里遵守它，多层的if嵌套会让我头晕
 		// 我喜欢遵守规则，但不喜欢看上去混乱的东西
@@ -109,10 +89,11 @@ class LoaderPermission {
 		if( $noPrivate ) {
 			return true;
 		}
-		// 同级目录？
 		// 我要加上一个目录分隔符做结尾，防止因为包含片段名称（比如'dir'和'directory'）可能导致的一些问题
 		$sourceDir = dirname( $_source ) . DIRECTORY_SEPARATOR;
 		$targetDir = dirname( $_target ) . DIRECTORY_SEPARATOR;
+		
+		// 同级目录？
 		if( $sourceDir === $targetDir ) {
 			return true;
 		}
