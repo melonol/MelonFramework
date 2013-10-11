@@ -4,15 +4,11 @@ define( 'IN_MELON', true );
 
 class Melon {
 	
-	static protected $_loaderSet;
-	
-	static protected $_permission;
+	static protected $_melon;
 	
 	static protected $_includePath = array(
 		__DIR__
 	);
-
-	static protected $_autoload;
 
 	final protected function __construct() {
 		;
@@ -24,29 +20,28 @@ class Melon {
 		}
 		
 		$melonRoot = __DIR__ . DIRECTORY_SEPARATOR . 'Melon' . DIRECTORY_SEPARATOR;
-		static::_initLoader( array(
+		$autoload = array(
 			$melonRoot . 'Exception' . DIRECTORY_SEPARATOR . 'BaseException.php',
 			$melonRoot . 'Exception' . DIRECTORY_SEPARATOR . 'RuntimeException.php',
 			$melonRoot . 'Helper' . DIRECTORY_SEPARATOR . 'Set.php',
-			$melonRoot . 'Helper' . DIRECTORY_SEPARATOR . 'RecursiveSet.php',
 			$melonRoot . 'File' . DIRECTORY_SEPARATOR . 'PathTrace.php',
 			$melonRoot . 'File' . DIRECTORY_SEPARATOR . 'LoaderSet.php',
 			$melonRoot . 'File' . DIRECTORY_SEPARATOR . 'LoaderPermission.php',
-		) );
+		);
 		
-		define( 'MELON_INIT', true );
-	}
-	
-	static private function _initLoader( $autoload ) {
 		$scripts = array();
 		foreach( $autoload as $script ) {
 			require $script;
 			$scripts[ $script ] = true;
 		}
-		self::$_loaderSet = new \Melon\File\LoaderSet( $scripts,
+		self::$_melon = new \Melon\Helper\Set( array(), \Melon\Helper\Set::REPLACE_NOT );
+		self::$_melon->loaderSet = new \Melon\File\LoaderSet( $scripts,
 			\Melon\File\LoaderSet::REPLACE_NOT );
-		self::$_permission = new \Melon\File\LoaderPermission( self::$_includePath );
+		self::$_melon->permission = new \Melon\File\LoaderPermission( self::$_includePath );
+		
 		spl_autoload_register( '\Melon::autoload' );
+		
+		define( 'MELON_INIT', true );
 	}
 
 	final static public function load( $script ) {
@@ -57,12 +52,12 @@ class Melon {
 		if( ! is_file( $load['target'] ) ) {
 			throw new \Melon\Exception\RuntimeException( "{$script}不是一个文件" );
 		}
-		if( ! self::$_loaderSet->has( $load['target'] ) ) {
-			if( ! self::$_permission->verify( $load['source'], $load['target'] ) ) {
+		if( ! self::$_melon->loaderSet->has( $load['target'] ) ) {
+			if( ! self::$_melon->permission->verify( $load['source'], $load['target'] ) ) {
 				throw new \Melon\Exception\RuntimeException( "{$load['source']}脚本没有权限载入{$load['target']}脚本" );
 			}
 			include $load['target'];
-			self::$_loaderSet->set( $load['target'], true );
+			self::$_melon->loaderSet->set( $load['target'], true );
 		}
 	}
 	
@@ -76,7 +71,7 @@ class Melon {
 			// TODO::改为抛出警告
 			throw new \Melon\Exception\RuntimeException( "{$script}不是一个文件" );
 		}
-		if( ! self::$_permission->verify( $load['source'], $load['target'] ) ) {
+		if( ! self::$_melon->permission->verify( $load['source'], $load['target'] ) ) {
 			// TODO::改为抛出警告
 			throw new \Melon\Exception\RuntimeException( "{$load['source']}脚本没有权限载入{$load['target']}脚本" );
 		}
@@ -92,7 +87,7 @@ class Melon {
 	}
 	
 	static public function env() {
-		print_r( self::$_loaderSet );
+		print_r( self::$_melon->loaderSet );
 	}
 	
 	static public function lang() {
@@ -108,8 +103,10 @@ class Melon {
 	}
 }
 
+Melon::init();
 class cms extends Melon {
 	static public function init() {
 		parent::init();
+		print_r( self::$_melon );
 	}
 }
