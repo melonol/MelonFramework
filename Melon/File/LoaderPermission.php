@@ -40,7 +40,7 @@ class LoaderPermission {
 	 * @param string $privatePre 私有权限的前缀标识符
 	 */
 	public function __construct( array $includePath, $privatePre = '_' ) {
-		$this->_includePath[] = $includePath;
+		$this->_includePath = $includePath;
 		$this->_privatePre = $privatePre;
 	}
 	
@@ -81,24 +81,24 @@ class LoaderPermission {
 		// 我喜欢遵守规则，但不喜欢看上去混乱的东西
 		
 		// 不在检查范围内？
-		if( ! $this->_inRange( $_target ) ) {
+		if( ! $this->_inRange( $target ) ) {
 			return true;
 		}
 		// 没有私有文件或者目录？
-		$noPrivate = ( strpos( $_target, DIRECTORY_SEPARATOR . $this->_privatePre ) === false );
+		$noPrivate = ( strpos( $target, DIRECTORY_SEPARATOR . $this->_privatePre ) === false );
 		if( $noPrivate ) {
 			return true;
 		}
 		// 我要加上一个目录分隔符做结尾，防止因为包含片段名称（比如'dir'和'directory'）可能导致的一些问题
-		$sourceDir = dirname( $_source ) . DIRECTORY_SEPARATOR;
-		$targetDir = dirname( $_target ) . DIRECTORY_SEPARATOR;
+		$sourceDir = dirname( $source ) . DIRECTORY_SEPARATOR;
+		$targetDir = dirname( $target ) . DIRECTORY_SEPARATOR;
 		
 		// 同级目录？
 		if( $sourceDir === $targetDir ) {
 			return true;
 		}
 		// 再确定一下是否是私有文件
-		if( strpos( basename( $_target ), $this->_privatePre ) !== 0 ) {
+		if( strpos( basename( $target ), $this->_privatePre ) !== 0 ) {
 			// 如果载入者路径包含了目标路径，则说明载入者在目标路径更里的目录
 			// 这样当然是有权限的
 			$includeTarget = ( strpos( $sourceDir, $targetDir ) === 0 );
@@ -112,7 +112,7 @@ class LoaderPermission {
 				// 谨慎点，我把两边的目录分隔符去掉，无论它是否存在
 				$replaceDir = trim( str_replace( $sourceDir, '', $targetDir, $count ), DIRECTORY_SEPARATOR );
 				$isLastDir = ( ! strpos( $replaceDir, DIRECTORY_SEPARATOR ) );
-				$isPublicInterface = ( $this->_privatePre . basename( $_source, '.php' ) === $replaceDir );
+				$isPublicInterface = ( $this->_privatePre . basename( $source, '.php' ) === $replaceDir );
 				if( $count && $isLastDir && $isPublicInterface ) {
 					return true;
 				}

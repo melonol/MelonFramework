@@ -4,7 +4,7 @@ define( 'IN_MELON', true );
 
 class Melon {
 	
-	static protected $_melon;
+	static private $_melon;
 
 	final protected function __construct() {
 		;
@@ -28,7 +28,7 @@ class Melon {
 		$scripts = array();
 		foreach( $autoload as $script ) {
 			require $script;
-			$scripts[ $script ] = true;
+			$scripts[ $script ] = $script;
 		}
 		self::$_melon = new \Melon\Helper\Set( array(), \Melon\Helper\Set::REPLACE_NOT );
 		self::$_melon->loaderSet = new \Melon\File\LoaderSet( $scripts,
@@ -47,6 +47,14 @@ class Melon {
 			throw new \Melon\Exception\RuntimeException( "无法识别{$script}脚本文件，请检查它是否存在" );
 		}
 		self::_load( $load['source'], $load['target'] );
+	}
+
+	final static public function pachageLoad() {
+		
+	}
+
+	final static public function packageDir() {
+		
 	}
 	
 	final static public function autoLoad( $class ) {
@@ -67,11 +75,11 @@ class Melon {
 			throw new \Melon\Exception\RuntimeException( "{$target}不是一个文件，不能载入它" );
 		}
 		if( ! self::$_melon->loaderPermission->verify( $source, $target ) ) {
-			throw new \Melon\Exception\RuntimeException( "{$source}脚本没有权限载入{$target}脚本文件" );
+			throw new \Melon\Exception\RuntimeException( "{$source}脚本文件没有权限载入{$target}" );
 		}
 		if( ! $loaded ) {
 			include $target;
-			self::$_melon->loaderSet->set( $target, true );
+			self::$_melon->loaderSet->set( $target, $target );
 		}
 	}
 	
@@ -108,7 +116,7 @@ class Melon {
 	}
 	
 	final static public function run() {
-		
+		return \Melon\File\PathTrace::getSourceFile( './Melon/Helper/RecursiveSet.php' );
 	}
 }
 
@@ -119,5 +127,6 @@ class cms extends Melon {
 		print_r( self::$_melon );
 	}
 }
-
-cms::load( './Melon/Helper/RecursiveSet.php' );
+$s = microtime(true);
+Melon::load( './Melon/Helper/RecursiveSet.php' );
+echo number_format(microtime(true) - $s, 5);
