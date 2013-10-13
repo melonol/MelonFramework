@@ -7,7 +7,7 @@ defined( 'IN_MELON' ) or die( 'Permission denied' );
 /**
  * 保存加载信息的类
  */
-class LoaderSet extends \Melon\Helper\Set {
+class LoaderSet extends \Melon\Util\Set {
 	
 	/**
 	 * 使用md5格式化键名

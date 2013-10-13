@@ -35,7 +35,7 @@ class LoaderPermission {
 	/**
 	 * 构造函数
 	 * 
-	 * @param array $includePath 包含路径数组，如果'目标路径'存在包含路径中，则'载入者路径'会被检查文件读取权限
+	 * @param array $includePath 包含路径数组，如果'目标路径'存在包含路径中，则'载入源路径'会被检查文件读取权限
 	 * 即是说包含路径是一组被管辖的范围，标准的系统路径格式
 	 * @param string $privatePre 私有权限的前缀标识符
 	 */
@@ -62,15 +62,15 @@ class LoaderPermission {
 	/**
 	 * 判断一个脚本文件是否有载入另一个文件的权限
 	 * 
-	 * 我把它们分别叫做'载入者路径'和'目标路径'，当载入者路径满足以下条件时，才有权限载入目标路径
+	 * 我把它们分别叫做'载入源路径'和'目标路径'，当载入源路径满足以下条件时，才有权限载入目标路径
 	 * 1. 目标路径不在检查范围内，即不在包含路径中
 	 * 2. 目标路径文件和父目录都不属于私有的
-	 * 3. 某个父目录属于私有，但是载入者也在这个私有目录或者其子目录下
-	 * 4. 载入者文件名与目标路径的当前父目录同级，载入者文件名（不含.php）加上私有前缀与当前父目录相等，比如 File.php和_File
+	 * 3. 某个父目录属于私有，但是载入源也在这个私有目录或者其子目录下
+	 * 4. 载入源文件名与目标路径的当前父目录同级，载入源文件名（不含.php）加上私有前缀与当前父目录相等，比如 File.php和_File
 	 * 
-	 * 另外载入者路径和目标路径都必需是有效的，否则会被抛出异常
+	 * 另外载入源路径和目标路径都必需是有效的，否则会被抛出异常
 	 * 
-	 * @param string $source 载入者路径，标准的系统路径格式
+	 * @param string $source 载入源路径，标准的系统路径格式
 	 * @param string $target 目标路径，标准的系统路径格式
 	 * @return boolean
 	 * @throws Exception\RuntimeException
@@ -99,7 +99,7 @@ class LoaderPermission {
 		}
 		// 再确定一下是否是私有文件
 		if( strpos( basename( $target ), $this->_privatePre ) !== 0 ) {
-			// 如果载入者路径包含了目标路径，则说明载入者在目标路径更里的目录
+			// 如果载入源路径包含了目标路径，则说明载入源在目标路径更里的目录
 			// 这样当然是有权限的
 			$includeTarget = ( strpos( $sourceDir, $targetDir ) === 0 );
 			if( $includeTarget ) {

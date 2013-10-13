@@ -25,14 +25,14 @@ final class PathTrace {
 	 * @param string $targetPath 相对或绝对文件、目录路径
 	 * 相对路径是相对于执行这个 parse 方法的文件所在目录路径来说的。
 	 * 比如在 /MelonFramework/Melon.php 文件中：
-	 * <code>
+	 * <pre>
 	 * echo PathTrace::parse( './Melon/System/PathTrace.php' );
 	 * // 输出：/MelonFramework/System/PathTrace.php
-	 * </code>
+	 * </pre>
 	 * 
 	 * @param boolean $getSource [可选] 是否获取调用者的文件路径。一般它用来做一些权限之类的验证
 	 * 在 /MelonFramework/Melon.php 文件中：
-	 * <code>
+	 * <pre>
 	 * print_r( PathTrace::parse( './Melon/System/PathTrace.php', true ) );
 	 * // 输出：
 	 * Array
@@ -40,7 +40,7 @@ final class PathTrace {
 	 *		[source] => /MelonFramework/Melon.php
 	 *		[target] => /MelonFramework/Melon/System/PathTrace.php
 	 * )
-	 * </code>
+	 * </pre>
 	 * 
 	 * @param array $ignoreTrace [可选] 格式请看 self::_getSourceTrace 
 	 * 如果提供这项参数，并且 $getSource 设置为 true ，
@@ -86,8 +86,8 @@ final class PathTrace {
 	 * 
 	 * @return string|false
 	 */
-	public static function getSourceFile() {
-		$sourceTrace = self::_getSourceTrace( array( __NAMESPACE__ . '\PathTrace::getSourceFile' ) );
+	public static function sourceFile() {
+		$sourceTrace = self::_getSourceTrace( array( __NAMESPACE__ . '\PathTrace::sourceFile' ) );
 		return empty( $sourceTrace ) ? false : $sourceTrace['file'];
 	}
 	
@@ -167,7 +167,7 @@ final class PathTrace {
 	 * @param int $index 栈索引
 	 * @return array|false
 	 */
-	private static function _getCompleteTrace( array $debugBacktrace, $index ) {
+	private static function _getCompleteTrace( array &$debugBacktrace, $index ) {
 		$trace = false;
 		if( isset( $debugBacktrace[ $index ] ) ) {
 			$trace =& $debugBacktrace[ $index ];

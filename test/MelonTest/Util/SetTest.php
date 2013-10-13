@@ -2,8 +2,8 @@
 define('IN_MELON', true);
 define('MELON_ROOT', '/www/Melon/MelonFramework/');
 
-require_once MELON_ROOT . '/Melon/Helper/Set.php';
-use Melon\Helper\Set;
+require_once MELON_ROOT . '/Melon/Util/Set.php';
+use Melon\Util\Set;
 
 class SetTest extends PHPUnit_Framework_TestCase {
 	

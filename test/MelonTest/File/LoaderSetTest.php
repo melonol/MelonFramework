@@ -2,7 +2,7 @@
 define('IN_MELON', true);
 define('MELON_ROOT', '/www/Melon/MelonFramework/');
 
-require_once MELON_ROOT . '/Melon/Helper/Set.php';
+require_once MELON_ROOT . '/Melon/Util/Set.php';
 require_once MELON_ROOT . '/Melon/File/LoaderSet.php';
 use Melon\File\LoaderSet;
 

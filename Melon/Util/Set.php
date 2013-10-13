@@ -1,6 +1,6 @@
 <?php
 
-namespace Melon\Helper;
+namespace Melon\Util;
 
 defined( 'IN_MELON' ) or die( 'Permission denied' );
 
@@ -9,7 +9,7 @@ defined( 'IN_MELON' ) or die( 'Permission denied' );
  * 参考了PHP Slim框架的Set类的接口，作者写得很好，我简单的借鉴一下 :)
  * 
  * 它可以产生一个类似数组的对象：
- * <code>
+ * <pre>
  * $arr = new \Melon\Helper\Set();
  * // 使用方法添加元素
  * $arr->set( 'k1', 1 );
@@ -30,7 +30,7 @@ defined( 'IN_MELON' ) or die( 'Permission denied' );
  * foreach( $arr as $key => $value );
  * // 也很容易获取它的元素总数
  * count( $arr );
- * </code>
+ * </pre>
  */
 class Set implements \ArrayAccess, \IteratorAggregate, \Countable {
 	
