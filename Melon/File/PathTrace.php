@@ -14,7 +14,7 @@ defined( 'IN_MELON' ) or die( 'Permission denied' );
  * 因为debug_backtrace很容易发生变化，非常难把握，不当或过度使用将会让你的代码陷于泥潭中
  */
 final class PathTrace {
-	
+	public static $s = 0;
 	private function __construct() {
 		;
 	}
@@ -48,28 +48,29 @@ final class PathTrace {
 	 * 
 	 * @return string|array|false
 	 */
-	public static function parse( $targetPath, $getSource = false, array $ignoreTrace = array() ) {
+	public static function parse( $targetPath, $getSource = false ) {
 		if( empty( $targetPath ) ) {
 			return false;
 		}
+		$s = microtime(true);
 		$_targetPath = $targetPath;
-		$ignoreTrace = array( __NAMESPACE__ . '\PathTrace::parse' );
 		// 初始化一个变量来保存调用者的栈信息
 		$sourceTrace = array();
 		// 第一步要做的就是要判断这是绝对路径还是相对路径，这样好分别处理
 		if( ! self::_isAbsolutePath( $_targetPath ) ) {
 			// 通过栈得到最近调用源的目录路径，和相对文件路径结合，就可以算出绝对路径
-			$sourceTrace = self::_getSourceTrace( $ignoreTrace );
+			$sourceTrace = self::_getSourceTrace();
 			$sourceDir = dirname( $sourceTrace['file'] );
 			$_targetPath = $sourceDir . DIRECTORY_SEPARATOR . $_targetPath;
 		}
+		
 		// 路径计算完毕，我用realpath来检查有效性，顺便格式化它
 		$realPath = realpath( $_targetPath );
 		// 客户端可能要求获取调用者的路径
 		// 如果调用者和被调用者任意一个路径不存在，统一返回假
 		if( $realPath !== false && $getSource === true ) {
 			$sourceTrace = ( empty( $sourceTrace ) ?
-				self::_getSourceTrace( $ignoreTrace ) : $sourceTrace );
+				self::_getSourceTrace() : $sourceTrace );
 			if( empty( $sourceTrace ) ) {
 				return false;
 			}
@@ -87,7 +88,7 @@ final class PathTrace {
 	 * @return string|false
 	 */
 	public static function sourceFile() {
-		$sourceTrace = self::_getSourceTrace( array( __NAMESPACE__ . '\PathTrace::sourceFile' ) );
+		$sourceTrace = self::_getSourceTrace();
 		return empty( $sourceTrace ) ? false : $sourceTrace['file'];
 	}
 	
@@ -112,87 +113,49 @@ final class PathTrace {
 	/**
 	 * 通过php提供的debug_backtrace函数中获取调用源的栈
 	 * 
-	 * 为了方便处理，它总是把调用自己的栈忽略掉
-	 * 
-	 * @param array $ignoreTrace [可选] 忽略哪些栈，$ignoreTrace的元素是方法名
-	 * 如果是函数，则方法名为栈的function值；如果是方法，则由栈的class、type、function连接得出
+	 * @param int $ignoreTrace [可选] 忽略前面多少个栈，因栈已经包含了目前方法的调用信息
+	 * 为了正确取得值，需要把自己调用的信息忽略掉
 	 * @return array|false
 	 */
-	private static function _getSourceTrace( array $ignoreTrace = array() ) {
+	private static function _getSourceTrace( $ignoreTrace = 3 ) {
 		// debug_backtrace的性能还是不错的，不过需要注意的是要开启DEBUG_BACKTRACE_IGNORE_ARGS
 		// 它是PHP5.3.6才开始被支持的，正因为增加了这项特性才让我的想法得以实现
 		// DEBUG_BACKTRACE_IGNORE_ARGS会忽略方法栈的参数
 		// 想想，通过参数传递对象是很普遍的事情，如果是你的系统有很多大对象
 		// debug_backtrace返回的信息量是多么庞大，如果多次使用，这样的内存消耗是一件恐怖的事情
 		$debugBacktrace = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS );
-		// 总是把调用自己的栈忽略掉
-		array_shift( $debugBacktrace );
+		$sourceTrace = $debugBacktrace[ $ignoreTrace - 1 ];
 		
-		$sourceTrace = array();
-		if( empty( $ignoreTrace ) ) {
-			$sourceTrace = self::_getCompleteTrace( $debugBacktrace, 0 );
-		} else {
-			foreach( $debugBacktrace as $index => $backtrace ) {
-				$func = $backtrace['function'];
-				if( isset( $backtrace['class'] ) ) {
-					$func = $backtrace['class'] . $backtrace['type'] . $func;
-				}
-				if( ! in_array( $func, $ignoreTrace ) ) {
-					$sourceTrace = self::_getCompleteTrace( $debugBacktrace, $index );
-					break;
-				}
-			}
-		}
 		if( ! empty( $sourceTrace ) ) {
-			$sourceFile =& $sourceTrace['file'];
-			// 如果有方法使用eval，它在栈中的file路径可能会像这样：
-			//	/MelonFramework/Melon.php(21) : eval()'d code
-			// 我用了正则表达式过滤它们,这是优雅但不太好的解决办法，正则不会很快
-			// 更好的解决办法是：不要使用eval
-			if ( strpos( $sourceFile, 'eval()\'d code' ) !== false ) {
-				$evalExp = '/\(\d+\)\s:\seval\(\)\'d\scode/';
-				$sourceFile = preg_replace( $evalExp, '', $sourceFile );
+			// 由于PHP提供的内部动态调用方法（比如call_user_func、invoke等）不会产生栈来源，即没有file这个值
+			// 这会对我们的操作产生影响，必要时要使用反射来确保这些值存在
+			if( isset( $sourceTrace['file'] ) ) {
+				$sourceFile =& $sourceTrace['file'];
+				// 如果有方法使用eval，它在栈中的file路径可能会像这样：
+				//	/MelonFramework/Melon.php(21) : eval()'d code
+				// 我用了正则表达式过滤它们,这是优雅但不太好的解决办法，正则不会很快
+				// 更好的解决办法是：不要使用eval
+				if ( strpos( $sourceFile, 'eval()\'d code' ) !== false ) {
+					$evalExp = '/\(\d+\)\s:\seval\(\)\'d\scode/';
+					$sourceFile = preg_replace( $evalExp, '', $sourceFile );
+				}
+			} else {
+				//使用反射获取方法声明的文件和行数
+				try {
+					if( isset( $sourceTrace['class'] ) ) {
+						$reflection = new \ReflectionMethod( $sourceTrace['class'], $sourceTrace['function'] );
+					} else {
+						$reflection = new \ReflectionFunction( $sourceTrace['function'] );
+					}
+					$sourceTrace['file'] = $reflection->getFileName();
+					$sourceTrace['line'] = $reflection->getStartLine();
+				} catch ( \Exception $e ) {
+					$sourceTrace = false;
+					//TODO::记录错误日志
+				}
 			}
 			return $sourceTrace;
 		}
 		return false;
-	}
-	
-	/**
-	 * 根据索引获取某个包含相对完整信息的栈
-	 * 
-	 * 由于PHP提供的内部动态调用方法（比如call_user_func、invoke等）不会产生栈来源，即没有file这个值
-	 * 这会对我们的操作产生影响，必要时要使用反射来确保这些值存在
-	 * 
-	 * 为什么需要索引这个参数，难道不能直接使用对应索引的方法栈？
-	 * 我只是做一个预留，可能我想多了，方法栈实在有点变化莫测
-	 * 给定索引值的方式，如果以后发现一些特殊问题，可以根据索引值向上寻找一些可能有用的信息来修正
-	 * 
-	 * @param array $debugBacktrace 来自debug_backtrace方法的栈
-	 * @param int $index 栈索引
-	 * @return array|false
-	 */
-	private static function _getCompleteTrace( array &$debugBacktrace, $index ) {
-		$trace = false;
-		if( isset( $debugBacktrace[ $index ] ) ) {
-			$trace =& $debugBacktrace[ $index ];
-			if( isset( $trace['file'] ) ) {
-				return $trace;
-			}
-			//使用反射获取方法声明的文件和行数
-			try {
-				if( isset( $trace['class'] ) ) {
-					$reflection = new \ReflectionMethod( $trace['class'], $trace['function'] );
-				} else {
-					$reflection = new \ReflectionFunction( $trace['function'] );
-				}
-				$trace['file'] = $reflection->getFileName();
-				$trace['line'] = $reflection->getStartLine();
-			} catch ( \Exception $e ) {
-				$trace = false;
-				//TODO::记录错误日志
-			}
-		}
-		return $trace;
 	}
 }

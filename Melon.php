@@ -19,7 +19,7 @@ class Melon {
 		$autoload = array(
 			$melonRoot . 'Exception' . DIRECTORY_SEPARATOR . 'BaseException.php',
 			$melonRoot . 'Exception' . DIRECTORY_SEPARATOR . 'RuntimeException.php',
-			$melonRoot . 'Helper' . DIRECTORY_SEPARATOR . 'Set.php',
+			$melonRoot . 'Util' . DIRECTORY_SEPARATOR . 'Set.php',
 			$melonRoot . 'File' . DIRECTORY_SEPARATOR . 'PathTrace.php',
 			$melonRoot . 'File' . DIRECTORY_SEPARATOR . 'LoaderSet.php',
 			$melonRoot . 'File' . DIRECTORY_SEPARATOR . 'LoaderPermission.php',
@@ -30,7 +30,7 @@ class Melon {
 			require $script;
 			$scripts[ $script ] = $script;
 		}
-		self::$_melon = new \Melon\Helper\Set( array(), \Melon\Helper\Set::REPLACE_NOT );
+		self::$_melon = new \Melon\Util\Set( array(), \Melon\Util\Set::REPLACE_NOT );
 		self::$_melon->loaderSet = new \Melon\File\LoaderSet( $scripts,
 			\Melon\File\LoaderSet::REPLACE_NOT );
 		self::$_melon->includePath = array( __DIR__ );
@@ -229,7 +229,7 @@ class Melon {
 	}
 	
 	static public function env() {
-		print_r( self::$_melon->loaderSet );
+		
 	}
 	
 	static public function lang() {
@@ -241,7 +241,7 @@ class Melon {
 	}
 	
 	final static public function run() {
-		return \Melon\File\PathTrace::sourceFile( self::$_melon );
+		
 	}
 }
 
@@ -252,4 +252,3 @@ class cms extends Melon {
 		print_r( self::$_melon );
 	}
 }
-Melon::run();
