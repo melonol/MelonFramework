@@ -73,7 +73,6 @@ class LoaderPermission {
 	 * @param string $source 载入源路径，标准的系统路径格式
 	 * @param string $target 目标路径，标准的系统路径格式
 	 * @return boolean
-	 * @throws Exception\RuntimeException
 	 */
 	public function verify( $source, $target ) {
 		// 准备开始检查权限，我设定如果满足要求，就立刻让程序返回
