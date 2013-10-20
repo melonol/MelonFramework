@@ -31,29 +31,29 @@ class Melon {
 		// 为了方便，我都是用了self来读取属性和方法
 		// 如果属性太多，到时和子类的属性冲突的机率就越大
 		// 用单属性的话，到时只需要管住它就可以了
-		self::$_melon = new \stdClass();
+		$melon = self::$_melon = new \stdClass();
 		
 		// env负责保存一些系统基本的信息
-		self::$_melon->env = array(
+		$melon->env = array(
 			'ROOT' => __DIR__,
 			'LIBRARY' =>  __DIR__  . DIRECTORY_SEPARATOR . 'Melon',
 		);
 		
 		// 载入基础配置
-		self::$_melon->conf = require ( self::$_melon->env['LIBRARY'] . DIRECTORY_SEPARATOR .
+		$melon->conf = require ( $melon->env['LIBRARY'] . DIRECTORY_SEPARATOR .
 				'Data' . DIRECTORY_SEPARATOR . 'Conf' . DIRECTORY_SEPARATOR . 'Base.php' );
 		// INCLUDE_PATH是loader － 包括autoload、权限审查等函数的工作范围
 		// 需要把MELON的基础目录添加到INCLUDE_PATH中
-		self::$_melon->conf['INCLUDE_PATH'][] = self::$_melon->env['ROOT'];
-		self::$_melon->env['CONFIG'] = &self::$_melon->conf;
+		$melon->conf['INCLUDE_PATH'][] = $melon->env['ROOT'];
+		$melon->env['CONFIG'] = &$melon->conf;
 		
 		// 设置时间
-		if( ! empty( self::$_melon->conf['TIMEZONE'] ) ) {
-			date_default_timezone_set( self::$_melon->conf['TIMEZONE'] );
+		if( ! empty( $melon->conf['TIMEZONE'] ) ) {
+			date_default_timezone_set( $melon->conf['TIMEZONE'] );
 		}
 		$microtime = microtime( true );
-		self::$_melon->env['TIME'] = intval( $microtime );
-		self::$_melon->env['MICROTIME'] = $microtime;
+		$melon->env['TIME'] = intval( $microtime );
+		$melon->env['MICROTIME'] = $microtime;
 		
 		// 初始化loader
 		self::_initLoader();
