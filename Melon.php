@@ -23,7 +23,7 @@ class Melon {
 		}
 		
 		// 注册autoload
-		// 不过现在它还不能用的，一些必要的数据还没初始化
+		// 不过现在它还不能用，一些必要的数据还没初始化
 		// 放在前面是为了让你能看到它的存在
 		spl_autoload_register( '\Melon::autoload' );
 		
@@ -44,8 +44,8 @@ class Melon {
 				'Data' . DIRECTORY_SEPARATOR . 'Conf' . DIRECTORY_SEPARATOR . 'Base.php' );
 		// INCLUDE_PATH是loader － 包括autoload、权限审查等函数的工作范围
 		// 需要把MELON的基础目录添加到INCLUDE_PATH中
-		self::$_melon->env['CONFIG'] = &self::$_melon->conf;
 		self::$_melon->conf['INCLUDE_PATH'][] = self::$_melon->env['ROOT'];
+		self::$_melon->env['CONFIG'] = &self::$_melon->conf;
 		
 		// 设置时间
 		if( ! empty( self::$_melon->conf['TIMEZONE'] ) ) {
