@@ -9,6 +9,59 @@ use Melon\File;
 use Melon\Util;
 use Melon\Database;
 
+set_exception_handler(function($exception) {
+	$trace = $exception->getTrace();
+	echo codeSnippet($trace[0]['file'], $exception->getLine());
+});
+
+		
+function codeSnippet( $file, $focus, $range = 7, $style = array( 'lineHeight' => 20, 'fontSize' => 13 ) ) {
+	$html = @highlight_file( $file, true );
+	if( ! $html ) {
+		return false;
+	}
+	$br = '<br />';
+	$html_lines = explode( $br, $html );
+	unset($html);
+	$lines_count = count( $html_lines );
+	$line_html = '';
+	$code_html = '';
+
+	//获取前五行的范围
+	$start = ( ( $focus - $range ) < 1 ? 1 : ($focus - $range) );
+	$end = ( ( $focus + $range ) > $lines_count ? $lines_count : ( $focus + $range ) );
+	for( $line = ( $start - 1 ); $line < $end; $line++ ) {
+		$index_pad = str_pad( $line + 1, strlen( $lines_count ), 0, STR_PAD_LEFT );
+		$line_html .= $index_pad . $br;
+		$code_html .= $html_lines[ $line ] . $br;
+	}
+	
+	//是否缺少开始标签
+	if( substr( $code_html, 0, 5 ) !== '<span' ) {
+		$index = $start - 1;
+		while( $index > 0 ) {
+			$match = array();
+			preg_match( '/<span style="color: #([\w]+)"(.(?!<\/span>))+$/', $html_lines[ --$index ], $match );
+			if( ! empty( $match ) ) {
+				$code_html = "<span style=\"color: #{$match[1]}\">" . $code_html;
+				break;
+			}
+		}
+	}
+	//是否缺少结束标签
+	if( substr( $code_html, -7 ) !== '</span>' ) {
+		$code_html .= '</span>';
+	}
+	
+	$hight_line_posistion = ( ( $focus - $start ) * $style['lineHeight'] );
+	return <<<EOT
+        <div style="position: relative; font-size: {$style['fontSize']}px;">
+            <span style="display: block; position: absolute; top: {$hight_line_posistion}px; height: {$style['lineHeight']}px; width: 100%; _width: 95%; background-color: yellow; opacity: 0.4; filter:alpha(opacity=40); z-index: -1; "></span>
+            <div style="float: left; margin-right: 10px; line-height: {$style['lineHeight']}px; color: #aaa;">{$line_html}</div>
+            <div style="_width: 95%; line-height: {$style['lineHeight']}px; overflow: hidden; white-space:nowrap; text-overflow:ellipsis;">{$code_html}</div>
+        </div>
+EOT;
+}
 class Melon {
 	
 	static private $_melon;
@@ -24,36 +77,36 @@ class Melon {
 		
 		// 注册autoload
 		// 不过现在它还不能用，一些必要的数据还没初始化
-		// 放在前面是为了让你能看到它的存在
+		// 放在前面是为了让你能看到它的存在 :)
 		spl_autoload_register( '\Melon::autoload' );
 		
 		// 我把属性都放到$_melon变量中，因为Melon很可能会被扩展（继承）
 		// 为了方便，我都是用了self来读取属性和方法
-		// 如果属性太多，到时和子类的属性冲突的机率就越大
+		// 因为如果属性太多，到时和子类的属性冲突的机率就越大
 		// 用单属性的话，到时只需要管住它就可以了
 		$melon = self::$_melon = new \stdClass();
 		
 		// env负责保存一些系统基本的信息
 		$melon->env = array(
-			'ROOT' => __DIR__,
-			'LIBRARY' =>  __DIR__  . DIRECTORY_SEPARATOR . 'Melon',
+			'root' => __DIR__,
+			'library' =>  __DIR__  . DIRECTORY_SEPARATOR . 'Melon',
 		);
 		
 		// 载入基础配置
-		$melon->conf = require ( $melon->env['LIBRARY'] . DIRECTORY_SEPARATOR .
+		$melon->conf = require ( $melon->env['library'] . DIRECTORY_SEPARATOR .
 				'Data' . DIRECTORY_SEPARATOR . 'Conf' . DIRECTORY_SEPARATOR . 'Base.php' );
-		// INCLUDE_PATH是loader － 包括autoload、权限审查等函数的工作范围
-		// 需要把MELON的基础目录添加到INCLUDE_PATH中
-		$melon->conf['INCLUDE_PATH'][] = $melon->env['ROOT'];
-		$melon->env['CONFIG'] = &$melon->conf;
+		// includePath是loader － 包括autoload、权限审查等函数的工作范围
+		// 需要把MELON的基础目录添加到includePath中
+		$melon->conf['includePath'][] = $melon->env['root'];
+		$melon->env['config'] = &$melon->conf;
 		
 		// 设置时间
-		if( ! empty( $melon->conf['TIMEZONE'] ) ) {
-			date_default_timezone_set( $melon->conf['TIMEZONE'] );
+		if( ! empty( $melon->conf['timezone'] ) ) {
+			date_default_timezone_set( $melon->conf['timezone'] );
 		}
 		$microtime = microtime( true );
-		$melon->env['TIME'] = intval( $microtime );
-		$melon->env['MICROTIME'] = $microtime;
+		$melon->env['time'] = intval( $microtime );
+		$melon->env['microtime'] = $microtime;
 		
 		// 初始化loader
 		self::_initLoader();
@@ -68,11 +121,12 @@ class Melon {
 	 * @return void
 	 */
 	private function _initLoader() {
-		$library = self::$_melon->env['LIBRARY'] . DIRECTORY_SEPARATOR;
+		$library = self::$_melon->env['library'] . DIRECTORY_SEPARATOR;
 		// 现在准备一些必需的类
 		$autoload = array(
 			$library . 'Util' . DIRECTORY_SEPARATOR . 'Set.php',
 			$library . 'File' . DIRECTORY_SEPARATOR . 'LoaderSet.php',
+			$library . 'File' . DIRECTORY_SEPARATOR . 'PathTrace.php',
 			$library . 'File' . DIRECTORY_SEPARATOR . 'LoaderPermission.php',
 		);
 		// 用一个数组来保存上面的类的信息
@@ -94,12 +148,12 @@ class Melon {
 		
 		// 我需要一个保存已载入的脚本文件信息的对象
 		// 这样可以不需要使用include_once或者require_once，也可以达到它们那样的效果
-		// 我把刚才已加载的类的信息添加进去
+		// 把刚才已加载的类的信息添加进去
 		self::$_melon->loaderSet = new File\LoaderSet( $scripts,
 			File\LoaderSet::REPLACE_NOT );
 		// 载入文件时还需要一个权限审查对象
 		self::$_melon->loaderPermission = new File\LoaderPermission(
-			self::$_melon->conf['INCLUDE_PATH'], self::$_melon->conf['PRIVATE_PRE']
+			self::$_melon->conf['includePath'], self::$_melon->conf['privatePre']
 		);
 	}
 
@@ -140,7 +194,7 @@ class Melon {
 	 */
 	final static public function autoLoad( $class ) {
 		$file = str_replace( '\\', DIRECTORY_SEPARATOR, $class ) . '.php';
-		foreach( self::$_melon->conf['INCLUDE_PATH'] as $path ) {
+		foreach( self::$_melon->conf['includePath'] as $path ) {
 			$script = realpath( $path . DIRECTORY_SEPARATOR . $file );
 			if( $script ) {
 				self::_load( File\PathTrace::sourceFile(), $script );
@@ -176,7 +230,7 @@ class Melon {
 	 * 获取载入脚本文件时返回的数据
 	 * 
 	 * 经常用在载入配置文件、语言包等直接返回原生PHP数组的脚本文件
-	 * 它不会像{@link \Melon::load}那样，可以防止重复载入同一个脚本文件
+	 * 它不会像{@link Melon::load}那样，可以防止重复载入同一个脚本文件
 	 * 
 	 * @param string $script 脚本路径
 	 * @return mixed
@@ -221,7 +275,7 @@ class Melon {
 	/**
 	 * 从包中载入一个脚本
 	 * 
-	 * 和{@link load}一样，它也会防止重复载入同一个脚本
+	 * 和{@link Melon::load}一样，它也会防止重复载入同一个脚本
 	 * 
 	 * @param string $script 脚本路径，必需是相对于包的路径
 	 * @return void
@@ -241,10 +295,10 @@ class Melon {
 	 * 从包中获取载入脚本文件时返回的数据
 	 * 
 	 * 经常用在载入配置文件、语言包等直接返回原生PHP数组的脚本文件
-	 * 它不会像{@link \Melon::load}那样，可以防止重复载入同一个脚本文件
+	 * 它不会像{@link Melon::load}那样，可以防止重复载入同一个脚本文件
 	 * 
 	 * @param string $script 脚本路径，必需是相对于包的路径
-	 * @return type
+	 * @return mixed
 	 * @throws Exception\RuntimeException
 	 */
 	final static public function packageAcquire( $script ) {
@@ -274,7 +328,7 @@ class Melon {
 	 */
 	final static private function _packageDir( $source ) {
 		$sourceDir = dirname( $source );
-		$parentPos = strrpos( $sourceDir, DIRECTORY_SEPARATOR . self::$_melon->conf['PRIVATE_PRE'] );
+		$parentPos = strrpos( $sourceDir, DIRECTORY_SEPARATOR . self::$_melon->conf['privatePre'] );
 		if( $parentPos ) {
 			$spos = ( $parentPos + strlen( DIRECTORY_SEPARATOR ) );
 			$epos = strpos( $sourceDir, DIRECTORY_SEPARATOR, $spos );
@@ -317,3 +371,5 @@ class cms extends Melon {
 		print_r( self::$_melon );
 	}
 }
+Melon::load('aaa');
+
