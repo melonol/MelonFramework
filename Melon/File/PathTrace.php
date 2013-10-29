@@ -122,7 +122,7 @@ final class PathTrace {
 		// 它是PHP5.3.6才开始被支持的，正因为增加了这项特性才让我的想法得以实现
 		// DEBUG_BACKTRACE_IGNORE_ARGS会忽略方法栈的参数
 		// 想想，通过参数传递对象是很普遍的事情，如果是你的系统有很多大对象
-		// debug_backtrace返回的信息量是多么庞大，如果多次使用，这样的内存消耗是一件恐怖的事情
+		// debug_backtrace返回的信息量是多么庞大，如果多次使用，这样的内存消耗还是挺大的
 		$debugBacktrace = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS );
 		$sourceTrace = $debugBacktrace[ $ignoreTrace - 1 ];
 		

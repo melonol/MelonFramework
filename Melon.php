@@ -1,3 +1,28 @@
+<table style="padding: 5px; border-collapse: collapse;">
+    <tr>
+        <th style="border: 1px solid #000; padding: 5px; text-align: left;">[-]/var/www/framework/</th>
+    </tr>
+    <tr>
+        <td style="border: 1px solid #000; padding: 5px;">
+            <a href="javascript:void(0);" style="color: #000; text-decoration: none;" onclick="
+                var codeMain = this.parentNode.getElementsByTagName('div')[0],
+                    codeStatus = this.getElementsByTagName('span')[0];
+                if(codeMain.style.display == 'block') {
+                    codeMain.style.display = 'none';
+                    codeStatus.innerHTML = '[+]'
+                } else {
+                    codeMain.style.display = 'block';
+                    codeStatus.innerHTML = '[-]';
+                }
+            "><span>[+]</span>/var/www/framework</a>
+            <div style="width: 600px; margin-left: 20px; overflow: hidden; display: none;">
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td style="border: 1px solid #000; padding: 5px;"><span>&nbsp;&nbsp;&nbsp;</span>/var/www/framework</td>
+    </tr>
+</table>
 <?php
 
 define( 'IN_MELON', true );
@@ -10,8 +35,7 @@ use Melon\Util;
 use Melon\Database;
 
 set_exception_handler(function($exception) {
-	$trace = $exception->getTrace();
-	echo codeSnippet($trace[0]['file'], $exception->getLine());
+	echo codeSnippet($exception->getFile(), $exception->getLine());
 });
 
 		
@@ -62,6 +86,7 @@ function codeSnippet( $file, $focus, $range = 7, $style = array( 'lineHeight' =>
         </div>
 EOT;
 }
+throw new \Exception('test');
 class Melon {
 	
 	static private $_melon;
