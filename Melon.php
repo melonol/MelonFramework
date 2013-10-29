@@ -1,6 +1,6 @@
 <table style="padding: 5px; border-collapse: collapse;">
     <tr>
-        <th style="border: 1px solid #000; padding: 5px; text-align: left;">[-]/var/www/framework/</th>
+        <th style="border: 1px solid #000; padding: 5px; text-align: left;">[-] /var/www/framework/</th>
     </tr>
     <tr>
         <td style="border: 1px solid #000; padding: 5px;">
@@ -14,13 +14,13 @@
                     codeMain.style.display = 'block';
                     codeStatus.innerHTML = '[-]';
                 }
-            "><span>[+]</span>/var/www/framework</a>
-            <div style="width: 600px; margin-left: 20px; overflow: hidden; display: none;">
+            "><span>[+]</span> /var/www/framework</a>
+            <div style="width: 600px; margin-left: 20px; overflow: hidden; display: none;">1
             </div>
         </td>
     </tr>
     <tr>
-        <td style="border: 1px solid #000; padding: 5px;"><span>&nbsp;&nbsp;&nbsp;</span>/var/www/framework</td>
+        <td style="border: 1px solid #000; padding: 5px;"><span>&nbsp;&nbsp;&nbsp;</span> /var/www/framework</td>
     </tr>
 </table>
 <?php
