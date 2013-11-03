@@ -128,8 +128,11 @@ class DebugMessage {
 		list( $file, $line ) = $this->_replaceEval( $this->_file, $this->_line );
 		$table .= $this->_setTr( 'th', '', $file, $line, $showCodeSnippet );
 
-		if( is_array( $this->_trace ) ) {
+		if( is_array( $this->_trace ) && ! empty( $this->_trace ) ) {
 			foreach( $this->_trace as $info ) {
+				if( ! isset( $info['function'] ) ) {
+					continue;
+				}
 				$func = $info['function'];
 				if( isset( $info['class'] ) ) {
 					$func = $info['class'] . $info['type'] . $func;
@@ -190,8 +193,13 @@ class DebugMessage {
 			}
 			$tr .= "</{$elem}>";
 		} else {
+			if( $elem === 'th' ) {
+				$title = "{$this->_type}: {$this->_message}";
+			} else {
+				$title = "unknow file --> {$func}";
+			}
 			$tr .= "<{$elem} style=\"border: 1px solid #000; padding: 5px;\">
-					unknow file --> {$func}
+					$title
 				</{$elem}>";
 		}
 		return ( $tr . '</tr>' );
@@ -209,9 +217,12 @@ class DebugMessage {
 		$br = "\n\r";
 		list( $file, $line ) = $this->_replaceEval( $this->_file, $this->_line );
 		$text .= "{$this->_type}: {$this->_message} in {$file}({$line}){$br}";
-		if( is_array( $this->_trace ) ) {
+		if( is_array( $this->_trace ) && ! empty( $this->_trace ) ) {
 			$text .= "Trace: {$br}";
 			foreach( $this->_trace as $info ) {
+				if( ! isset( $info['function'] ) ) {
+					continue;
+				}
 				$func = $info['function'];
 				if( isset( $info['class'] ) ) {
 					$func = $info['class'] . $info['type'] . $func;
@@ -266,6 +277,10 @@ class DebugMessage {
 	 * @return string
 	 */
 	private function _codeSnippetHtml( $file, $focus, $range = 7, $style = array( 'lineHeight' => 20, 'fontSize' => 13 ) ) {
+		if( $file == '/' ) {
+			print_r(debug_backtrace());
+			exit;
+		}
 		$html = @highlight_file( $file, true );
 		if( ! $html ) {
 			return false;

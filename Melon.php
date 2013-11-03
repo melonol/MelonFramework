@@ -9,12 +9,6 @@ use Melon\File;
 use Melon\Util;
 use Melon\Database;
 
-set_exception_handler(function($exception) {
-	$trace = $exception->getTrace();
-	$message = new MessageTrace( 'error', $exception->getMessage(), $exception->getFile(), $exception->getLine(), $trace);
-	$message->show();
-});
-
 class Melon {
 	
 	static private $_melon;
@@ -27,11 +21,31 @@ class Melon {
 		if( defined( 'MELON_INIT' ) ) {
 			return;
 		}
+		error_reporting( 0 );
 		
 		// 注册autoload
 		// 不过现在它还不能用，一些必要的数据还没初始化
 		// 放在前面是为了让你能看到它的存在 :)
 		spl_autoload_register( '\Melon::autoload' );
+		
+		set_exception_handler( function( $exception ) {
+			Melon::logMessage( 'Exception', $exception->getMessage(), $exception->getFile(),
+				$exception->getLine(), $exception->getTrace() );
+		} );
+		
+		set_error_handler( function( $type, $message, $file, $line ) {
+			$trace = debug_backtrace();
+			array_shift( $trace );
+			Melon::logMessage( $type, $message, $file, $line, $trace );
+		} );
+		
+		register_shutdown_function( function() {
+			$error = error_get_last();
+			$logTypes = array( E_ERROR, E_PARSE, E_COMPILE_ERROR, E_CORE_ERROR );
+			if( ! empty( $error ) && in_array( $error['type'], $logTypes ) ) {
+				Melon::logMessage( $error['type'], $error['message'], $error['file'], $error['line'] );
+			}
+		} );
 		
 		// 我把属性都放到$_melon变量中，因为Melon很可能会被扩展（继承）
 		// 为了方便，我都是用了self来读取属性和方法
@@ -73,8 +87,7 @@ class Melon {
 	 * 
 	 * @return void
 	 */
-	private function _initLoader() {
-		throw new \Exception('test');
+	static private function _initLoader() {
 		$library = self::$_melon->env['library'] . DIRECTORY_SEPARATOR;
 		// 现在准备一些必需的类
 		$autoload = array(
@@ -111,8 +124,61 @@ class Melon {
 		);
 	}
 
-
-
+	/**
+	 * 记录日志
+	 * 
+	 * 主要是错误方面，当然也可以是调试信息
+	 * 它根据程序配置，可以输出到浏览器，也可以写入日志文件
+	 * 
+	 * @param string $type 消息类型，目前用来显示给用户看的类型，以后可能还有其它作用
+	 * @param string $message 消息，它是一个整个事件的主要描述
+	 * @param string $file [可选] 脚本，消息所描述的事件发生在哪个脚本
+	 * @param int $line [可选] 所在的行，消息所描述的事件发生在脚本中的那一行
+	 * @param array $trace [可选] 调用方法栈，这个是使用debug_backtrace方法、捕获异常等方式得到的栈
+	 */
+	final static public function logMessage( $type, $message, $file = null, $line = null, $trace = null ) {
+		static $typeMap = array(
+			E_COMPILE_ERROR => 'Compile error',
+			E_COMPILE_WARNING => 'Compile warning',
+			E_CORE_ERROR => 'Core error',
+			E_CORE_WARNING => 'Core warning',
+			E_DEPRECATED => 'Deprecated',
+			E_ERROR => 'Error',
+			E_WARNING => 'warning',
+			E_NOTICE => 'Notice',
+			E_PARSE => 'Parsing error',
+			E_RECOVERABLE_ERROR => 'Recoverable error',
+			E_STRICT => 'Strict',
+			E_USER_DEPRECATED => 'User deprecated',
+			E_USER_ERROR => 'User error',
+			E_USER_WARNING => 'User warning',
+			E_USER_NOTICE => 'User notice',
+		);
+		$_type = ( isset( $typeMap[ $type ] ) ? $typeMap[ $type ] : $type );
+		$debugMessage = new Base\DebugMessage( $_type, $message, $file, $line, $trace );
+		$debugMessage->show();
+	}
+	
+	/**
+	 * 记录调试日志
+	 * 
+	 * 封装
+	 * 它根据程序配置，可以输出到浏览器，也可以写入日志文件
+	 * 
+	 * @param type $message
+	 * @param type $showTrace
+	 */
+	final static public function debugLog( $message, $showTrace = true ) {
+		if( $showTrace ) {
+			$trace = debug_backtrace();
+			$firstTrace = array_shift( $trace );
+			$file = $firstTrace['file'];
+			$line = $firstTrace['line'];
+			self::logMessage( 'Debug', $message, $file, $line, $trace );
+		} else {
+			self::logMessage( 'Debug', $message );
+		}
+	}
 
 
 	/******************************************************************
@@ -318,12 +384,6 @@ class Melon {
 	}
 }
 
-Melon::init();
-class cms extends Melon {
-	static public function init() {
-		parent::init();
-		print_r( self::$_melon );
-	}
-}
-Melon::load('aaa');
+class M extends Melon {}
 
+M::init();
