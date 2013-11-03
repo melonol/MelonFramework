@@ -14,7 +14,7 @@ defined( 'IN_MELON' ) or die( 'Permission denied' );
  * 因为debug_backtrace很容易发生变化，非常难把握，不当或过度使用将会让你的代码陷于泥潭中
  */
 final class PathTrace {
-	public static $s = 0;
+	
 	private function __construct() {
 		;
 	}

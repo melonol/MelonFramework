@@ -1,28 +1,3 @@
-<table style="padding: 5px; border-collapse: collapse;">
-    <tr>
-        <th style="border: 1px solid #000; padding: 5px; text-align: left;">[-] /var/www/framework/</th>
-    </tr>
-    <tr>
-        <td style="border: 1px solid #000; padding: 5px;">
-            <a href="javascript:void(0);" style="color: #000; text-decoration: none;" onclick="
-                var codeMain = this.parentNode.getElementsByTagName('div')[0],
-                    codeStatus = this.getElementsByTagName('span')[0];
-                if(codeMain.style.display == 'block') {
-                    codeMain.style.display = 'none';
-                    codeStatus.innerHTML = '[+]'
-                } else {
-                    codeMain.style.display = 'block';
-                    codeStatus.innerHTML = '[-]';
-                }
-            "><span>[+]</span> /var/www/framework</a>
-            <div style="width: 600px; margin-left: 20px; overflow: hidden; display: none;">1
-            </div>
-        </td>
-    </tr>
-    <tr>
-        <td style="border: 1px solid #000; padding: 5px;"><span>&nbsp;&nbsp;&nbsp;</span> /var/www/framework</td>
-    </tr>
-</table>
 <?php
 
 define( 'IN_MELON', true );
@@ -35,58 +10,11 @@ use Melon\Util;
 use Melon\Database;
 
 set_exception_handler(function($exception) {
-	echo codeSnippet($exception->getFile(), $exception->getLine());
+	$trace = $exception->getTrace();
+	$message = new MessageTrace( 'error', $exception->getMessage(), $exception->getFile(), $exception->getLine(), $trace);
+	$message->show();
 });
 
-		
-function codeSnippet( $file, $focus, $range = 7, $style = array( 'lineHeight' => 20, 'fontSize' => 13 ) ) {
-	$html = @highlight_file( $file, true );
-	if( ! $html ) {
-		return false;
-	}
-	$br = '<br />';
-	$html_lines = explode( $br, $html );
-	unset($html);
-	$lines_count = count( $html_lines );
-	$line_html = '';
-	$code_html = '';
-
-	//获取前五行的范围
-	$start = ( ( $focus - $range ) < 1 ? 1 : ($focus - $range) );
-	$end = ( ( $focus + $range ) > $lines_count ? $lines_count : ( $focus + $range ) );
-	for( $line = ( $start - 1 ); $line < $end; $line++ ) {
-		$index_pad = str_pad( $line + 1, strlen( $lines_count ), 0, STR_PAD_LEFT );
-		$line_html .= $index_pad . $br;
-		$code_html .= $html_lines[ $line ] . $br;
-	}
-	
-	//是否缺少开始标签
-	if( substr( $code_html, 0, 5 ) !== '<span' ) {
-		$index = $start - 1;
-		while( $index > 0 ) {
-			$match = array();
-			preg_match( '/<span style="color: #([\w]+)"(.(?!<\/span>))+$/', $html_lines[ --$index ], $match );
-			if( ! empty( $match ) ) {
-				$code_html = "<span style=\"color: #{$match[1]}\">" . $code_html;
-				break;
-			}
-		}
-	}
-	//是否缺少结束标签
-	if( substr( $code_html, -7 ) !== '</span>' ) {
-		$code_html .= '</span>';
-	}
-	
-	$hight_line_posistion = ( ( $focus - $start ) * $style['lineHeight'] );
-	return <<<EOT
-        <div style="position: relative; font-size: {$style['fontSize']}px;">
-            <span style="display: block; position: absolute; top: {$hight_line_posistion}px; height: {$style['lineHeight']}px; width: 100%; _width: 95%; background-color: yellow; opacity: 0.4; filter:alpha(opacity=40); z-index: -1; "></span>
-            <div style="float: left; margin-right: 10px; line-height: {$style['lineHeight']}px; color: #aaa;">{$line_html}</div>
-            <div style="_width: 95%; line-height: {$style['lineHeight']}px; overflow: hidden; white-space:nowrap; text-overflow:ellipsis;">{$code_html}</div>
-        </div>
-EOT;
-}
-throw new \Exception('test');
 class Melon {
 	
 	static private $_melon;
@@ -146,6 +74,7 @@ class Melon {
 	 * @return void
 	 */
 	private function _initLoader() {
+		throw new \Exception('test');
 		$library = self::$_melon->env['library'] . DIRECTORY_SEPARATOR;
 		// 现在准备一些必需的类
 		$autoload = array(
