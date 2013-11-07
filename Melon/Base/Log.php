@@ -47,7 +47,7 @@ class Log {
 		}
 		$this->_locked = true;
 		
-		while( file_exists( $this->_file ) && ( filesize( $this->_dir ) >= $this->_splitSize ) ) {
+		while( file_exists( $this->_file ) && ( filesize( $this->_dir ) >= $this->_splitSize ) && ! empty( $this->_dateSuffix ) ) {
 			$this->_date .= array_shift( $this->_dateSuffix );
 			$this->_setFile();
 		}
