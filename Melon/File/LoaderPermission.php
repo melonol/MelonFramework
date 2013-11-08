@@ -68,8 +68,6 @@ class LoaderPermission {
 	 * 3. 某个父目录属于私有，但是载入源也在这个私有目录或者其子目录下
 	 * 4. 载入源文件名与目标路径的当前父目录同级，载入源文件名（不含.php）加上私有前缀与当前父目录相等，比如 File.php和_File
 	 * 
-	 * 另外载入源路径和目标路径都必需是有效的，否则会被抛出异常
-	 * 
 	 * @param string $source 载入源路径，标准的系统路径格式
 	 * @param string $target 目标路径，标准的系统路径格式
 	 * @return boolean

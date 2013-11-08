@@ -277,10 +277,6 @@ class DebugMessage {
 	 * @return string
 	 */
 	private function _codeSnippetHtml( $file, $focus, $range = 7, $style = array( 'lineHeight' => 20, 'fontSize' => 13 ) ) {
-		if( $file == '/' ) {
-			print_r(debug_backtrace());
-			exit;
-		}
 		$html = @highlight_file( $file, true );
 		if( ! $html ) {
 			return false;

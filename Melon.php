@@ -144,7 +144,7 @@ class Melon {
 			E_CORE_WARNING => 'Core warning',
 			E_DEPRECATED => 'Deprecated',
 			E_ERROR => 'Error',
-			E_WARNING => 'warning',
+			E_WARNING => 'Warning',
 			E_NOTICE => 'Notice',
 			E_PARSE => 'Parsing error',
 			E_RECOVERABLE_ERROR => 'Recoverable error',
