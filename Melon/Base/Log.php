@@ -25,12 +25,12 @@ class Log {
 	
 	private $_locked = false;
 	
-	public function __construct( $dir, $filePrefix, $splitSize = 10 ) {
+	public function __construct( $dir, $filePrefix = 'log', $splitSize = 10 ) {
 		if( ! is_readable( $dir ) ) {
-			throw new \Melon\Exception\RuntimeException( "日志目录不可访问：{$this->_file}" );
+			throw new \Melon\Exception\RuntimeException( "日志目录不可访问：{$dir}" );
 		}
 		$this->_dir = $dir;
-		$this->_splitSize = $split * 1024 * 1024;
+		$this->_splitSize = $splitSize * 1024 * 1024;
 		$this->_filePrefix = $filePrefix;
 		$this->_setFile();
 	}
@@ -47,7 +47,8 @@ class Log {
 		}
 		$this->_locked = true;
 		
-		while( file_exists( $this->_file ) && ( filesize( $this->_dir ) >= $this->_splitSize ) && ! empty( $this->_dateSuffix ) ) {
+		while( file_exists( $this->_file ) && ( filesize( $this->_dir ) >= $this->_splitSize ) &&
+				! empty( $this->_dateSuffix ) ) {
 			$this->_date .= array_shift( $this->_dateSuffix );
 			$this->_setFile();
 		}
@@ -56,7 +57,7 @@ class Log {
 			throw new \Melon\Exception\RuntimeException( "无法写入日志：{$this->_file}" );
 		}
 		$date = date( 'Y-m-d H:i:s', \Melon::env( 'time' )  );
-		$write = "[{$date}] $string\r\n";
+		$write = "[{$date}] {$string}\r\n";
 		fwrite( $handle, $write );
 		fclose( $handle );
 		

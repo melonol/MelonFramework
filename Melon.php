@@ -67,6 +67,9 @@ class Melon {
 		$melon->conf['includePath'][] = $melon->env['root'];
 		$melon->env['config'] = &$melon->conf;
 		
+		// 设置编码
+		header( 'Content-Type: text/html; charset=' . $melon->conf['charset'] );
+		
 		// 设置时间
 		if( ! empty( $melon->conf['timezone'] ) ) {
 			date_default_timezone_set( $melon->conf['timezone'] );
@@ -77,7 +80,8 @@ class Melon {
 		
 		// 初始化loader
 		self::_initLoader();
-		$melon->logger = new Base\Log( $melon->env['library'] . '/Data/Log', 'runtime' );
+		$melon->logger = new Base\Log( $melon->env['library'] .
+				DIRECTORY_SEPARATOR . 'Data' . DIRECTORY_SEPARATOR . 'Log', 'runtime' );
 		echo $a;
 		define( 'MELON_INIT', true );
 	}
@@ -158,8 +162,10 @@ class Melon {
 		$_type = ( isset( $typeMap[ $type ] ) ? $typeMap[ $type ] : $type );
 		$debugMessage = new Base\DebugMessage( $_type, $message, $file, $line, $trace );
 		$debugMessage->show();
-		$text = $debugMessage->parse( Base\DebugMessage::SHOW_TEXT );
-		self::$_melon->logger->write( $text );
+		if( isset( self::$_melon->logger ) ) {
+			$text = $debugMessage->parse( Base\DebugMessage::SHOW_TEXT );
+			self::$_melon->logger->write( $text );
+		}
 	}
 	
 	/**
