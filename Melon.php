@@ -77,7 +77,8 @@ class Melon {
 		
 		// 初始化loader
 		self::_initLoader();
-		
+		$melon->logger = new Base\Log( $melon->env['library'] . '/Data/Log', 'runtime' );
+		echo $a;
 		define( 'MELON_INIT', true );
 	}
 	
@@ -157,16 +158,19 @@ class Melon {
 		$_type = ( isset( $typeMap[ $type ] ) ? $typeMap[ $type ] : $type );
 		$debugMessage = new Base\DebugMessage( $_type, $message, $file, $line, $trace );
 		$debugMessage->show();
+		$text = $debugMessage->parse( Base\DebugMessage::SHOW_TEXT );
+		self::$_melon->logger->write( $text );
 	}
 	
 	/**
 	 * 记录调试日志
 	 * 
-	 * 封装
+	 * 对{@link \Melon::logMessage}的封装
 	 * 它根据程序配置，可以输出到浏览器，也可以写入日志文件
 	 * 
-	 * @param type $message
-	 * @param type $showTrace
+	 * @param string $message 调试信息
+	 * @param boolean $showTrace 是否显示调用方法栈
+	 * @return void
 	 */
 	final static public function debugLog( $message, $showTrace = true ) {
 		if( $showTrace ) {
@@ -275,12 +279,10 @@ class Melon {
 	 */
 	final static private function _acquire( $source, $target ) {
 		if( ! is_file( $target ) ) {
-			// TODO::改为抛出警告
-			throw new Exception\RuntimeException( "{$target}不是一个文件，不能载入它" );
+			trigger_error( "{$target}不是一个文件，不能载入它", E_USER_ERROR );
 		}
 		if( ! self::$_melon->loaderPermission->verify( $source, $target ) ) {
-			// TODO::改为抛出警告
-			throw new Exception\RuntimeException( "{$source}脚本文件没有权限载入{$target}" );
+			trigger_error( "{$source}脚本文件没有权限载入{$target}", E_USER_ERROR );
 		}
 		return ( include $target );
 	}

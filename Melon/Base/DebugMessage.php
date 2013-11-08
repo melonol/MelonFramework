@@ -87,7 +87,7 @@ class DebugMessage {
 	 * @return void
 	 */
 	public function show( $showType = self::SHOW_AUTO ) {
-		echo $this->parse( $showType );
+		echo $this->parse( $showType ) . "\r\n";
 	}
 	
 	/**
@@ -102,6 +102,7 @@ class DebugMessage {
 	 */
 	public function parse( $showType = self::SHOW_AUTO, $showCodeSnippet = true ) {
 		if( $showType === self::SHOW_AUTO ) {
+			//TODO::ajax请求的时候，设为文本
 			$_showType = ( PHP_SAPI === 'cli' ? self::SHOW_TEXT : self::SHOW_HTML );
 		} else {
 			//TODO::抛出警告
@@ -214,7 +215,7 @@ class DebugMessage {
 	 */
 	private function _setText() {
 		$text = '';
-		$br = "\n\r";
+		$br = "\r\n";
 		list( $file, $line ) = $this->_replaceEval( $this->_file, $this->_line );
 		$text .= "{$this->_type}: {$this->_message} in {$file}({$line}){$br}";
 		if( is_array( $this->_trace ) && ! empty( $this->_trace ) ) {
@@ -236,7 +237,7 @@ class DebugMessage {
 				$text .= $br;
 			}
 		}
-		return ( $text . $br );
+		return trim( $text, $br );
 	}
 	
 	/**
