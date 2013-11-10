@@ -15,11 +15,11 @@ defined('IN_MELON') or die('Permission denied');
 class DebugMessage {
 	
 	// 自动判断输出格式
-	const SHOW_AUTO = 0;
+	const DISPLAY_AUTO = 0;
 	// 输出HTML
-	const SHOW_HTML = 1;
+	const DISPLAY_HTML = 1;
 	// 输出文本
-	const SHOW_TEXT = 2;
+	const DISPLAY_TEXT = 2;
 	
 	/**
 	 * 消息类型
@@ -86,7 +86,7 @@ class DebugMessage {
 	 * 3. DebugMessage::SHOW_HTML	HTML
 	 * @return void
 	 */
-	public function show( $showType = self::SHOW_AUTO ) {
+	public function show( $showType = self::DISPLAY_AUTO ) {
 		echo $this->parse( $showType ) . "\r\n";
 	}
 	
@@ -100,15 +100,15 @@ class DebugMessage {
 	 * @param boolean $showCodeSnippet [可选] 如果输出HTML（输出文本该选项无效），是否输出消息所在位置的代码片段
 	 * @return string
 	 */
-	public function parse( $showType = self::SHOW_AUTO, $showCodeSnippet = true ) {
-		if( $showType === self::SHOW_AUTO ) {
+	public function parse( $showType = self::DISPLAY_AUTO, $showCodeSnippet = true ) {
+		if( $showType === self::DISPLAY_AUTO ) {
 			//TODO::ajax请求的时候，设为文本
-			$_showType = ( PHP_SAPI === 'cli' ? self::SHOW_TEXT : self::SHOW_HTML );
+			$_showType = ( PHP_SAPI === 'cli' ? self::DISPLAY_TEXT : self::DISPLAY_HTML );
 		} else {
 			//TODO::抛出警告
-			$_showType = ( $showType === self::SHOW_HTML ? self::SHOW_HTML : self::SHOW_TEXT );
+			$_showType = ( $showType === self::DISPLAY_HTML ? self::DISPLAY_HTML : self::DISPLAY_TEXT );
 		}
-		if( $_showType === self::SHOW_TEXT ) {
+		if( $_showType === self::DISPLAY_TEXT ) {
 			return $this->_setText();
 		} else {
 			return $this->_setHtml( $showCodeSnippet );

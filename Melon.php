@@ -2,6 +2,10 @@
 
 define( 'IN_MELON', true );
 
+// 异常错误常量
+// 它和E_系列的常量一起被用于框架的错误处理
+define( 'E_EXCEPTION', 'E_EXCEPTION' );
+
 use Melon\Base;
 use Melon\Cache;
 use Melon\Exception;
@@ -29,7 +33,7 @@ class Melon {
 		spl_autoload_register( '\Melon::autoload' );
 		
 		set_exception_handler( function( $exception ) {
-			Melon::logMessage( 'Exception', $exception->getMessage(), $exception->getFile(),
+			Melon::logMessage( E_EXCEPTION, $exception->getMessage(), $exception->getFile(),
 				$exception->getLine(), $exception->getTrace() );
 		} );
 		
@@ -80,9 +84,8 @@ class Melon {
 		
 		// 初始化loader
 		self::_initLoader();
-		$melon->logger = new Base\Log( $melon->env['library'] .
-				DIRECTORY_SEPARATOR . 'Data' . DIRECTORY_SEPARATOR . 'Log', 'runtime' );
-		echo $a;
+		$melon->logger = new Base\Logger( $melon->env['library'] .
+				DIRECTORY_SEPARATOR . 'Data' . DIRECTORY_SEPARATOR . 'Log', 'runtime', $melon->conf['logSplitSize'] );
 		define( 'MELON_INIT', true );
 	}
 	
@@ -158,13 +161,50 @@ class Melon {
 			E_USER_ERROR => 'User error',
 			E_USER_WARNING => 'User warning',
 			E_USER_NOTICE => 'User notice',
+			E_EXCEPTION => 'Exception',
 		);
 		$_type = ( isset( $typeMap[ $type ] ) ? $typeMap[ $type ] : $type );
 		$debugMessage = new Base\DebugMessage( $_type, $message, $file, $line, $trace );
-		$debugMessage->show();
+		
+		/**
+		 * 日志助手
+		 * 
+		 * @param int $level 等级，等级决定是否执行回调函数
+		 *  0不执行回调；1异常和致命错误执行回调；2所有错误类型都执行回调；3所有类型都执行回调
+		 * @param Closure $callback 回调函数
+		 * @return void
+		 */
+		$logHandler = function( $level, $callback ) use( $type, &$typeMap ) {
+			switch( $level ) {
+				case 0;
+					break;
+				case 1:
+					$types = array( E_ERROR, E_PARSE, E_COMPILE_ERROR, E_CORE_ERROR, E_EXCEPTION );
+					if( in_array( $type, $types ) ) {
+						$callback();
+					}
+					break;
+				case 2:
+					if( in_array( $type, array_keys( $typeMap ) ) ) {
+						$callback();
+					}
+					break;
+				case 3:
+				default:
+					$callback();
+			}
+		};
+		// 显示
+		$logHandler( self::$_melon->conf['logDisplayLevel'], function() use( $debugMessage ) {
+			$debugMessage->show();
+		} );
+		// 写入
 		if( isset( self::$_melon->logger ) ) {
-			$text = $debugMessage->parse( Base\DebugMessage::SHOW_TEXT );
-			self::$_melon->logger->write( $text );
+			$logger = self::$_melon->logger;
+			$logHandler( self::$_melon->conf['logLevel'], function() use ( $debugMessage, $logger ) {
+				$text = $debugMessage->parse( Base\DebugMessage::DISPLAY_TEXT );
+				$logger->write( $text );
+			} );
 		}
 	}
 	
