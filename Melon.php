@@ -2,9 +2,12 @@
 
 define( 'IN_MELON', true );
 
-// 异常错误常量
-// 它和E_系列的常量一起被用于框架的错误处理
+// 定义一些错误常量，它们和E_系列的常量一起被用于框架的错误处理
+// 命名为同名字符串好了，数字怕有冲突
+// 异常错误
 define( 'E_EXCEPTION', 'E_EXCEPTION' );
+// SQL错误
+define( 'E_SQL', 'E_SQL' );
 
 use Melon\Base;
 use Melon\Cache;
@@ -86,6 +89,7 @@ class Melon {
 		self::_initLoader();
 		$melon->logger = new Base\Logger( $melon->env['library'] .
 				DIRECTORY_SEPARATOR . 'Data' . DIRECTORY_SEPARATOR . 'Log', 'runtime', $melon->conf['logSplitSize'] );
+		echo $a;
 		define( 'MELON_INIT', true );
 	}
 	
@@ -163,8 +167,6 @@ class Melon {
 			E_USER_NOTICE => 'User notice',
 			E_EXCEPTION => 'Exception',
 		);
-		$_type = ( isset( $typeMap[ $type ] ) ? $typeMap[ $type ] : $type );
-		$debugMessage = new Base\DebugMessage( $_type, $message, $file, $line, $trace );
 		
 		/**
 		 * 日志助手
@@ -173,35 +175,37 @@ class Melon {
 		 *  0不执行回调；1异常和致命错误执行回调；2所有错误类型都执行回调；3所有类型都执行回调
 		 * @param Closure $callback 回调函数
 		 * @return void
+		 * @TODO 能解释xdebug的trace
 		 */
-		$logHandler = function( $level, $callback ) use( $type, &$typeMap ) {
-			switch( $level ) {
-				case 0;
-					break;
-				case 1:
-					$types = array( E_ERROR, E_PARSE, E_COMPILE_ERROR, E_CORE_ERROR, E_EXCEPTION );
-					if( in_array( $type, $types ) ) {
-						$callback();
-					}
-					break;
-				case 2:
-					if( in_array( $type, array_keys( $typeMap ) ) ) {
-						$callback();
-					}
-					break;
-				case 3:
-				default:
-					$callback();
+		$logHandler = function( $level, $callback ) use( &$typeMap, $type, $message, $file, $line, $trace ) {
+			// 处理错误消息的实例
+			// 我知道当前函数会被调用多次，所以做一个静态变量保存
+			// 这样可以省下一次实例，我吝啬这一点
+			// 实际运行中，如果不注意，NOTICE和WARNING可能会很多
+			static $debugMessage = null;
+			if( $level === 0 ) {
+				return;
+			} else if( $level === 1 && ! in_array( $type, array( E_ERROR, E_PARSE,
+				E_COMPILE_ERROR, E_CORE_ERROR, E_EXCEPTION ) )  ) {
+				return;
+			} else if( $level === 2 && ! in_array( $type, array_keys( $typeMap ) ) ) {
+				return;
+			} else {
+				if( is_null( $debugMessage ) ) {
+					$_type = ( isset( $typeMap[ $type ] ) ? $typeMap[ $type ] : $type );
+					$debugMessage = new Base\DebugMessage( $_type, $message, $file, $line, $trace );
+				}
+				$callback( $debugMessage );
 			}
 		};
 		// 显示
-		$logHandler( self::$_melon->conf['logDisplayLevel'], function() use( $debugMessage ) {
+		$logHandler( self::$_melon->conf['logDisplayLevel'], function( $debugMessage ) {
 			$debugMessage->show();
 		} );
 		// 写入
 		if( isset( self::$_melon->logger ) ) {
 			$logger = self::$_melon->logger;
-			$logHandler( self::$_melon->conf['logLevel'], function() use ( $debugMessage, $logger ) {
+			$logHandler( self::$_melon->conf['logLevel'], function( $debugMessage ) use ( $logger ) {
 				$text = $debugMessage->parse( Base\DebugMessage::DISPLAY_TEXT );
 				$logger->write( $text );
 			} );
@@ -209,7 +213,7 @@ class Melon {
 	}
 	
 	/**
-	 * 记录调试日志
+	 * 调试信息
 	 * 
 	 * 对{@link \Melon::logMessage}的封装
 	 * 它根据程序配置，可以输出到浏览器，也可以写入日志文件
@@ -218,7 +222,7 @@ class Melon {
 	 * @param boolean $showTrace 是否显示调用方法栈
 	 * @return void
 	 */
-	final static public function debugLog( $message, $showTrace = true ) {
+	final static public function debugMessage( $message, $showTrace = true ) {
 		if( $showTrace ) {
 			$trace = debug_backtrace();
 			$firstTrace = array_shift( $trace );
