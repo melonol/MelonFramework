@@ -82,7 +82,6 @@ class Melon {
 		self::_initLoader();
 		$melon->logger = new Base\Log( $melon->env['library'] .
 				DIRECTORY_SEPARATOR . 'Data' . DIRECTORY_SEPARATOR . 'Log', 'runtime' );
-		echo $a;
 		define( 'MELON_INIT', true );
 	}
 	
