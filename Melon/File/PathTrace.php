@@ -101,12 +101,13 @@ final class PathTrace {
 	private static function _isAbsolutePath( $path = '' ) {
 		// 主流的系统我见过有两种绝对路径：
 		//	一种是以/号开头的，而另一种是字母和:号开头（猜猜看它们可能是什么系统？\偷笑）
+		// 还有就是phar
 		// 如果你还见过其它的形式，或者有更好的判断绝对路径的方法，请告诉我
 		$strFirst = ( isset( $path[0] ) ? $path[0] : '' );
 		$strSecond = ( isset( $path[1] ) ? $path[1] : '' );
 		$isAbsolute = ( $strFirst === '/' ||
-			( stripos( 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $strFirst ) !== false &&
-				$strSecond === ':' ) );
+			( stripos( 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $strFirst ) !== false && $strSecond === ':' ) ||
+			( stripos( $path, 'PHAR://' ) === 0 ) );
 		return $isAbsolute;
 	}
 	
