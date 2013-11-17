@@ -7,11 +7,17 @@
 	<body>
 		<div>
 			{foreach  $arr.d as $value => $a}
-				{if $a == 2}{$value.aa[ $b.c[ $d.e[ abc ] ].f ]}{/if}
+				{if $a == 2}
+					{$value.aa[ $b.c[ $d.e[ abc ] ].f ]}
+				{elseif $arr.d.e[g]}
+					{$value.aa[ $b.c[ $d.e[ abc ] ].f ]}
+				{else}
+				{/if}
 			{/foreach}
 			{tag:list id="2" name=$a.b.c[$d.z].e.f['g']}
 				<p>{$data.name}</p>
 			{/tag:list}
+			{print $a;}
 		</div>
 	</body>
 </html>

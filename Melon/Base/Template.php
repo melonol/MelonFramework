@@ -75,11 +75,13 @@ class Template {
 		$this->_replaceVars();
 		$this->_replaceTag();
 		$exps = array(
-			"/{$b}php\\s+(.*?)\\/{$e}/s" => '$1;',
-			"/{$b}echo\\s+(.*?){$e}/" => 'echo $1;',
-			"/{$b}if\\s+(.*?){$e}/" => 'if($1){',
-			"/{$b}foreach\\s+(.*?)(?<!=){$e}/" => 'foreach($1){',
-			"/{$b}\\/(if|foreach){$e}/" => '}',
+			"/{$b}php\\s+(.*?)\\/?{$e}/is"		=> '$1;',
+			"/{$b}print\\s+(.*?)\\/?{$e}/i"		=> 'echo $1;',
+			"/{$b}if\\s+(.*?){$e}/i"			=> 'if($1){',
+			"/{$b}else{$e}/i"					=> '}else{',
+			"/{$b}elseif\\s+(.*?){$e}/i"			=> '}elseif($1){',
+			"/{$b}foreach\\s+(.*?)(?<!=){$e}/i"	=> 'foreach($1){',
+			"/{$b}\\/(if|foreach){$e}/i"			=> '}',
 		);
 		foreach( $exps as $exp => $replace ) {
 			$this->_content = preg_replace( $exp, "<?php {$replace} ?>", $this->_content );
@@ -95,7 +97,7 @@ class Template {
 		$self = $this;
 		$b = $this->_beginTag;
 		$e = $this->_endTag;
-		$this->_content = preg_replace_callback( "/{$b}((?:echo|if|foreach|\\$).*?){$e}/",
+		$this->_content = preg_replace_callback( "/{$b}((?:print|if|elseif|foreach|\\$).*?){$e}/i",
 			function( $match ) use( $self, $b, $e ) {
 			$var = $self->replaceVar( $match[1] );
 			if( $match[1][0] === '$' ) {
@@ -115,7 +117,7 @@ class Template {
 	
 	private function _replaceTag() {
 		$tags = $this->_tags;
-		$exp = "/{$this->_beginTag}tag:(\\w+)(?:{$this->_endTag}|(\\s+.*?){$this->_endTag})/";
+		$exp = "/{$this->_beginTag}tag:(\\w+)(?:{$this->_endTag}|(\\s+.*?){$this->_endTag})/i";
 		$self = $this;
 		$match = array();
 		$this->_content = preg_replace_callback( $exp, function( $match ) use( $self, $tags ) {
@@ -136,8 +138,7 @@ class Template {
 					foreach( $tags[ $tagName ]['args'] as $argName => $defaultValue ) {
 						$value = isset( $args[ $argName ] ) ? $args[ $argName ] : $defaultValue;
 						if( substr( $value, 0, 1 ) === '$' ) {
-							$value = $self->replaceVar( $value );
-							$exportArgs .= $value . ',';
+							$exportArgs .= $self->replaceVar( $value ) . ',';
 						} else {
 							$exportArgs .= "'{$value}',";
 						}
@@ -151,7 +152,7 @@ class Template {
 			}
 			return "<?php foreach(call_user_func_array( '{$tags[ $tagName ]['callable']}', {$exportArgs} ) as \${$resultName}) { ?>";
 		}, $this->_content );
-		$this->_content = preg_replace( "/{$this->_beginTag}\\/tag:(\\w+){$this->_endTag}/", '<?php } ?>', $this->_content);
+		$this->_content = preg_replace( "/{$this->_beginTag}\\/tag:(\\w+){$this->_endTag}/i", '<?php } ?>', $this->_content);
 	}
 	
 	public function fetch() {
