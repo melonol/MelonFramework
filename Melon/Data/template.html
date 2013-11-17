@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	</head>
+	<body>
+		<div>
+			{foreach  $arr.d as $value => $a}
+				{if $a == 2}{$value.aa[ $b.c[ $d.e[ abc ] ].f ]}{/if}
+			{/foreach}
+			{tag:list id="2" name=$a.b.c[$d.z].e.f['g']}
+				<p>{$data.name}</p>
+			{/tag:list}
+		</div>
+	</body>
+</html>

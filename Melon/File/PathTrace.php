@@ -124,6 +124,7 @@ final class PathTrace {
 		// DEBUG_BACKTRACE_IGNORE_ARGS会忽略方法栈的参数
 		// 想想，通过参数传递对象是很普遍的事情，如果是你的系统有很多大对象
 		// debug_backtrace返回的信息量是多么庞大，如果多次使用，这样的内存消耗还是挺大的
+		// TODO::php5.3.6以下不要使用DEBUG_BACKTRACE_IGNORE_ARGS
 		$debugBacktrace = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS );
 		$sourceTrace = $debugBacktrace[ $ignoreTrace - 1 ];
 		

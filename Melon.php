@@ -433,8 +433,19 @@ class Melon {
 	final static public function run() {
 		
 	}
+	final static public function callable( $name ) {
+		return array( array(
+			'name' => $name,
+			'pic' => '1'
+		),  array(
+			'name' => 'test.txt',
+			'pic' => '1'
+		));
+	}
 }
 
 class M extends Melon {}
 
 M::init();
+$template = new Base\Template( Melon::env( 'library' ) . '/Data/template.html' );
+$template->compile();

@@ -76,9 +76,11 @@ class Logger {
 	 * @throws \Melon\Exception\RuntimeException
 	 */
 	public function __construct( $dir, $filePrefix = 'log', $splitSize = 10 ) {
-		//TODO::自动创建日志目录
-		if( ! is_readable( $dir ) ) {
-			throw new \Melon\Exception\RuntimeException( "日志目录不可访问：{$dir}" );
+		if( ! is_dir( $dir ) ) {
+			$mkdir = mkdir( $dir, 0777, true );
+			if( ! $mkdir ) {
+				throw new \Melon\Exception\RuntimeException( "无法创建日志目录：{$dir}" );
+			}
 		}
 		$this->_dir = $dir;
 		$this->_splitSize = $splitSize * 1024 * 1024;
