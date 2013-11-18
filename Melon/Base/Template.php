@@ -26,6 +26,8 @@ class Template {
 	private $_beginTag = '{';
 	
 	private $_endTag = '}';
+	
+	private $_includeFiles = array();
 
 	public function __construct( $template ) {
 		$this->_template = $template;
@@ -41,11 +43,11 @@ class Template {
 		
 	}
 	
-	private function _getContent() {
-		if( ! file_exists( $this->_template ) ) {
-			throw new \Melon\Exception\RuntimeException( "模板文件{$this->_template}不存在" );
+	private function _getContent( $file ) {
+		if( ! file_exists( $file ) ) {
+			throw new \Melon\Exception\RuntimeException( "模板文件{$file}不存在" );
 		}
-		return file_get_contents( $this->_template );
+		return file_get_contents( $file );
 	}
 	
 	public function assign( $key, $value = null ) {
@@ -68,12 +70,14 @@ class Template {
 
 	}
 	
-	public function compile() {
+	public function compile( $template ) {
+		$content = $this->_getContent( $template );
+		$content = $this->_replaceInclude( $template, $content );
+		
+		$content = $this->_replaceVars( $content );
+		$content = $this->_replaceTag( $content );
 		$b = $this->_beginTag;
 		$e = $this->_endTag;
-		$this->_content = $this->_getContent();
-		$this->_replaceVars();
-		$this->_replaceTag();
 		$exps = array(
 			"/{$b}php\\s+(.*?)\\/?{$e}/is" => '$1;',
 			"/{$b}print\\s+(.*?)\\/?{$e}/i" => 'echo $1;',
@@ -85,27 +89,25 @@ class Template {
 			"/{$b}\\/(if|foreach){$e}/i" => '}',
 		);
 		foreach( $exps as $exp => $replace ) {
-			$this->_content = preg_replace( $exp, "<?php {$replace} ?>", $this->_content );
+			$content = preg_replace( $exp, "<?php {$replace} ?>", $content );
 		}
 		
-		$file = \Melon::env('root') . '/Melon/Data/complie.php';
-		file_put_contents($file, $this->_content);
-		
-		include $file;
+		$this->_includeFiles[] = $template;
+		return $content;
 	}
 	
-	private function _replaceVars() {
+	private function _replaceVars( $content ) {
 		$self = $this;
 		$b = $this->_beginTag;
 		$e = $this->_endTag;
-		$this->_content = preg_replace_callback( "/{$b}((?:print|if|elseif|foreach|\\$).*?){$e}/i",
+		return preg_replace_callback( "/{$b}((?:print|if|elseif|foreach|\\$).*?){$e}/i",
 			function( $match ) use( $self, $b, $e ) {
 			$var = $self->replaceVar( $match[1] );
 			if( $match[1][0] === '$' ) {
 				return "<?php echo {$var}; ?>";
 			}
 			return $b . $var. $e;
-		}, $this->_content );
+		}, $content );
 	}
 	
 	public function replaceVar( $var ) {
@@ -116,12 +118,12 @@ class Template {
 		return $var;
 	}
 	
-	private function _replaceTag() {
+	private function _replaceTag( $content ) {
 		$tags = $this->_tags;
 		$exp = "/{$this->_beginTag}tag:(\\w+)(?:{$this->_endTag}|(\\s+.*?){$this->_endTag})/i";
 		$self = $this;
 		$match = array();
-		$this->_content = preg_replace_callback( $exp, function( $match ) use( $self, $tags ) {
+		$content = preg_replace_callback( $exp, function( $match ) use( $self, $tags ) {
 			$tagName = $match[1];
 			if( ! isset( $tags[ $tagName ] ) ) {
 				throw new \Melon\Exception\RuntimeException( "没有定义{$tagName}模板标签" );
@@ -153,8 +155,27 @@ class Template {
 				return "<?php echo {$tags[ $tagName ]['callable']}({$exportArgs}); ?>";
 			}
 			return "<?php foreach({$tags[ $tagName ]['callable']}({$exportArgs}) as \${$resultName}) { ?>";
-		}, $this->_content );
-		$this->_content = preg_replace( "/{$this->_beginTag}\\/tag:(\\w+){$this->_endTag}/i", '<?php } ?>', $this->_content);
+		}, $content );
+		$content = preg_replace( "/{$this->_beginTag}\\/tag:(\\w+){$this->_endTag}/i", '<?php } ?>', $content );
+		
+		return $content;
+	}
+	
+	public function _replaceInclude( $template, $content ) {
+		$sourceTemplate = $this->_template;
+		$self = $this;
+		return preg_replace_callback( "/{$this->_beginTag}include\\s+(['\"]?)(.*?)(\\1)\\s*\\/?{$this->_endTag}/i",
+			function( $match ) use( $self, $template ) {
+			if( \Melon\Base\Func\isAbsolutePath( $match[2] ) ) {
+				$includeTemplate = $match[2];
+			} else {
+				$includeTemplate = dirname( $template ) . DIRECTORY_SEPARATOR . $match[2];
+			}
+			if( ! file_exists( $includeTemplate ) ) {
+				throw new \Melon\Exception\RuntimeException( "解释{$template}模板时，子模板{$match[2]}不存在" );
+			}
+			return $self->compile( $includeTemplate );
+		}, $content );
 	}
 	
 	public function fetch() {
@@ -162,6 +183,9 @@ class Template {
 	}
 	
 	public function display() {
-		
+		$file = \Melon::env('root') . '/Melon/Data/complie.php';
+		$this->_content = $this->compile( $this->_template );
+		file_put_contents($file, $this->_content);
+		include $file;
 	}
 }

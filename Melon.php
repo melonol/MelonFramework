@@ -89,6 +89,9 @@ class Melon {
 		self::_initLoader();
 		$melon->logger = new Base\Logger( $melon->env['library'] . DIRECTORY_SEPARATOR .
 			'Data' . DIRECTORY_SEPARATOR . 'Log', 'runtime', $melon->conf['logSplitSize'] );
+		
+		//TODO::重构
+		require $melon->env['library'] . DIRECTORY_SEPARATOR . 'Base' . DIRECTORY_SEPARATOR . 'Func.php';
 		define( 'MELON_INIT', true );
 	}
 	
@@ -448,4 +451,4 @@ class M extends Melon {}
 
 M::init();
 $template = new Base\Template( Melon::env( 'library' ) . '/Data/template.html' );
-$template->compile();
+$template->display();

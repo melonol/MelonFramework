@@ -57,7 +57,7 @@ final class PathTrace {
 		// 初始化一个变量来保存调用者的栈信息
 		$sourceTrace = array();
 		// 第一步要做的就是要判断这是绝对路径还是相对路径，这样好分别处理
-		if( ! self::_isAbsolutePath( $_targetPath ) ) {
+		if( ! \Melon\Base\Func\isAbsolutePath( $_targetPath ) ) {
 			// 通过栈得到最近调用源的目录路径，和相对文件路径结合，就可以算出绝对路径
 			$sourceTrace = self::_getSourceTrace();
 			$sourceDir = dirname( $sourceTrace['file'] );
@@ -90,25 +90,6 @@ final class PathTrace {
 	public static function sourceFile() {
 		$sourceTrace = self::_getSourceTrace();
 		return empty( $sourceTrace ) ? false : $sourceTrace['file'];
-	}
-	
-	/**
-	 * 判断一个路径是否为绝对的
-	 * 
-	 * @param string $path 被判断的路径
-	 * @return boolean
-	 */
-	private static function _isAbsolutePath( $path = '' ) {
-		// 主流的系统我见过有两种绝对路径：
-		//	一种是以/号开头的，而另一种是字母和:号开头（猜猜看它们可能是什么系统？\偷笑）
-		// 还有就是phar
-		// 如果你还见过其它的形式，或者有更好的判断绝对路径的方法，请告诉我
-		$strFirst = ( isset( $path[0] ) ? $path[0] : '' );
-		$strSecond = ( isset( $path[1] ) ? $path[1] : '' );
-		$isAbsolute = ( $strFirst === '/' ||
-			( stripos( 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $strFirst ) !== false && $strSecond === ':' ) ||
-			( stripos( $path, 'PHAR://' ) === 0 ) );
-		return $isAbsolute;
 	}
 	
 	/**
