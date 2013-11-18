@@ -75,13 +75,14 @@ class Template {
 		$this->_replaceVars();
 		$this->_replaceTag();
 		$exps = array(
-			"/{$b}php\\s+(.*?)\\/?{$e}/is"		=> '$1;',
-			"/{$b}print\\s+(.*?)\\/?{$e}/i"		=> 'echo $1;',
-			"/{$b}if\\s+(.*?){$e}/i"			=> 'if($1){',
-			"/{$b}else{$e}/i"					=> '}else{',
-			"/{$b}elseif\\s+(.*?){$e}/i"			=> '}elseif($1){',
-			"/{$b}foreach\\s+(.*?)(?<!=){$e}/i"	=> 'foreach($1){',
-			"/{$b}\\/(if|foreach){$e}/i"			=> '}',
+			"/{$b}php\\s+(.*?)\\/?{$e}/is" => '$1;',
+			"/{$b}print\\s+(.*?)\\/?{$e}/i" => 'echo $1;',
+			"/{$b}if\\s+(.*?){$e}/i" => 'if($1){',
+			"/{$b}else{$e}/i" => '}else{',
+			"/{$b}elseif\\s+(.*?){$e}/i" => '}elseif($1){',
+			"/{$b}foreach\\s+([^\\s]+)\\s*([^\\s]+)\\s*{$e}/i" => 'foreach($1 as $2){',
+			"/{$b}foreach\\s+([^\\s]+)\\s*([^\\s]+)\\s*([^\\s]+)\\s*{$e}/i" => 'foreach($1 as $2 => $3){',
+			"/{$b}\\/(if|foreach){$e}/i" => '}',
 		);
 		foreach( $exps as $exp => $replace ) {
 			$this->_content = preg_replace( $exp, "<?php {$replace} ?>", $this->_content );
@@ -133,24 +134,25 @@ class Template {
 				if( ! empty( $matchArgs[1] ) ) {
 					$args = array();
 					foreach( $matchArgs[1] as $index => $name ) {
-						$args[ $name ] = ! empty( $matchArgs[4][ $index ] ) ?  $matchArgs[4][ $index ] : $matchArgs[3][ $index ];
+						$args[ $name ] = ( ! empty( $matchArgs[4][ $index ] ) ?
+							$matchArgs[4][ $index ] : $matchArgs[3][ $index ] );
 					}
 					foreach( $tags[ $tagName ]['args'] as $argName => $defaultValue ) {
-						$value = isset( $args[ $argName ] ) ? $args[ $argName ] : $defaultValue;
+						$value = ( isset( $args[ $argName ] ) ? $args[ $argName ] : $defaultValue );
 						if( substr( $value, 0, 1 ) === '$' ) {
 							$exportArgs .= $self->replaceVar( $value ) . ',';
 						} else {
-							$exportArgs .= "'{$value}',";
+							$exportArgs .= '\'' . addcslashes( $value, '\'' ) . '\',';
 						}
 					}
-					$exportArgs =  "array( $exportArgs )";
-					$resultName = isset( $args['result'] ) ? $args['result'] : $resultName;
+					$exportArgs = rtrim( $exportArgs, ',' );
+					$resultName = ( isset( $args['result'] ) ? $args['result'] : $resultName );
 				}
 			}
 			if( substr( $match[0], -2, 1 ) === '/' ) {
-				return "<?php echo call_user_func_array( '{$tags[ $tagName ]['callable']}', {$exportArgs} ); ?>";
+				return "<?php echo {$tags[ $tagName ]['callable']}({$exportArgs}); ?>";
 			}
-			return "<?php foreach(call_user_func_array( '{$tags[ $tagName ]['callable']}', {$exportArgs} ) as \${$resultName}) { ?>";
+			return "<?php foreach({$tags[ $tagName ]['callable']}({$exportArgs}) as \${$resultName}) { ?>";
 		}, $this->_content );
 		$this->_content = preg_replace( "/{$this->_beginTag}\\/tag:(\\w+){$this->_endTag}/i", '<?php } ?>', $this->_content);
 	}

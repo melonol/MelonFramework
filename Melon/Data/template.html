@@ -6,7 +6,7 @@
 	</head>
 	<body>
 		<div>
-			{foreach  $arr.d as $value => $a}
+			{foreach $arr.die[pd] $k $v}
 				{if $a == 2}
 					{$value.aa[ $b.c[ $d.e[ abc ] ].f ]}
 				{elseif $arr.d.e[g]}
@@ -14,7 +14,7 @@
 				{else}
 				{/if}
 			{/foreach}
-			{tag:list id="2" name=$a.b.c[$d.z].e.f['g']}
+			{tag:list id='2"' name=$a.b.c[$d.z].e.f['g']}
 				<p>{$data.name}</p>
 			{/tag:list}
 			{print $a;}
