@@ -100,7 +100,7 @@ class Template {
 		$self = $this;
 		$b = $this->_beginTag;
 		$e = $this->_endTag;
-		return preg_replace_callback( "/{$b}((?:print|if|elseif|foreach|\\$).*?){$e}/i",
+		return preg_replace_callback( "/{$b}((?:print|if|elseif|foreach|\$).*?){$e}/i",
 			function( $match ) use( $self, $b, $e ) {
 			$var = $self->replaceVar( $match[1] );
 			if( $match[1][0] === '$' ) {
