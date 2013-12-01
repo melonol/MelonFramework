@@ -44,8 +44,31 @@ class Template {
 		);
 	}
 	
-	static public function checkForUpdates() {
-		
+	static public function getSubTemplate( $dir, $template, $compile ) {
+		if( file_exists( $dir . DIRECTORY_SEPARATOR . $template ) ) {
+			$template = $dir . DIRECTORY_SEPARATOR . $template;
+		}
+		$templateObj = new self( $template );
+		return $templateObj->getCompileFile( $template, $compile );
+	}
+	
+	public function getCompileFile( $sourceFile, $targerDir ) {
+		if( ! $targerDir ||
+			( ! is_dir( $targerDir ) && ! mkdir( $targerDir, 0777, true ) ) ) {
+			throw new \Melon\Exception\RuntimeException( "模板编译目录不存在" );
+		}
+		$_targerDir = realpath( $targerDir );
+		$_sourceFile = realpath( $sourceFile );
+		if( ! $sourceFile ) {
+			throw new \Melon\Exception\RuntimeException( "模板文件{$sourceFile}不存在" );
+		}
+		$compileFile = $_targerDir . DIRECTORY_SEPARATOR . md5( $_sourceFile ) . '.php';
+		if( ! file_exists( $compileFile ) ||  filemtime( $compileFile ) < filemtime( $sourceFile ) ) {
+			echo '编译<br>';
+			$content = $this->compile( $sourceFile );
+			file_put_contents( $compileFile , $content );
+		}
+		return $compileFile;
 	}
 	
 	private function _getContent( $template ) {
@@ -59,12 +82,14 @@ class Template {
 		
 	}
 	
-	public function setCachePath() {
-		
+	public function setCachePath( $cachePath ) {
+		$this->_cachePath = $cachePath;
+		return $this;
 	}
 	
-	public function setCompilePath() {
-		
+	public function setCompilePath( $compileingPath ) {
+		$this->_compileingPath = $compileingPath;
+		return $this;
 	}
 	
 	public function saveCache( $cachePath = null ) {
@@ -72,7 +97,7 @@ class Template {
 	}
 	
 	public function saveCompile( $compilePath = null ) {
-
+		
 	}
 	
 	public function compile(  $template  ) {
@@ -219,19 +244,14 @@ class Template {
 	 */
 	public function compileInclude( $content, $dir ) {
 		$self = $this;
-		$exp = "/{$this->_beginTag}include\\s+(['\"]?)(.*?)(\\1)\\s*\\/?{$this->_endTag}/i";
+		$exp = "/{$this->_beginTag}include\\s+((['\"]?).*?(\\2))\\s*\\/?{$this->_endTag}/i";
 		return preg_replace_callback( $exp, function( $match ) use( $self, $dir ) {
-			// 解释子模板的路径
-			if( \Melon\Base\Func\isAbsolutePath( $match[2] ) ) {
-				$includeTemplate = $match[2];
-			} else {
-				$includeTemplate = $dir . DIRECTORY_SEPARATOR . $match[2];
-			}
-			if( ! file_exists( $includeTemplate ) ) {
-				throw new \Melon\Exception\RuntimeException( "子模板{$match[2]}不存在" );
+			$template = $match[1];
+			if( ! preg_match( '/^([\'"]).*\1$/', $template ) ) {
+				$template = "'$template'";
 			}
 			// 编译子模板
-			return $self->compileSnippet( $includeTemplate );
+			return '<?php include ' . get_class( $self ) . "::getSubTemplate( '$dir', $template, __DIR__ ); ?>";
 		}, $content );
 	}
 	
@@ -310,9 +330,7 @@ class Template {
 	}
 	
 	public function display() {
-		$file = \Melon::env('root') . '/Melon/Data/complie.php';
-		$this->_content = $this->compile( $this->_template );
-		file_put_contents($file, $this->_content);
-		include $file;
+		$compileFile = $this->getCompileFile( $this->_template, $this->_compileingPath );
+		include $compileFile;
 	}
 }

@@ -451,4 +451,4 @@ class M extends Melon {}
 
 M::init();
 $template = new Base\Template( Melon::env( 'library' ) . '/Data/subTemplate.html' );
-$template->display();
+$template->setCompilePath( Melon::env( 'library' ) . '/Data/' )->display();

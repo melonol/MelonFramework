@@ -16,6 +16,6 @@ class LoaderSet extends \Melon\Util\Set {
 	 * @return string 
 	 */
 	protected function _normalizeKey( $key ) {
-		return md5( strtolower( $key ) );
+		return md5( $key );
 	}
 }
