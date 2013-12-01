@@ -450,5 +450,5 @@ class Melon {
 class M extends Melon {}
 
 M::init();
-$template = new Base\Template( Melon::env( 'library' ) . '/Data/template.html' );
+$template = new Base\Template( Melon::env( 'library' ) . '/Data/subTemplate.html' );
 $template->display();

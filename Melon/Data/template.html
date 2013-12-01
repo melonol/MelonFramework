@@ -1,27 +1,35 @@
+{extend 'parentTemplate.html' /}
 <!DOCTYPE html>
 <html>
 	<head>
 		<title></title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	</head>
-	<body>
-		<div>
-			{foreach $arr.die[pd] $k $v}
-				{if $a == 2}
-					{$value.aa[ $b.c[ $d.e[ 'abc' ] ].f ] /}
-				{elseif $arr.d.e[g]/}
-					{$value.aa[ $b.c[ $d.e[ 'abc' ] ].f ] /}
+	<body>{block body}<div>hello world!</div>{/block}
+		
+		b
+		{block td}靠靠
+			{block bod}
+				adf
+			{/block}
+			{foreach $arr[pd] $k $v}
+				{if $a == "a.b.c"}
+				{elseif $arr[g]/}
 				{else/}
 				{/if}
 			{/foreach}
-			{tag:list id='2"' name=$a.b.c['abc'].e.f['g']}
-				<p>{$data.name /}</p>
-			{/tag:list}
-			{print $a; /}
-			{include './subTemplate.html' /}
-			{php}
-				
-			{/php}
-		</div>
+		{/block}
+		e
+		{block ee}
+		<div>
+			{foreach $arr[pd] $k $v}
+				{if $a == "a.b.c"}
+				{elseif $arr[g]/}
+				{else/}
+				{/if}
+			{/foreach}
+		{/block}
+	<script>
+	</script>
 	</body>
 </html>
