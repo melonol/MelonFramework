@@ -27,7 +27,7 @@ final class PathTrace {
 	 * 比如在 /MelonFramework/Melon.php 文件中：
 	 * <pre>
 	 * echo PathTrace::parse( './Melon/System/PathTrace.php' );
-	 * // 输出：/MelonFramework/System/PathTrace.php
+	 * // 输出：/MelonFramework/Melon/System/PathTrace.php
 	 * </pre>
 	 * 
 	 * @param boolean $getSource [可选] 是否获取调用者的文件路径。一般它用来做一些权限之类的验证
@@ -41,10 +41,6 @@ final class PathTrace {
 	 *		[target] => /MelonFramework/Melon/System/PathTrace.php
 	 * )
 	 * </pre>
-	 * 
-	 * @param array $ignoreTrace [可选] 格式请看 self::_getSourceTrace 
-	 * 如果提供这项参数，并且 $getSource 设置为 true ，
-	 * 在调用栈中向上查找 source 信息的时候，将会忽略包含 $ignoreTrace 中的方法的栈
 	 * 
 	 * @return string|array|false
 	 */

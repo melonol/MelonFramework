@@ -284,56 +284,56 @@ class DebugMessage {
 		}
 		$br = '<br />';
 		// 分割html保存到数组
-		$html_lines = explode( $br, $html );
+		$htmlLines = explode( $br, $html );
 		// 这html其实挺大的，没用了先清掉
 		unset($html);
-		$lines_count = count( $html_lines );
+		$linesCount = count( $htmlLines );
 		// 行号的html
-		$line_html = '';
+		$lineHtml = '';
 		// 代码的html
-		$code_html = '';
+		$codeHtml = '';
 
 		// 获取相应范围的代码
 		// 要注意边界，比如焦点在第一行，那再上面应该是没有代码的
 		$start = ( ( $focus - $range ) < 1 ? 1 : ($focus - $range) );
 		// 下面也是
-		$end = ( ( $focus + $range ) > $lines_count ? $lines_count : ( $focus + $range ) );
+		$end = ( ( $focus + $range ) > $linesCount ? $linesCount : ( $focus + $range ) );
 		for( $line = ( $start - 1 ); $line < $end; $line++ ) {
 			// 在行号前填充0，看起来更整齐一些
-			$index_pad = str_pad( $line + 1, strlen( $lines_count ), 0, STR_PAD_LEFT );
-			$line_html .= $index_pad . $br;
-			$code_html .= $html_lines[ $line ] . $br;
+			$index_pad = str_pad( $line + 1, strlen( $linesCount ), 0, STR_PAD_LEFT );
+			$lineHtml .= $index_pad . $br;
+			$codeHtml .= $htmlLines[ $line ] . $br;
 		}
 
 		// 修正开始标签
 		// 有可能取到的片段缺少开始的span标签，而它包代码着色的CSS属性
 		// 如果缺少，片段开始的代码则没有颜色了，所以需要把它找出来
-		if( substr( $code_html, 0, 5 ) !== '<span' ) {
+		if( substr( $codeHtml, 0, 5 ) !== '<span' ) {
 			$index = $start - 1;
 			// 在范围外一直向上找到开始标签
 			while( $index > 0 ) {
 				$match = array();
 				// 找到了后，只需要拿到颜色的属性，让开始范围的代码重新着色即可
-				preg_match( '/<span style="color: #([\w]+)"(.(?!<\/span>))+$/', $html_lines[ --$index ], $match );
+				preg_match( '/<span style="color: #([\w]+)"(.(?!<\/span>))+$/', $htmlLines[ --$index ], $match );
 				if( ! empty( $match ) ) {
-					$code_html = "<span style=\"color: #{$match[1]}\">" . $code_html;
+					$codeHtml = "<span style=\"color: #{$match[1]}\">" . $codeHtml;
 					break;
 				}
 			}
 		}
 		// 修正结束标签
-		if( substr( $code_html, -7 ) !== '</span>' ) {
-			$code_html .= '</span>';
+		if( substr( $codeHtml, -7 ) !== '</span>' ) {
+			$codeHtml .= '</span>';
 		}
 		
 		// 现在可以生成一个包含行号和焦点高亮的代码块
 		// 这CSS写得我够呛。。
-		$hight_line_posistion = ( ( $focus - $start ) * $style['lineHeight'] );
+		$hightLinePosistion = ( ( $focus - $start ) * $style['lineHeight'] );
 		return <<<EOT
 			<div style="position: relative; font-size: {$style['fontSize']}px;">
-				<span style="display: block; position: absolute; z-index: 1; top: {$hight_line_posistion}px; height: {$style['lineHeight']}px; width: 100%; _width: 95%; background-color: yellow; opacity: 0.4; filter:alpha(opacity=40); "></span>
-				<div style="float: left; margin-right: 10px; position: relative; z-index: 2; line-height: {$style['lineHeight']}px; color: #aaa;">{$line_html}</div>
-				<div style="_width: 95%; line-height: {$style['lineHeight']}px; position: relative; z-index: 2; overflow: hidden; white-space:nowrap; text-overflow:ellipsis;">{$code_html}</div>
+				<span style="display: block; position: absolute; z-index: 1; top: {$hightLinePosistion}px; height: {$style['lineHeight']}px; width: 100%; _width: 95%; background-color: yellow; opacity: 0.4; filter:alpha(opacity=40); "></span>
+				<div style="float: left; margin-right: 10px; position: relative; z-index: 2; line-height: {$style['lineHeight']}px; color: #aaa;">{$lineHtml}</div>
+				<div style="_width: 95%; line-height: {$style['lineHeight']}px; position: relative; z-index: 2; overflow: hidden; white-space:nowrap; text-overflow:ellipsis;">{$codeHtml}</div>
 			</div>
 EOT;
 	}
