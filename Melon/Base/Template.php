@@ -103,12 +103,6 @@ class Template {
 		$this->_template = \Melon\File\PathTrace::repair( $template );
 		$this->_beginTag = $tag[0];
 		$this->_endTag = $tag[1];
-		$this->_tags = array(
-			'list' => array(
-				'callable' => '\Melon::callable',
-				'args' => array( 'name' => 3, 'id' => null )
-			)
-		);
 	}
 	
 	/**
