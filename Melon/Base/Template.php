@@ -20,9 +20,40 @@ defined('IN_MELON') or die('Permission denied');
  * {php php代码/}
  * {php} php代码 {/php}
  * {include 子模板路径}  注：可在模板中引入子模板
+ * 
  * {extend 继承模板路径/}
  * {block 块名称} 块内容 {/block}
+ * 如果你熟悉smarty中的继承，应该不难理解，使用方法基本类似
+ * 继承标签由extend和block标签共同完成
+ * 继承模板中的block会覆盖父模板中的同名block内容
+ * 如果没有覆盖（同名块）父模板某个block，则使用这个block中默认的内容
+ * 
  * {tag:标签名 属性=值} 内容 {/tag}  注：可使用assignTag或assignTagItem方法添加自定义标签
+ * 你可以在模板中使用这个自定义标签
+ * // 声明一个获取某个列表数据的函数
+ * function getList( $id, $limit ) {
+ *		// 返回一个列表数据
+ * }
+ * // 定义一个list标签
+ * $template->assignTag( 'list', array(
+ *		'callable' => 'getList',
+ *		'args' => array( 'id' => 1, 'limit' => 10 )
+ * ) );
+ * 
+ * 
+ * 如果getList返回一个数组，在模板中就可以这样使用，程序会自动遍历这个数组：
+ * {tag:list id=1}
+ *		{$data} //$data是getList返回的数据
+ * {/tag:list}
+ * 参数可使用变量，同时也可以自定义返回结果的名称：
+ * {tag:list id=$id result=row}
+ *		{$row}
+ * {/tag:list}
+ * 
+ * 如果getList返回一个字符串，在模板中可以这样使用，程序会输出这个字符串：
+ * {tag:list id=1 /}
+ * 
+ * 另外，标签也可以互相嵌套，没有限制
  * </pre>
  */
 class Template {
@@ -110,6 +141,9 @@ class Template {
 	 * 
 	 * @param string $tagname 自定义标签名
 	 * @param array $setting 标签设置
+	 * 要提供的参数：
+	 * １. callable		string	可直接调用的函数名称
+	 * ２. args		array	参数数组，key是参数名称，value是默认值，数组元素必须按照callable函数的参数顺序一一对应
 	 * @return \Melon\Base\Template
 	 */
 	public function assignTag( $tagname, $setting ) {
@@ -282,11 +316,6 @@ class Template {
 	 * 编译一段继承标签
 	 * 该方法的特点是不会清空block标签名，仅把内容继承过来
 	 * 
-	 * 继承标签由extend和block标签共同完成，如果你熟悉smarty中的继承，应该不难理解
-	 * 继承模板中的block会覆盖父模板中的同名block内容
-	 * 如果没有覆盖（同名块）父模板某个block，则使用这个block中默认的内容
-	 * 程序有递归处理，支持连续向上继承
-	 * 
 	 * 继承标签可以互相嵌套，由于这个原因，我使用了类似平衡组的方法
 	 * 把block的头和尾分割为各自的一小块，按照层级关系抽取和替换
 	 * 可能有点复杂，不过我曾经试过用正则表达式处理，非常简洁
@@ -431,7 +460,7 @@ class Template {
 				// 解释这些参数，不过有点棘手
 				// 因为我允许参数值可以带引号，也可以不带，所以要分两种类型处理
 				// 这样产生了两个正则分组（稍后会从这两个分组里面取值）
-				preg_match_all( '/(\w+)\s*=\s*+(?:(([\'"]).+?\3)|([^\'"][^\s]+))/i', $match[2], $matchArgs );
+				preg_match_all( '/(\w+)\s*=\s*+(?:(([\'"]).+?\3)|([^\'"][^\s]*))/i', $match[2], $matchArgs );
 				if( ! empty( $matchArgs[1] ) ) {
 					$args = array();
 					// 取到这些参数后，因为值有两种类型
@@ -444,12 +473,14 @@ class Template {
 					foreach( $tags[ $tagName ]['args'] as $argName => $defaultValue ) {
 						$value = ( isset( $args[ $argName ] ) ? $args[ $argName ] : $defaultValue );
 						// 允许参数值使用变量，这样会很灵活，而且在嵌套标签里很有用
-						if( preg_match( '/^("?)\$.*\1$/i', $value ) ) {
+						if( preg_match( '/^("?)\$.*\1$/', $value ) ) {
 							$exportArgs .= trim( $value, '"' ) . ',';
 						}
-						// 正常情况，要注意参数值可能里包含了引号，这样就会产生意外的语法错误
+						elseif( preg_match( '/^([\'"]).*\1$/', $value ) ) {
+							$exportArgs .= $value . ',';
+						// 要注意参数值可能里包含了引号，这样就会产生意外的语法错误
 						// 我使用单引号标注参数值，所以只转义单引号就行
-						else {
+						} else {
 							$exportArgs .= '\'' . addcslashes( $value, '\'' ) . '\',';
 						}
 					}
@@ -492,8 +523,11 @@ class Template {
 	 * @return void
 	 */
 	public function display() {
+		// 得到编译文件
 		$compileFile = $this->_createCompileFile( $this->_template );
+		// 导入变量
 		extract( $this->_vars );
+		// 导入当前模板对象
 		$__melonTemplate = $this;
 		include $compileFile;
 	}

@@ -1,4 +1,7 @@
 {extend ./template.html /}
 {block abc}
-ggg
+{$arr[1]}
+{tag:list name=a}
+<li>{$data['name']}</li>
+{/tag:list}
 {/block}
