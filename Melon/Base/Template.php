@@ -55,6 +55,9 @@ defined('IN_MELON') or die('Permission denied');
  * 
  * 另外，标签也可以互相嵌套，没有限制
  * </pre>
+ * 
+ * 在引入编译文件时，会自动注入一个$__melonTemplate变量，指向当前模板对象的实例
+ * 程序会使用这个实例进行一些操作，比如检查更新等
  */
 class Template {
 	
@@ -420,6 +423,15 @@ class Template {
 			$template = $match[1];
 			if( ! preg_match( '/^([\'"]).*\1$/', $template ) ) {
 				$template = "'$template'";
+			}
+			// 使得include在双引号中支持花括号引用变量
+			// 因为{$var}可能会被当作变量标签替换为php语法，在被替换之前首先把这个处理了
+			// 否则会有语法错误
+			// 好吧，这方法很hack，也不够灵活，不过我暂时只能想到这方法了
+			// 例："/www/$arr['dir']/file.html"
+			// 替换后："/www/" . $arr['dir'] . "/file.html"
+			elseif( preg_match( '/^(["]).*\1$/', $template ) ) {
+				$template = preg_replace( '/\{(\$.*?)\}/', '".$1."', $template );
 			}
 			// 编译子模板
 			return "<?php include \$__melonTemplate->getSubTemplate( '{$dir}', {$template} ); ?>";

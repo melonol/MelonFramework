@@ -1,7 +1,6 @@
-{extend ./template.html /}
+{include "{$a[dd]}./template.html" /}
 {block abc}
-{$arr[1]}
-{tag:list name=a}
+{tag:list name="$ab"}
 <li>{$data['name']}</li>
 {/tag:list}
 {/block}

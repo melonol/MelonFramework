@@ -437,7 +437,6 @@ class Melon {
 		
 	}
 	final static public function callable( $name ) {
-		return $name;
 		return array( array(
 			'name' => $name,
 			'pic' => '1'
@@ -452,9 +451,9 @@ class M extends Melon {}
 
 M::init();
 $template = new Base\Template( './Melon/Data/subTemplate.html' );
-echo $template->setCompilePath( './Melon/Data/' )->assign('arr', array(1, 2, 3))->assignTag('list', array(
+$template->setCompilePath( './Melon/Data/' )->assign('arr', array(1, 2, 3))->assignTag('list', array(
 	'callable' => '\Melon::callable',
 	'args' => array(
 		'name' => 'haha'
 	)
-))->fetch();
+))->display();
