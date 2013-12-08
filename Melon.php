@@ -251,7 +251,7 @@ class Melon {
 	 * @throws Exception\RuntimeException
 	 */
 	final static public function load( $script ) {
-		$load = File\PathTrace::parse( $script, true );
+		$load = File\PathTrace::repair( $script, true );
 		if( ! $load ) {
 			throw new Exception\RuntimeException( "无法识别{$script}脚本文件" );
 		}
@@ -313,7 +313,7 @@ class Melon {
 	 * @throws Exception\RuntimeException
 	 */
 	final static public function acquire( $script ) {
-		$load = File\PathTrace::parse( $script, true );
+		$load = File\PathTrace::repair( $script, true );
 		if( ! $load ) {
 			// TODO::改为抛出警告
 			throw new Exception\RuntimeException( "无法识别{$script}脚本" );
@@ -450,5 +450,5 @@ class Melon {
 class M extends Melon {}
 
 M::init();
-$template = new Base\Template( Melon::env( 'library' ) . '/Data/subTemplate.html' );
-$template->setCompilePath( Melon::env( 'library' ) . '/Data/' )->display();
+$template = new Base\Template( './Melon/Data/subTemplate.html' );
+echo $template->setCompilePath( './Melon/Data/' )->assign('arr', array(1, 2, 3))->fetch();

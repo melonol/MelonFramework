@@ -19,11 +19,11 @@ class PathTraceTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testParse() {
 		$file = basename( $this->_realpath );
-		$method_str = '\Melon\File\PathTrace::parse';
+		$method_str = '\Melon\File\PathTrace::repair';
 		
 		//期望正确
 		$this->assertEquals(
-			\Melon\File\PathTrace::parse( $file ),
+			\Melon\File\PathTrace::repair( $file ),
 			$this->_realpath
 		);
 		$this->assertEquals(
@@ -55,7 +55,7 @@ class PathTraceTest extends PHPUnit_Framework_TestCase {
 				continue;
 			}
 			$this->assertFalse(
-				\Melon\File\PathTrace::parse( $file ), $file
+				\Melon\File\PathTrace::repair( $file ), $file
 			);
 			error_log( call_user_func( $method_str, $file ), 3, 'err.txt' );
 			$this->assertFalse(
