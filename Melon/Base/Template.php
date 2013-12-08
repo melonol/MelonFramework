@@ -43,9 +43,9 @@ defined('IN_MELON') or die('Permission denied');
  * 
  * 如果getList返回一个数组，在模板中就可以这样使用，程序会自动遍历这个数组：
  * {tag:list id=1}
- *		{$data} //$data是getList返回的数据
+ *		{$data} //$data是getList返回的数组中的每个元素的值
  * {/tag:list}
- * 参数可使用变量，同时也可以自定义返回结果的名称：
+ * 参数可使用变量，同时也可以自定义遍历的元素值的名称：
  * {tag:list id=$id result=row}
  *		{$row}
  * {/tag:list}
@@ -411,7 +411,7 @@ class Template {
 	}
 	
 	/**
-	 * 替换include标签
+	 * 编译include标签
 	 * 
 	 * 使用include标签可以引入一个子模板，就像PHP的include一样
 	 * 
@@ -433,7 +433,7 @@ class Template {
 	}
 	
 	/**
-	 * 替换自定义标签
+	 * 编译自定义标签
 	 * 
 	 * 自定义标签是一个可扩展的功能，可以方便制定一些像CMS模板标签的功能
 	 * 
