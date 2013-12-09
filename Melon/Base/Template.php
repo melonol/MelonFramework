@@ -253,6 +253,8 @@ class Template {
 	private function _compile( $template ) {
 		$content = $this->_getContent( $template );
 		
+		//清除标签的注释符
+		$content = preg_replace("/\<\!\-\-{$this->_beginTag}(.+?){$this->_endTag}\-\-\>/", "{$this->_beginTag}\$1{$this->_endTag}", $content);
 		// 处理几个比较麻烦的标签
 		// 先把内容继承过来
 		$content = $this->_compileExtend( dirname( $template ), $content );
@@ -262,7 +264,7 @@ class Template {
 		$content = $this->_compileTag( $content );
 		
 		// 还有一些简单好用的标签
-		$exp = "/{$this->_beginTag}(\/?[^\n\r]+?){$this->_endTag}/i";
+		$exp = "/{$this->_beginTag}(\/?[^\n\r]+?){$this->_endTag}/";
 		$content = preg_replace_callback( $exp, function( $match ) {
 			// 按使用频率排序（我主观认为的）
 			// 所有单个标签都可以添加'/'做为结束符号，也可以不加
@@ -292,6 +294,14 @@ class Template {
 			// 没有匹配的，返回原本的数据
 			return $match[0];
 		}, $content );
+		
+		// 为没有引号的数组索引添加引号
+		// 这个要放到最后，因为一开始添加引号可能会与标签中的引号冲突
+		$indexQuote = '/((\$[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*(\-\>)?[a-zA-Z0-9_\x7f-\xff]*)(\[[a-zA-Z0-9_\-\.\"\'\[\]\$\x7f-\xff]+\])*)/';
+		$content = preg_replace_callback($indexQuote, function($match) {
+			return str_replace('\"', '"', preg_replace('/\[([a-zA-Z0-9_\-\.\x7f-\xff]+)\]/s', '[\'$1\']', $match[1]));
+		}, $content);
+		
 		return $content;
 	}
 	
