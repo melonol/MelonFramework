@@ -4,6 +4,6 @@ namespace Melon\Exception;
 
 defined('IN_MELON') or die('Permission denied');
 
-class RuntimeException extends BaseException {
+class RuntimeException extends \Exception {
 	
 }

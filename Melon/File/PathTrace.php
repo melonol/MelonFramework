@@ -26,14 +26,14 @@ final class PathTrace {
 	 * 相对路径是相对于执行这个 parse 方法的文件所在目录路径来说的。
 	 * 比如在 /MelonFramework/Melon.php 文件中：
 	 * <pre>
-	 * echo PathTrace::parse( './Melon/System/PathTrace.php' );
+	 * echo PathTrace::repair( './Melon/System/PathTrace.php' );
 	 * // 输出：/MelonFramework/Melon/System/PathTrace.php
 	 * </pre>
 	 * 
 	 * @param boolean $getSource [可选] 是否获取调用者的文件路径。一般它用来做一些权限之类的验证
 	 * 在 /MelonFramework/Melon.php 文件中：
 	 * <pre>
-	 * print_r( PathTrace::parse( './Melon/System/PathTrace.php', true ) );
+	 * print_r( PathTrace::repair( './Melon/System/PathTrace.php', true ) );
 	 * // 输出：
 	 * Array
 	 * (
@@ -44,11 +44,10 @@ final class PathTrace {
 	 * 
 	 * @return string|array|false
 	 */
-	public static function parse( $targetPath, $getSource = false ) {
+	public static function repair( $targetPath, $getSource = false ) {
 		if( empty( $targetPath ) ) {
 			return false;
 		}
-		$s = microtime(true);
 		$_targetPath = $targetPath;
 		// 初始化一个变量来保存调用者的栈信息
 		$sourceTrace = array();
@@ -64,7 +63,7 @@ final class PathTrace {
 		$realPath = realpath( $_targetPath );
 		// 客户端可能要求获取调用者的路径
 		// 如果调用者和被调用者任意一个路径不存在，统一返回假
-		if( $realPath !== false && $getSource === true ) {
+		if( $realPath !== false && $getSource ) {
 			$sourceTrace = ( empty( $sourceTrace ) ?
 				self::_getSourceTrace() : $sourceTrace );
 			if( empty( $sourceTrace ) ) {
@@ -74,6 +73,10 @@ final class PathTrace {
 				'source' => $sourceTrace['file'],
 				'target' => $realPath,
 			);
+		}
+		// 如果获取失败了，尽可能返回原本的路径
+		if( $realPath === false && $getSource === false ) {
+			return $targetPath;
 		}
 		return $realPath;
 	}
