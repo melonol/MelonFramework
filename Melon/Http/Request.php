@@ -5,15 +5,17 @@ namespace Melon\Request;
 defined('IN_MELON') or die('Permission denied');
 
 class Request {
-	
-    const METHOD_GET = 'GET';
-    const METHOD_POST = 'POST';
-    const METHOD_PUT = 'PUT';
-    const METHOD_DELETE = 'DELETE';
+
+	const METHOD_GET = 'GET';
+	const METHOD_POST = 'POST';
+	const METHOD_PUT = 'PUT';
+	const METHOD_DELETE = 'DELETE';
 	const METHOD_HEAD = 'HEAD';
-    const METHOD_PATCH = 'PATCH';
-    const METHOD_OPTIONS = 'OPTIONS';
-	
+	const METHOD_PATCH = 'PATCH';
+	const METHOD_OPTIONS = 'OPTIONS';
+
+	private $_input;
+
 	private function __construct() {
 		;
 	}
@@ -21,7 +23,7 @@ class Request {
 	public function getInstance() {
 		
 	}
-	
+
 	/**
 	 * 解释HTTP头参数
 	 * 所有参数名的'-'号都会被转为'_'，字母转为大写
@@ -43,7 +45,7 @@ class Request {
 				}
 			}
 		}
-		
+
 		if (isset($_SERVER['CONTENT_LENGTH'])) {
 			$header['CONTENT_LENGTH'] = $_SERVER['CONTENT_LENGTH'];
 		}
@@ -57,11 +59,11 @@ class Request {
 			$header['PHP_AUTH_USER'] = $_SERVER['PHP_AUTH_USER'];
 			$header['PHP_AUTH_PW'] = $_SERVER['PHP_AUTH_PW'];
 		}
-		
-		if(isset($header['AUTHORIZATION'])) {
+
+		if (isset($header['AUTHORIZATION'])) {
 			$match = array();
 			if (preg_match('/^\w+/', $header['AUTHORIZATION'], $match)) {
-				$header['AUTH_TYPE'] = strtoupper( $match[0] );
+				$header['AUTH_TYPE'] = strtoupper($match[0]);
 			}
 		}
 
@@ -71,7 +73,7 @@ class Request {
 			self::$_header[$key] = $value;
 		}
 	}
-	
+
 	public function parseAuth($authorization) {
 		$authArgs = $matchArgs = array();
 		if (preg_match_all('/(\w+)=(?:(?:")([^"]+)"|([^\s,$]+))/', $authorization, $matchArgs)) {
@@ -81,82 +83,103 @@ class Request {
 		}
 		return $authArgs;
 	}
-	
-    /**
-     * 获取头信息
-     * 
-     * @param string $name [optional] 如果提供此项，则返回相应的头信息，否则返回全部
-     * @return string
-     */
-    public function header($name=null) {
-        
-    }
-    
-    /**
-     * 获取请求方法
-     * 
-     * @return string
-     */
-    public function getMethod() {
-        return strtoupper( $_SERVER['REQUEST_METHOD'] );
-    }
-    
-    /**
-     * 获取请求数据
-     * 
-     * @staticvar array $data
-     * @return string
-     */
-    public function getData() {
-        static $data = array();
-        switch ($this->getMethod()) {
-            case self::METHOD_GET:
-                $data = $_GET;
-                break;
-            case self::METHOD_POST:
-                $data = $_POST;
-                break;
-            case self::METHOD_PUT:
-                parse_str(file_get_contents('php://input'), $put_vars);
-                $data = $put_vars;
-                break;
-        }
-        return $data;
-    }
-	
-	public function post() {
+
+	/**
+	 * 获取头信息
+	 * 
+	 * @param string $name [optional] 如果提供此项，则返回相应的头信息，否则返回全部
+	 * @return string
+	 */
+	public function header($name = null) {
 		
 	}
-	
-	public function get() {
-		
+
+	/**
+	 * 获取请求方法
+	 * 
+	 * @return string
+	 */
+	public function getMethod() {
+		return strtoupper($_SERVER['REQUEST_METHOD']);
+	}
+
+	/**
+	 * 获取请求数据
+	 * 
+	 * @staticvar array $data
+	 * @return string
+	 */
+	private function getInput() {
+		static $data = array();
+		$this->_input['post'] = $_POST;
+		$this->_input['get'] = $_GET;
+		$this->_input['cookie'] = $_COOKIE;
+		$this->_input['put'] = array();
+		if ($this->getMethod() === self::METHOD_PUT) {
+			parse_str(file_get_contents('php://input'), $put_vars);
+			$this->_input['put'] = $put_vars;
+		}
+		$this->_input['request'] = $_REQUEST;
 	}
 	
-	public function put() {
-		
+	private function input($key, $mode='a') {
+		switch($mode) {
+			// get
+			case 'g' :
+				$input =& $this->_input['get'];
+				break;
+			// put or post
+			case 'p' :
+				if ($this->getMethod() === self::METHOD_PUT ) {
+					$input =& $this->_input['put'];
+				} else {
+					$input =& $this->_input['post'];
+				}
+				break;
+			// cookie
+			case 'c' :
+				$input =& $this->_input['cookie'];
+				break;
+			// all or default
+			case 'a' :
+			default :
+				if( isset( $this->_input['put'][$key] ) ) {
+					$input =& $this->_input['put'];
+				} else {
+					$input =& $this->_input['request'];
+				}
+				break;
+		}
+		return isset( $input[$key] ) ? $input[$key] : null;
 	}
 	
+	public function inputFormat($key, $default=null, $type='str', $mode='a') {
+		//bool  str  int  double  float posint natint time  fulltime
+		
+	}
+
 	public function isPost() {
 		
 	}
-	
+
 	public function isGet() {
 		
 	}
-	
+
 	public function isPut() {
 		
 	}
-	
+
 	public function isHead() {
 		
 	}
-	
+
 	public function isPatch() {
 		
 	}
-	
+
 	public function isOptions() {
 		
 	}
+
 }
