@@ -306,7 +306,7 @@ class DebugMessage {
 		}
 
 		// 修正开始标签
-		// 有可能取到的片段缺少开始的span标签，而它包代码着色的CSS属性
+		// 有可能取到的片段缺少开始的span标签，而它包含代码着色的CSS属性
 		// 如果缺少，片段开始的代码则没有颜色了，所以需要把它找出来
 		if( substr( $codeHtml, 0, 5 ) !== '<span' ) {
 			$index = $start - 1;

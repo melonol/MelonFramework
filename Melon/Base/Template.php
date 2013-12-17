@@ -139,8 +139,8 @@ class Template {
 	 * @param string $tagname 自定义标签名
 	 * @param array $setting 标签设置
 	 * 要提供的参数：
-	 * １. callable		string	可直接调用的函数名称
-	 * ２. args		array	参数数组，key是参数名称，value是默认值，数组元素必须按照callable函数的参数顺序一一对应
+	 * 1. callable		string	可直接调用的函数的名称
+	 * 2. args		array	参数数组，key是参数名称，value是默认值，数组元素必须按照callable函数的参数顺序一一对应
 	 * @return \Melon\Base\Template
 	 */
 	public function assignTag( $tagname, $setting ) {

@@ -5,7 +5,23 @@ namespace Melon\Request;
 defined('IN_MELON') or die('Permission denied');
 
 class Request {
+	
+    const METHOD_GET = 'GET';
+    const METHOD_POST = 'POST';
+    const METHOD_PUT = 'PUT';
+    const METHOD_DELETE = 'DELETE';
+	const METHOD_HEAD = 'HEAD';
+    const METHOD_PATCH = 'PATCH';
+    const METHOD_OPTIONS = 'OPTIONS';
+	
+	private function __construct() {
+		;
+	}
 
+	public function getInstance() {
+		
+	}
+	
 	/**
 	 * 解释HTTP头参数
 	 * 所有参数名的'-'号都会被转为'_'，字母转为大写
@@ -42,19 +58,10 @@ class Request {
 			$header['PHP_AUTH_PW'] = $_SERVER['PHP_AUTH_PW'];
 		}
 		
-		if(isset($header['AUTHENTICATION'])) {
+		if(isset($header['AUTHORIZATION'])) {
 			$match = array();
-			if (preg_match('/^\w+/', $header['AUTHENTICATION'], $match)) {
-				$header['PHP_AUTH_TYPE'] = strtoupper( $match[0] );
-				// apache下有AUTH_TYPE参数，为其它服务器做个兼容
-				$header['AUTH_TYPE'] = $header['PHP_AUTH_TYPE'];
-				
-				$header['PHP_AUTH_ARGS'] = $matchArgs = array();
-				if (preg_match_all('/(\w+)=(?:(?:")([^"]+)"|([^\s,$]+))/', $header['AUTHENTICATION'], $matchArgs)) {
-					foreach ($matchArgs[1] as $index => $key) {
-						$header['PHP_AUTH_ARGS'][$key] = $matchArgs[2][$index];
-					}
-				}
+			if (preg_match('/^\w+/', $header['AUTHORIZATION'], $match)) {
+				$header['AUTH_TYPE'] = strtoupper( $match[0] );
 			}
 		}
 
@@ -63,5 +70,93 @@ class Request {
 			$key = strtoupper(str_replace('_', '-', $key));
 			self::$_header[$key] = $value;
 		}
+	}
+	
+	public function parseAuth($authorization) {
+		$authArgs = $matchArgs = array();
+		if (preg_match_all('/(\w+)=(?:(?:")([^"]+)"|([^\s,$]+))/', $authorization, $matchArgs)) {
+			foreach ($matchArgs[1] as $index => $key) {
+				$authArgs[$key] = $matchArgs[2][$index];
+			}
+		}
+		return $authArgs;
+	}
+	
+    /**
+     * 获取头信息
+     * 
+     * @param string $name [optional] 如果提供此项，则返回相应的头信息，否则返回全部
+     * @return string
+     */
+    public function header($name=null) {
+        
+    }
+    
+    /**
+     * 获取请求方法
+     * 
+     * @return string
+     */
+    public function getMethod() {
+        return strtoupper( $_SERVER['REQUEST_METHOD'] );
+    }
+    
+    /**
+     * 获取请求数据
+     * 
+     * @staticvar array $data
+     * @return string
+     */
+    public function getData() {
+        static $data = array();
+        switch ($this->getMethod()) {
+            case self::METHOD_GET:
+                $data = $_GET;
+                break;
+            case self::METHOD_POST:
+                $data = $_POST;
+                break;
+            case self::METHOD_PUT:
+                parse_str(file_get_contents('php://input'), $put_vars);
+                $data = $put_vars;
+                break;
+        }
+        return $data;
+    }
+	
+	public function post() {
+		
+	}
+	
+	public function get() {
+		
+	}
+	
+	public function put() {
+		
+	}
+	
+	public function isPost() {
+		
+	}
+	
+	public function isGet() {
+		
+	}
+	
+	public function isPut() {
+		
+	}
+	
+	public function isHead() {
+		
+	}
+	
+	public function isPatch() {
+		
+	}
+	
+	public function isOptions() {
+		
 	}
 }
