@@ -99,7 +99,7 @@ class Request {
 	 * 
 	 * @return string
 	 */
-	public function getMethod() {
+	public function method() {
 		return strtoupper($_SERVER['REQUEST_METHOD']);
 	}
 
@@ -115,7 +115,7 @@ class Request {
 		$this->_input['get'] = $_GET;
 		$this->_input['cookie'] = $_COOKIE;
 		$this->_input['put'] = array();
-		if ($this->getMethod() === self::METHOD_PUT) {
+		if ($this->method() === self::METHOD_PUT) {
 			parse_str(file_get_contents('php://input'), $put_vars);
 			$this->_input['put'] = $put_vars;
 		}
@@ -123,14 +123,25 @@ class Request {
 	}
 	
 	private function input($key, $mode='a') {
-		switch($mode) {
+		static $map = array(
+			self::METHOD_GET => 'g',
+			self::METHOD_POST => 'p',
+			self::METHOD_PUT => 'p'
+		);
+		// auto
+		if($mode == 'a') {
+			$_mode = (isset($map[$this->method()]) ? $map[$this->method()] : 'r');
+		} else {
+			$_mode = $mode;
+		}
+		switch($_mode) {
 			// get
 			case 'g' :
 				$input =& $this->_input['get'];
 				break;
 			// put or post
 			case 'p' :
-				if ($this->getMethod() === self::METHOD_PUT ) {
+				if ($this->method() === self::METHOD_PUT ) {
 					$input =& $this->_input['put'];
 				} else {
 					$input =& $this->_input['post'];
@@ -140,8 +151,8 @@ class Request {
 			case 'c' :
 				$input =& $this->_input['cookie'];
 				break;
-			// all or default
-			case 'a' :
+			// request or default
+			case 'r' :
 			default :
 				if( isset( $this->_input['put'][$key] ) ) {
 					$input =& $this->_input['put'];
@@ -153,6 +164,13 @@ class Request {
 		return isset( $input[$key] ) ? $input[$key] : null;
 	}
 	
+	/**
+	 * 
+	 * @param type $key
+	 * @param type $default
+	 * @param type $type
+	 * @param type $mode
+	 */
 	public function inputFormat($key, $default=null, $type='str', $mode='a') {
 		//bool  str  int  double  float posint natint time  fulltime
 		
