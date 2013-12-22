@@ -68,10 +68,16 @@ class Template {
 	private $_template;
 	
 	/**
+	 *  模板目录
+	 *  @var string
+	 */
+	private $_templateDir;
+	
+	/**
 	 * 模板的编译文件保存路径
 	 * @var string
 	 */
-	private $_compilePath;
+	private $_compileDir;
 	
 	/**
 	 * 注入的变量
@@ -102,8 +108,7 @@ class Template {
 	 * @param string $template 模板路径
 	 * @param array $tag 模板标签符 第一个元素表示标签起始符，第二个元素表示标签结束符
 	 */
-	public function __construct( $template, $tag = array( '{', '}' ) ) {
-		$this->_template = \Melon\File\PathTrace::repair( $template );
+	public function __construct( $tag = array( '{', '}' ) ) {
 		$this->_beginTag = $tag[0];
 		$this->_endTag = $tag[1];
 	}
@@ -162,13 +167,24 @@ class Template {
 	}
 	
 	/**
-	 * 设置编译文件目录
+	 * 设置模板目录
 	 * 
-	 * @param string $compilePath 路径
+	 * @param string $templateDir 路径
 	 * @return \Melon\Base\Template
 	 */
-	public function setCompilePath( $compilePath ) {
-		$this->_compilePath = \Melon\File\PathTrace::repair( $compilePath );
+	public function setTemplateDir( $templateDir ) {
+		$this->_templateDir = \Melon\File\PathTrace::repair( $templateDir );
+		return $this;
+	}
+	
+	/**
+	 * 设置编译文件目录
+	 * 
+	 * @param string $compileDir 路径
+	 * @return \Melon\Base\Template
+	 */
+	public function setCompileDir( $compileDir ) {
+		$this->_compileDir = \Melon\File\PathTrace::repair( $compileDir );
 		return $this;
 	}
 	
@@ -212,7 +228,7 @@ class Template {
 	 * @throws \Melon\Exception\RuntimeException
 	 */
 	private function _createCompileFile( $template, $forceUpdate = false ) {
-		$targetDir = $this->_compilePath;
+		$targetDir = $this->_compileDir;
 		if( ! $targetDir ||
 			( ! is_dir( $targetDir ) && ! mkdir( $targetDir, 0777, true ) ) ) {
 			throw new \Melon\Exception\RuntimeException( "模板编译目录不存在" );
@@ -254,7 +270,7 @@ class Template {
 		$content = $this->_getContent( $template );
 		
 		//清除标签的注释符
-		$content = preg_replace("/\<\!\-\-{$this->_beginTag}(.+?){$this->_endTag}\-\-\>/", "{$this->_beginTag}\$1{$this->_endTag}", $content);
+		$content = preg_replace( "/\<\!\-\-{$this->_beginTag}(.+?){$this->_endTag}\-\-\>/", "{$this->_beginTag}\$1{$this->_endTag}", $content );
 		// 处理几个比较麻烦的标签
 		// 先把内容继承过来
 		$content = $this->_compileExtend( dirname( $template ), $content );
@@ -298,9 +314,9 @@ class Template {
 		// 为没有引号的数组索引添加引号
 		// 这个要放到最后，因为一开始添加引号可能会与标签中的引号冲突
 		$indexQuote = '/((\$[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*(\-\>)?[a-zA-Z0-9_\x7f-\xff]*)(\[[a-zA-Z0-9_\-\.\"\'\[\]\$\x7f-\xff]+\])*)/';
-		$content = preg_replace_callback($indexQuote, function($match) {
-			return str_replace('\"', '"', preg_replace('/\[([a-zA-Z0-9_\-\.\x7f-\xff]+)\]/s', '[\'$1\']', $match[1]));
-		}, $content);
+		$content = preg_replace_callback( $indexQuote, function( $match ) {
+			return str_replace( '\"', '"', preg_replace( '/\[([a-zA-Z0-9_\-\.\x7f-\xff]+)\]/s', '[\'$1\']', $match[1] ) );
+		}, $content );
 		
 		return $content;
 	}
@@ -523,11 +539,17 @@ class Template {
 	/**
 	 * 把模板运行结果返回
 	 * 
+	 * @param string $template 模板路径，如果设置了模板目录，则它是相对于模板目录下的文件路径
 	 * @return string
 	 */
-	public function fetch() {
+	public function fetch( $template ) {
 		ob_start();
-		$this->display();
+		if( $this->_templateDir ) {
+			$this->_template = $this->_templateDir . DIRECTORY_SEPARATOR . $template;
+		} else {
+			$this->_template = \Melon\File\PathTrace::repair( $template );
+		}
+		$this->_show();
 		$content = ob_get_contents();
 		ob_end_clean();
 		return $content;
@@ -536,9 +558,25 @@ class Template {
 	/**
 	 * 把模板运行结果输出
 	 * 
+	 * @param string $template 模板路径，如果设置了模板目录，则它是相对于模板目录下的文件路径
+	 * @param boolean $repair 是否使用PathTrace::repair来调整模板路径
 	 * @return void
 	 */
-	public function display() {
+	public function display( $template ) {
+		if( $this->_templateDir ) {
+			$this->_template = $this->_templateDir . DIRECTORY_SEPARATOR . $template;
+		} else {
+			$this->_template = \Melon\File\PathTrace::repair( $template );
+		}
+		$this->_show();
+	}
+	
+	/**
+	 * 显示编译文件
+	 * 
+	 * @return void
+	 */
+	private function _show() {
 		// 得到编译文件
 		$compileFile = $this->_createCompileFile( $this->_template );
 		// 导入变量

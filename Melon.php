@@ -36,21 +36,21 @@ class Melon {
 		spl_autoload_register( '\Melon::autoload' );
 		
 		set_exception_handler( function( $exception ) {
-			Melon::logMessage( E_EXCEPTION, $exception->getMessage(), $exception->getFile(),
+			Melon::log( E_EXCEPTION, $exception->getMessage(), $exception->getFile(),
 				$exception->getLine(), $exception->getTrace() );
 		} );
 		
 		set_error_handler( function( $type, $message, $file, $line ) {
 			$trace = debug_backtrace();
 			array_shift( $trace );
-			Melon::logMessage( $type, $message, $file, $line, $trace );
+			Melon::log( $type, $message, $file, $line, $trace );
 		} );
 		
 		register_shutdown_function( function() {
 			$error = error_get_last();
 			$logTypes = array( E_ERROR, E_PARSE, E_COMPILE_ERROR, E_CORE_ERROR );
 			if( ! empty( $error ) && in_array( $error['type'], $logTypes ) ) {
-				Melon::logMessage( $error['type'], $error['message'], $error['file'], $error['line'] );
+				Melon::log( $error['type'], $error['message'], $error['file'], $error['line'] );
 			}
 		} );
 		
@@ -145,12 +145,12 @@ class Melon {
 	 * 它根据程序配置，可以输出到浏览器，也可以写入日志文件
 	 * 
 	 * @param string $type 消息类型，目前用来显示给用户看的类型，以后可能还有其它作用
-	 * @param string $message 消息，它是一个整个事件的主要描述
+	 * @param mixed $message 消息，它是一个整个事件的主要描述
 	 * @param string $file [可选] 脚本，消息所描述的事件发生在哪个脚本
 	 * @param int $line [可选] 所在的行，消息所描述的事件发生在脚本中的那一行
 	 * @param array $trace [可选] 调用方法栈，这个是使用debug_backtrace方法、捕获异常等方式得到的栈
 	 */
-	final static public function logMessage( $type, $message, $file = null, $line = null, $trace = null ) {
+	final static public function log( $type, $message, $file = null, $line = null, $trace = null ) {
 		static $typeMap = array(
 			E_COMPILE_ERROR => 'Compile error',
 			E_COMPILE_WARNING => 'Compile warning',
@@ -177,7 +177,7 @@ class Melon {
 		 *  0不执行回调；1异常和致命错误执行回调；2所有错误类型都执行回调；3所有类型都执行回调
 		 * @param Closure $callback 回调函数
 		 * @return void
-		 * @TODO 能解释xdebug的trace
+		 * @TODO 能解释xdebug的trace、可配置是否显示源代码
 		 */
 		$logHandler = function( $level, $callback ) use( &$typeMap, $type, $message, $file, $line, $trace ) {
 			// 处理错误消息的实例
@@ -220,19 +220,35 @@ class Melon {
 	 * 对{@link \Melon::logMessage}的封装
 	 * 它根据程序配置，可以输出到浏览器，也可以写入日志文件
 	 * 
-	 * @param string $message 调试信息
-	 * @param boolean $showTrace 是否显示调用方法栈
+	 * @param mixed $message 调试信息
+	 * @param mixed $_ 可继续添加调试信息
 	 * @return void
 	 */
-	final static public function debugMessage( $message, $showTrace = true ) {
-		if( $showTrace ) {
-			$trace = debug_backtrace();
-			$firstTrace = array_shift( $trace );
-			$file = $firstTrace['file'];
-			$line = $firstTrace['line'];
-			self::logMessage( 'Debug', $message, $file, $line, $trace );
-		} else {
-			self::logMessage( 'Debug', $message );
+	final static public function debug( $message, $_ = null) {
+		$trace = debug_backtrace();
+		$firstTrace = array_shift( $trace );
+		foreach( func_get_args() as $message ) {
+			self::log( 'Debug', $message, $firstTrace['file'], $firstTrace['line'] );
+		}
+	}
+	
+	/**
+	 * 调试信息，显示方法栈
+	 * 
+	 * 对{@link \Melon::logMessage}的封装
+	 * 它根据程序配置，可以输出到浏览器，也可以写入日志文件
+	 * 
+	 * @param mixed $message 调试信息
+	 * @param mixed $_ 可继续添加调试信息
+	 * @return void
+	 */
+	final static public function debugWithTrace( $message, $_ = null) {
+		$trace = debug_backtrace();
+		$firstTrace = array_shift( $trace );
+		$file = $firstTrace['file'];
+		$line = $firstTrace['line'];
+		foreach( func_get_args() as $message ) {
+			self::log( 'Debug', $message, $firstTrace['file'], $firstTrace['line'], $trace );
 		}
 	}
 
@@ -450,10 +466,13 @@ class Melon {
 class M extends Melon {}
 
 M::init();
-$template = new Base\Template( './Melon/Data/subTemplate.html' );
-$template->setCompilePath( './Melon/Data/' )->assign('arr', array(1, 2, 3))->assignTag('list', array(
+$s = microtime(true);
+$template = new Base\Template();
+$template->setCompileDir( './Melon/Data/' )->setTemplateDir('./Melon/Data/')->assign('arr', array(1, 2, 3))->assignTag('list', array(
 	'callable' => '\Melon::callable',
 	'args' => array(
 		'name' => 'haha'
 	)
-))->display();
+))->display('subTemplate.html');
+
+echo number_format(microtime(true) - $s, 4);

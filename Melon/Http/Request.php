@@ -110,6 +110,7 @@ class Request {
 	 * @return string
 	 */
 	private function getInput() {
+		//todo::处理开启magic quotes的情况
 		static $data = array();
 		$this->_input['post'] = $_POST;
 		$this->_input['get'] = $_GET;

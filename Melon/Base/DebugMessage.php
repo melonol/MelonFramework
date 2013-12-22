@@ -32,7 +32,7 @@ class DebugMessage {
 	 * 消息
 	 * 
 	 * 它是一个整个事件的主要描述
-	 * @var string
+	 * @var mixed
 	 */
 	private $_message;
 	
@@ -64,7 +64,7 @@ class DebugMessage {
 	 * 构造函数
 	 * 
 	 * @param string $type 消息类型，目前用来显示给用户看的类型，以后可能还有其它作用
-	 * @param string $message 消息，它是一个整个事件的主要描述
+	 * @param mixed $message 消息，它是一个整个事件的主要描述
 	 * @param string $file [可选] 脚本，消息所描述的事件发生在哪个脚本
 	 * @param int $line [可选] 所在的行，消息所描述的事件发生在脚本中的那一行
 	 * @param array $trace [可选] 调用方法栈，这个是使用debug_backtrace方法、捕获异常等方式得到的栈
@@ -109,9 +109,45 @@ class DebugMessage {
 			$_showType = ( $showType === self::DISPLAY_HTML ? self::DISPLAY_HTML : self::DISPLAY_TEXT );
 		}
 		if( $_showType === self::DISPLAY_TEXT ) {
+			$this->_messageFormatText();
 			return $this->_setText();
 		} else {
+			$this->_messageFormatHtml();
 			return $this->_setHtml( $showCodeSnippet );
+		}
+	}
+	
+	/**
+	 * 根据message的数据类型格式化为普通文本
+	 * 字符串使用htmlspecialchars转义，数组使用print_r，对象使用var_dump
+	 */
+	private function _messageFormatText() {
+		if( is_array( $this->_message ) ) {
+			$this->_message = "\r\n" . print_r( $this->_message, true );
+		} else if( is_object( $this->_message ) ) {
+			ob_start();
+			var_dump( $this->_message );
+			$this->_message = "\r\n" . ob_get_contents();
+			ob_end_clean();
+		} else {
+			$this->_message = strval( $this->_message );
+		}
+	}
+	
+	/**
+	 * 根据message的数据类型格式化为HTML
+	 * 字符串使用htmlspecialchars转义，数组使用print_r，对象使用var_dump
+	 */
+	private function _messageFormatHtml() {
+		if( is_array( $this->_message ) ) {
+			$this->_message = '<pre>' . print_r( $this->_message, true ) . '</pre>';
+		} else if( is_object( $this->_message ) ) {
+			ob_start();
+			var_dump( $this->_message );
+			$this->_message = '<pre>' . ob_get_contents() . '</pre>';
+			ob_end_clean();
+		} else {
+			$this->_message = htmlspecialchars( strval( $this->_message ) );
 		}
 	}
 	
@@ -125,7 +161,7 @@ class DebugMessage {
 	 * @return string
 	 */
 	private function _setHtml( $showCodeSnippet = true ) {
-		$table = '<table style="margin: 10px; padding: 5px; border-collapse: collapse; background-color: #eeefff; ">';
+		$table = '<table style="margin: 10px; padding: 5px; border-collapse: collapse; background-color: #eeefff; color: #000;">';
 		list( $file, $line ) = $this->_replaceEval( $this->_file, $this->_line );
 		$table .= $this->_setTr( 'th', '', $file, $line, $showCodeSnippet );
 
