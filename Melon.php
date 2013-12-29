@@ -2,19 +2,37 @@
 
 define( 'IN_MELON', true );
 
-// 定义一些错误常量，它们和E_系列的常量一起被用于框架的错误处理
-// 命名为同名字符串好了，数字怕有冲突
-// 异常错误
-define( 'E_EXCEPTION', 'E_EXCEPTION' );
-// SQL错误
-define( 'E_SQL', 'E_SQL' );
-
 use Melon\Base;
 use Melon\Cache;
 use Melon\Exception;
 use Melon\File;
 use Melon\Util;
 use Melon\Database;
+
+if( function_exists('set_magic_quotes_runtime') ) {
+	set_magic_quotes_runtime(0);
+}
+
+// 客户端连类型
+if( ! defined( 'CLIENT_TYPE' ) ) {
+	if( ( isset( $_SERVER["HTTP_X_REQUESTED_WITH"] ) &&
+		strtolower( $_SERVER["HTTP_X_REQUESTED_WITH"] ) === 'xmlhttprequest' ) ||
+		( isset( $_REQUEST['inajax'] ) && $_REQUEST['inajax'] == 1 ) ) {
+		define( 'CLIENT_TYPE', 'AJAX' );
+	} elseif( isset( $_SERVER['HTTP_USER_AGENT'] ) ) {
+		define( 'CLIENT_TYPE', 'BROWSER' );
+	} elseif( stripos( PHP_SAPI, 'CGI' ) === 0 ) {
+		define( 'CLIENT_TYPE', 'CGI' );
+	} else {
+		define( 'CLIENT_TYPE', 'OTHER' );
+	}
+}
+
+// 异常错误，和E_系列的常量一起被用于框架的错误处理
+// 当然它不能用于error_reporting之类的原生错误处理函数
+// 65534是根据E_常量的定义规则，由E_ALL x 2得出
+define( 'E_EXCEPTION', 65534 );
+
 
 class Melon {
 	
@@ -476,3 +494,6 @@ $template->setCompileDir( './Melon/Data/' )->setTemplateDir('./Melon/Data/')->as
 ))->display('subTemplate.html');
 
 echo number_format(microtime(true) - $s, 4);
+
+//todo::env支持以.的方式获取
+//todo::支持自定义错误页面

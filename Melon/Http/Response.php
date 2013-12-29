@@ -1,6 +1,6 @@
 <?php
 
-namespace Melon\Request;
+namespace Melon\Http;
 
 defined('IN_MELON') or die('Permission denied');
 
@@ -41,6 +41,7 @@ class Response {
 	 * HTTP头设置
 	 * @var array
 	 * @link http://kb.cnblogs.com/page/92320/
+	 * @link http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
 	 */
 	private $_header = array();
 
@@ -112,27 +113,31 @@ class Response {
 	/**
 	 * 发送回应结果
 	 * 
+	 * @param string $body [optional] 媒体内容
 	 * @param int $status [optional] 状态码
-	 * @param mixed $body [optional] 媒体内容
 	 * @param string $contentType [optional] 媒体格式
 	 */
 	public function send($body = '', $status = null, $contentType = null) {
-		if (!is_null($status)) {
-			$this->setStatus($status);
-		}
 		if (!empty($body)) {
 			$this->setBody($body);
+		}
+		if (!is_null($status)) {
+			$this->setStatus($status);
 		}
 		if (!empty($contentType)) {
 			$this->setContentType($contentType);
 		}
-		//HTTP状态行
-		$message = $this->getStatusMessage();
-		header("HTTP/{$this->_httpVersion} {$this->_status} {$message}");
-		//HTTP其它头信息
-		$this->setHeader("Content-Type", "{$this->_contentType};charset={$this->_charset}");
-		foreach ($this->_header as $name => $value) {
-			header("{$name}:{$value}");
+		if( ! headers_sent() ) {
+			$message = $this->getStatusMessage();
+			if(CLIENT_TYPE === 'cgi') {
+				header("Status:{$message}");
+			} else {
+				header("HTTP/{$this->_httpVersion} {$this->_status} {$message}");
+			}
+			header("Content-Type:{$this->_contentType};charset={$this->_charset}");
+			foreach ($this->_header as $name => $value) {
+				header("{$name}:{$value}");
+			}
 		}
 		//内容
 		if (!empty($this->_body)) {
@@ -154,10 +159,10 @@ class Response {
 	/**
 	 * 设置媒体内容
 	 * 
-	 * @param mixed $body
+	 * @param string $body
 	 */
 	public function setBody($body) {
-		$this->_body = $body;
+		$this->_body = strval( $body );
 		return $this;
 	}
 

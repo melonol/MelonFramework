@@ -559,7 +559,6 @@ class Template {
 	 * 把模板运行结果输出
 	 * 
 	 * @param string $template 模板路径，如果设置了模板目录，则它是相对于模板目录下的文件路径
-	 * @param boolean $repair 是否使用PathTrace::repair来调整模板路径
 	 * @return void
 	 */
 	public function display( $template ) {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Melon\Request;
+namespace Melon\Http;
 
 defined('IN_MELON') or die('Permission denied');
 
@@ -13,15 +13,26 @@ class Request {
 	const METHOD_HEAD = 'HEAD';
 	const METHOD_PATCH = 'PATCH';
 	const METHOD_OPTIONS = 'OPTIONS';
+	
+	private $_headers = array();
 
-	private $_input;
+	private $_inputs = array();
+	
+	private $_method = '';
 
 	private function __construct() {
-		;
+		$this->_praseHeader();
+		$this->_setInputs();
+		$this->_setMethod();
 	}
 
 	public function getInstance() {
-		
+		static $instance = null;
+		if(is_null($instance)) {
+			return new self();
+		} else {
+			return $instance;
+		}
 	}
 
 	/**
@@ -70,37 +81,20 @@ class Request {
 		//格式化参数
 		foreach ($header as $key => $value) {
 			$key = strtoupper(str_replace('_', '-', $key));
-			self::$_header[$key] = $value;
+			$this->_headers[$key] = $value;
 		}
 	}
 
-	public function parseAuth($authorization) {
+	public function parseAuth() {
 		$authArgs = $matchArgs = array();
-		if (preg_match_all('/(\w+)=(?:(?:")([^"]+)"|([^\s,$]+))/', $authorization, $matchArgs)) {
-			foreach ($matchArgs[1] as $index => $key) {
-				$authArgs[$key] = $matchArgs[2][$index];
+		if( $this->header( 'AUTHORIZATION' ) ) {
+			if (preg_match_all('/(\w+)=(?:(?:")([^"]+)"|([^\s,$]+))/', $this->header( 'AUTHORIZATION' ), $matchArgs)) {
+				foreach ($matchArgs[1] as $index => $key) {
+					$authArgs[$key] = $matchArgs[2][$index];
+				}
 			}
 		}
 		return $authArgs;
-	}
-
-	/**
-	 * 获取头信息
-	 * 
-	 * @param string $name [optional] 如果提供此项，则返回相应的头信息，否则返回全部
-	 * @return string
-	 */
-	public function header($name = null) {
-		
-	}
-
-	/**
-	 * 获取请求方法
-	 * 
-	 * @return string
-	 */
-	public function method() {
-		return strtoupper($_SERVER['REQUEST_METHOD']);
 	}
 
 	/**
@@ -109,18 +103,59 @@ class Request {
 	 * @staticvar array $data
 	 * @return string
 	 */
-	private function getInput() {
-		//todo::处理开启magic quotes的情况
-		static $data = array();
-		$this->_input['post'] = $_POST;
-		$this->_input['get'] = $_GET;
-		$this->_input['cookie'] = $_COOKIE;
-		$this->_input['put'] = array();
+	private function _setInputs() {
+		$this->_inputs['post'] =& $_POST;
+		$this->_inputs['get'] =& $_GET;
+		$this->_inputs['cookie'] =& $_COOKIE;
+		$this->_inputs['put'] = array();
 		if ($this->method() === self::METHOD_PUT) {
-			parse_str(file_get_contents('php://input'), $put_vars);
-			$this->_input['put'] = $put_vars;
+			$putVars = array();
+			parse_str(file_get_contents('php://input'), $putVars);
+			$this->_inputs['put'] =& $putVars;
 		}
-		$this->_input['request'] = $_REQUEST;
+		$this->_inputs['request'] =& $_REQUEST;
+		
+		// 虽然5.3默认已经关闭magic quotes，但5.4才真正移除
+		// 所以还是要处理这个问题
+		if(get_magic_quotes_gpc()) {
+			foreach($this->_inputs as &$data) {
+				foreach($data as &$value) {
+					$value = stripslashes($value);
+				}
+			}
+		}
+	}
+	
+	private function _setMethod() {
+		if(isset($_SERVER['REQUEST_METHOD'])) {
+			$this->_method = strtoupper($_SERVER['REQUEST_METHOD']);
+		}
+	}
+	
+	/**
+	 * 获取所有头信息
+	 */
+	public function allHeaders() {
+		return $this->_headers;
+	}
+
+	/**
+	 * 获取头信息
+	 * 
+	 * @param string $name
+	 * @return string
+	 */
+	public function header($name) {
+		return ( isset( $this->_headers[ $name ] ) ? $this->_headers[ $name ] : null );
+	}
+
+	/**
+	 * 获取请求方法
+	 * 
+	 * @return string
+	 */
+	public function method() {
+		return $this->_method;
 	}
 	
 	private function input($key, $mode='a') {
@@ -138,67 +173,124 @@ class Request {
 		switch($_mode) {
 			// get
 			case 'g' :
-				$input =& $this->_input['get'];
+				$inputs =& $this->_inputs['get'];
 				break;
 			// put or post
 			case 'p' :
-				if ($this->method() === self::METHOD_PUT ) {
-					$input =& $this->_input['put'];
+				if ($this->isPut() ) {
+					$inputs =& $this->_inputs['put'];
 				} else {
-					$input =& $this->_input['post'];
+					$inputs =& $this->_inputs['post'];
 				}
 				break;
 			// cookie
 			case 'c' :
-				$input =& $this->_input['cookie'];
+				$inputs =& $this->_inputs['cookie'];
 				break;
 			// request or default
 			case 'r' :
 			default :
-				if( isset( $this->_input['put'][$key] ) ) {
-					$input =& $this->_input['put'];
+				if( isset( $this->_inputs['put'][$key] ) ) {
+					$inputs =& $this->_inputs['put'];
 				} else {
-					$input =& $this->_input['request'];
+					$inputs =& $this->_inputs['request'];
 				}
 				break;
 		}
-		return isset( $input[$key] ) ? $input[$key] : null;
+		return isset( $inputs[$key] ) ? $inputs[$key] : null;
 	}
 	
 	/**
+	 * 获取并格式化输入参数
 	 * 
-	 * @param type $key
-	 * @param type $default
-	 * @param type $type
-	 * @param type $mode
+	 * 由于输入参数被预定义程序处理，所以使用此方法得到的数据不保证完全可靠
+	 * 如果你需要确切的数据，请使用input方法获取并自行处理
+	 * 
+	 * @param string $key
+	 * @param mixed $default
+	 * @param mixed $type
+	 * @param string $mode
 	 */
 	public function inputFormat($key, $default=null, $type='str', $mode='a') {
-		//bool  str  int  double  float posint natint time  fulltime
-		
-	}
-
-	public function isPost() {
-		
+		//bool  str  int  double  float posint natint time  intime
+		$value = $this->input($key, $mode);
+		if(is_null($value)) {
+			return $default;
+		}
+		$_type = (is_array($type) ? 'enum' : $type);
+		switch ($_type) {
+			case 'bool':		// 布尔值
+				$value = !!$value;
+				break;
+			case 'int':		// 整数
+				$value = intval($value);
+				break;
+			case 'double':		// 双精度浮点数
+				$value = doubleval($value);
+				break;
+			case 'float':		// 浮点数
+				$value = floatval($value);
+				break;
+			case 'posint':		// 正整数
+				$value = intval($value);
+				if($value <= 0) {
+					$value = $default;
+				}
+				break;
+			case 'natint':		// 自然数（非负整数）
+				$value = intval($value);
+				if($value < 0) {
+					$value = $default;
+				}
+				break;
+			case 'time':		// 时间截
+				$timestamp = strtotime($value);
+				$value = $timestamp ?: $default;
+				break;
+			case 'intime':		// 当天起始时间的时间截
+				$timestamp = strtotime($value);
+				$value = ( $timestamp ? strtotime( date( 'Y-m-d 00:00:00', $timestamp ) ) : $default );
+				break;
+			case 'endtime':	// 当天结束时间的时间截
+				$timestamp = strtotime($value);
+				$value = ( $timestamp ? strtotime( date( 'Y-m-d 23:59:59', $timestamp ) ) : $default );
+				break;
+			case 'enum':		// 枚举
+				$value = ( in_array( $value, $type ) ? $value : $default );
+				break;
+			case 'str':		// 字符串
+			default:
+				$value = strval($value);
+				break;
+		}
+		return $value;
 	}
 
 	public function isGet() {
-		
+		return ( $this->method() === self::METHOD_GET );
+	}
+
+	public function isPost() {
+		return ( $this->method() === self::METHOD_POST );
 	}
 
 	public function isPut() {
-		
+		return ( $this->method() === self::METHOD_PUT );
+	}
+	
+	public function isDelete() {
+		return ( $this->method() === self::METHOD_DELETE );
 	}
 
 	public function isHead() {
-		
+		return ( $this->method() === self::METHOD_HEAD );
 	}
 
 	public function isPatch() {
-		
+		return ( $this->method() === self::METHOD_PATCH );
 	}
 
 	public function isOptions() {
-		
+		return ( $this->method() === self::METHOD_OPTIONS );
 	}
-
 }

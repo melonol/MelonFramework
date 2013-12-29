@@ -102,10 +102,8 @@ class DebugMessage {
 	 */
 	public function parse( $showType = self::DISPLAY_AUTO, $showCodeSnippet = true ) {
 		if( $showType === self::DISPLAY_AUTO ) {
-			//TODO::ajax请求的时候，设为文本
-			$_showType = ( PHP_SAPI === 'cli' ? self::DISPLAY_TEXT : self::DISPLAY_HTML );
+			$_showType = ( CLIENT_TYPE === 'BROWSER' ? self::DISPLAY_HTML : self::DISPLAY_TEXT );
 		} else {
-			//TODO::抛出警告
 			$_showType = ( $showType === self::DISPLAY_HTML ? self::DISPLAY_HTML : self::DISPLAY_TEXT );
 		}
 		if( $_showType === self::DISPLAY_TEXT ) {
