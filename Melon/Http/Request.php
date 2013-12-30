@@ -26,7 +26,7 @@ class Request {
 		$this->_setMethod();
 	}
 
-	public function getInstance() {
+	static public function getInstance() {
 		static $instance = null;
 		if(is_null($instance)) {
 			return new self();
@@ -40,7 +40,7 @@ class Request {
 	 * 所有参数名的'-'号都会被转为'_'，字母转为大写
 	 * 然后会被放到self::$_header中
 	 */
-	private static function _praseHeader() {
+	private function _praseHeader() {
 		$header = array();
 		// 这是apache特有的函数，可以很方便取到数据
 		if (function_exists('getallheaders')) {
@@ -222,14 +222,14 @@ class Request {
 			case 'bool':		// 布尔值
 				$value = !!$value;
 				break;
-			case 'int':		// 整数
+			case 'int':			// 整数
 				$value = intval($value);
-				break;
-			case 'double':		// 双精度浮点数
-				$value = doubleval($value);
 				break;
 			case 'float':		// 浮点数
 				$value = floatval($value);
+			case 'double':		// 双精度浮点数
+				$value = doubleval($value);
+				break;
 				break;
 			case 'posint':		// 正整数
 				$value = intval($value);
@@ -251,14 +251,14 @@ class Request {
 				$timestamp = strtotime($value);
 				$value = ( $timestamp ? strtotime( date( 'Y-m-d 00:00:00', $timestamp ) ) : $default );
 				break;
-			case 'endtime':	// 当天结束时间的时间截
+			case 'endtime':		// 当天结束时间的时间截
 				$timestamp = strtotime($value);
 				$value = ( $timestamp ? strtotime( date( 'Y-m-d 23:59:59', $timestamp ) ) : $default );
 				break;
 			case 'enum':		// 枚举
 				$value = ( in_array( $value, $type ) ? $value : $default );
 				break;
-			case 'str':		// 字符串
+			case 'str':			// 字符串
 			default:
 				$value = strval($value);
 				break;

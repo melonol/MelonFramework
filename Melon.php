@@ -3,29 +3,26 @@
 define( 'IN_MELON', true );
 
 use Melon\Base;
-use Melon\Cache;
 use Melon\Exception;
 use Melon\File;
 use Melon\Util;
-use Melon\Database;
+use Melon\Http;
 
-if( function_exists('set_magic_quotes_runtime') ) {
-	set_magic_quotes_runtime(0);
+if( function_exists( 'set_magic_quotes_runtime' ) ) {
+	@set_magic_quotes_runtime(0);
 }
 
 // 客户端连类型
-if( ! defined( 'CLIENT_TYPE' ) ) {
-	if( ( isset( $_SERVER["HTTP_X_REQUESTED_WITH"] ) &&
-		strtolower( $_SERVER["HTTP_X_REQUESTED_WITH"] ) === 'xmlhttprequest' ) ||
-		( isset( $_REQUEST['inajax'] ) && $_REQUEST['inajax'] == 1 ) ) {
-		define( 'CLIENT_TYPE', 'AJAX' );
-	} elseif( isset( $_SERVER['HTTP_USER_AGENT'] ) ) {
-		define( 'CLIENT_TYPE', 'BROWSER' );
-	} elseif( stripos( PHP_SAPI, 'CGI' ) === 0 ) {
-		define( 'CLIENT_TYPE', 'CGI' );
-	} else {
-		define( 'CLIENT_TYPE', 'OTHER' );
-	}
+if( ( isset( $_SERVER["HTTP_X_REQUESTED_WITH"] ) &&
+	strtolower( $_SERVER["HTTP_X_REQUESTED_WITH"] ) === 'xmlhttprequest' ) ||
+	( isset( $_REQUEST['inajax'] ) && $_REQUEST['inajax'] == 1 ) ) {
+	define( 'CLIENT_TYPE', 'AJAX' );
+} elseif( isset( $_SERVER['HTTP_USER_AGENT'] ) ) {
+	define( 'CLIENT_TYPE', 'BROWSER' );
+} elseif( stripos( PHP_SAPI, 'CGI' ) === 0 ) {
+	define( 'CLIENT_TYPE', 'CGI' );
+} else {
+	define( 'CLIENT_TYPE', 'OTHER' );
 }
 
 // 异常错误，和E_系列的常量一起被用于框架的错误处理
@@ -454,13 +451,31 @@ class Melon {
 	 * @param string $var [可选] 指定获取哪个值，如果不填此项，则返回所有
 	 * @return mixed
 	 */
-	static public function env( $var = null ) {
+	final static public function env( $var = null ) {
 		return is_null( $var ) ? self::$_melon->env : 
 			( isset( self::$_melon->env[ $var ] ) ? self::$_melon->env[ $var ] : null );
 	}
 	
-	static public function lang() {
-		
+	final static public function HttpRequest() {
+		return Http\Request::getInstance();
+	}
+	
+	final static public function HttpResponse( $httpVersion = '1.1', $charset = '', $contentType = 'text/html' ) {
+		if( ! $charset ) {
+			$charset = self::env( 'charset' );
+		}
+		return new Http\Response( $httpVersion, $charset, $contentType );
+	}
+	
+	final static public function HttpRoute( $config = array() ) {
+		return new Http\Route( $config );
+	}
+	
+	final static public function HttpSimpleRest( $route = null, $matchMode = Http\SimpleRest::MATCH_ONE ) {
+		if( is_null( $route ) ) {
+			$route = self::HttpRoute();
+		}
+		return new Http\SimpleRest( $route, $matchMode );
 	}
 	
 	static public function cache() {
@@ -484,16 +499,33 @@ class Melon {
 class M extends Melon {}
 
 M::init();
-$s = microtime(true);
-$template = new Base\Template();
-$template->setCompileDir( './Melon/Data/' )->setTemplateDir('./Melon/Data/')->assign('arr', array(1, 2, 3))->assignTag('list', array(
-	'callable' => '\Melon::callable',
-	'args' => array(
-		'name' => 'haha'
-	)
-))->display('subTemplate.html');
-
-echo number_format(microtime(true) - $s, 4);
+//$s = microtime(true);
+//$template = new Base\Template();
+//$template->setCompileDir( './Melon/Data/' )->setTemplateDir('./Melon/Data/')->assign('arr', array(1, 2, 3))->assignTag('list', array(
+//	'callable' => '\Melon::callable',
+//	'args' => array(
+//		'name' => 'haha'
+//	)
+//))->display('subTemplate.html');
+//
+//echo number_format(microtime(true) - $s, 4);
 
 //todo::env支持以.的方式获取
 //todo::支持自定义错误页面
+
+$rest = M::HttpSimpleRest();
+$rest->get('/', function() {
+	M::HttpResponse()->send('hello world!');
+});
+
+$rest->get('/[id]/[book:\d+]', function($id, $book) {
+	M::HttpResponse()->send($book);
+});
+
+$rest->get('/[id]/[book:\w+]', function($id, $book) {
+	M::HttpResponse()->send($book);
+});
+
+if(!$rest->matchTotal()) {
+	echo '你要的页面找不到了！';
+}

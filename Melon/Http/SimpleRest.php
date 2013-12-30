@@ -6,17 +6,26 @@ defined('IN_MELON') or die('Permission denied');
 
 class SimpleRest {
 	
+	const MATCH_ALL = 0;
+	const MATCH_ONE = 1;
+	
+	private $_matchMode;
+	
 	private $_route;
+	
+	private $_method;
 	
 	private $_matchTotal = 0;
 	
-	public function __construct(Route $route) {
+	public function __construct(Route $route, $matchMode = self::MATCH_ONE) {
 		$this->_route = $route;
+		$this->_matchMode = ( $matchMode === self::MATCH_ALL ? self::MATCH_ALL : self::MATCH_ONE );
+		$this->_method = strtolower( \Melon::HttpRequest()->method() );
 	}
 	
 	private function _parse($method, $rule, $callback) {
-		//todo::$method方法不对，立即返回
-		if(!$rule) {
+		if($method !== $this->_method || !$rule ||
+			($this->_matchMode === self::MATCH_ONE && $this->_matchTotal > 0)) {
 			return;
 		}
 		$parseInfo = array();

@@ -16,10 +16,10 @@ class Route {
 	 * 构造器，实例化时请提供相关配置参数
 	 * @param array $config 全局路由配置
 	 */
-	public function __construct($config = array(), $method = '', $mode='a') {
+	public function __construct($config = array()) {
 		$this->setConfig($config);
 		$this->_setPathInfo();
-		$this->_method = strtolower( $method );
+		$this->_method = strtolower( \Melon::HttpRequest()->method() );
 	}
 	
 	public function setConfig($config) {

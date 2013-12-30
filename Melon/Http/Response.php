@@ -129,7 +129,7 @@ class Response {
 		}
 		if( ! headers_sent() ) {
 			$message = $this->getStatusMessage();
-			if(CLIENT_TYPE === 'cgi') {
+			if(CLIENT_TYPE === 'CGI') {
 				header("Status:{$message}");
 			} else {
 				header("HTTP/{$this->_httpVersion} {$this->_status} {$message}");
