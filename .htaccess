@@ -1,0 +1,5 @@
+# apache URL重写规则
+# 把所有请求重定向到域名根目录的index.php里
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.php [L,QSA]

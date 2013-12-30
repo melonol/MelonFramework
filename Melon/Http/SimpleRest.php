@@ -13,12 +13,15 @@ class SimpleRest {
 	
 	private $_route;
 	
+	private $_response;
+	
 	private $_method;
 	
 	private $_matchTotal = 0;
 	
-	public function __construct(Route $route, $matchMode = self::MATCH_ONE) {
+	public function __construct(Route $route, Response $response, $matchMode = self::MATCH_ONE) {
 		$this->_route = $route;
+		$this->_response = $response;
 		$this->_matchMode = ( $matchMode === self::MATCH_ALL ? self::MATCH_ALL : self::MATCH_ONE );
 		$this->_method = strtolower( \Melon::HttpRequest()->method() );
 	}
@@ -36,7 +39,11 @@ class SimpleRest {
 		))->parse($parseInfo);
 		if( $parseInfo ) {
 			$this->_matchTotal++;
+			ob_start();
 			call_user_func_array($callback, $parseInfo['args']);
+			$content = ob_get_contents();
+			ob_end_clean();
+			$this->_response->send( $content );
 		}
 	}
 	

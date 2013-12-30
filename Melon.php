@@ -471,11 +471,14 @@ class Melon {
 		return new Http\Route( $config );
 	}
 	
-	final static public function HttpSimpleRest( $route = null, $matchMode = Http\SimpleRest::MATCH_ONE ) {
+	final static public function HttpSimpleRest( $route = null, $response = null, $matchMode = Http\SimpleRest::MATCH_ONE ) {
 		if( is_null( $route ) ) {
 			$route = self::HttpRoute();
 		}
-		return new Http\SimpleRest( $route, $matchMode );
+		if( is_null( $response ) ) {
+			$response = self::HttpResponse();
+		}
+		return new Http\SimpleRest( $route, $response, $matchMode );
 	}
 	
 	static public function cache() {
@@ -515,10 +518,10 @@ M::init();
 
 $rest = M::HttpSimpleRest();
 $rest->get('/', function() {
-	M::HttpResponse()->send('hello world!');
+	echo 'hello world!';
 });
 
-$rest->get('/[id]/[book:\d+]', function($id, $book) {
+$rest->get('/[id]/[book]/[dd]', function($id, $book) {
 	M::HttpResponse()->send($book);
 });
 
