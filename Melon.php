@@ -517,8 +517,9 @@ M::init();
 //todo::支持自定义错误页面
 
 $rest = M::HttpSimpleRest();
-$rest->get('/', function() {
-	echo 'hello world!';
+$rest->put('/', function() {
+	$request = M::HttpRequest();
+	M::debug($request->inputs());
 });
 
 $rest->get('/[id]/[book]/[dd]', function($id, $book) {

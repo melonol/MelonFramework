@@ -22,17 +22,16 @@ class Request {
 
 	private function __construct() {
 		$this->_praseHeader();
-		$this->_setInputs();
 		$this->_setMethod();
+		$this->_setInputs();
 	}
 
 	static public function getInstance() {
 		static $instance = null;
 		if(is_null($instance)) {
-			return new self();
-		} else {
-			return $instance;
+			$instance = new self();
 		}
+		return $instance;
 	}
 
 	/**
@@ -41,7 +40,7 @@ class Request {
 	 * 然后会被放到self::$_header中
 	 */
 	private function _praseHeader() {
-		$header = array();
+		$header =& $this->_headers;
 		// 这是apache特有的函数，可以很方便取到数据
 		if (function_exists('getallheaders')) {
 			$header = getallheaders();
@@ -56,6 +55,13 @@ class Request {
 				}
 			}
 		}
+		$_header = array();
+		//格式化参数
+		foreach ($header as $key => $value) {
+			$key = strtoupper(str_replace('-', '_', $key));
+			$_header[$key] = $value;
+		}
+		$header = $_header;
 
 		if (isset($_SERVER['CONTENT_LENGTH'])) {
 			$header['CONTENT_LENGTH'] = $_SERVER['CONTENT_LENGTH'];
@@ -74,14 +80,8 @@ class Request {
 		if (isset($header['AUTHORIZATION'])) {
 			$match = array();
 			if (preg_match('/^\w+/', $header['AUTHORIZATION'], $match)) {
-				$header['AUTH_TYPE'] = strtoupper($match[0]);
+				$header['AUTH_TYPE'] = $match[0];
 			}
-		}
-
-		//格式化参数
-		foreach ($header as $key => $value) {
-			$key = strtoupper(str_replace('_', '-', $key));
-			$this->_headers[$key] = $value;
 		}
 	}
 
@@ -90,7 +90,11 @@ class Request {
 		if( $this->header( 'AUTHORIZATION' ) ) {
 			if (preg_match_all('/(\w+)=(?:(?:")([^"]+)"|([^\s,$]+))/', $this->header( 'AUTHORIZATION' ), $matchArgs)) {
 				foreach ($matchArgs[1] as $index => $key) {
-					$authArgs[$key] = $matchArgs[2][$index];
+					if($matchArgs[2][$index]) {
+						$authArgs[$key] = $matchArgs[2][$index];
+					} else {
+						$authArgs[$key] = $matchArgs[3][$index];
+					}
 				}
 			}
 		}
@@ -104,17 +108,15 @@ class Request {
 	 * @return string
 	 */
 	private function _setInputs() {
-		$this->_inputs['post'] =& $_POST;
 		$this->_inputs['get'] =& $_GET;
+		$this->_inputs['post'] =& $_POST;
 		$this->_inputs['cookie'] =& $_COOKIE;
 		$this->_inputs['put'] = array();
-		if ($this->method() === self::METHOD_PUT) {
-			$putVars = array();
+		if ($this->isPut()) {
+			$putVars =& $this->_inputs['put'];
 			parse_str(file_get_contents('php://input'), $putVars);
-			$this->_inputs['put'] =& $putVars;
 		}
 		$this->_inputs['request'] =& $_REQUEST;
-		
 		// 虽然5.3默认已经关闭magic quotes，但5.4才真正移除
 		// 所以还是要处理这个问题
 		if(get_magic_quotes_gpc()) {
@@ -131,11 +133,20 @@ class Request {
 			$this->_method = strtoupper($_SERVER['REQUEST_METHOD']);
 		}
 	}
+
+	/**
+	 * 获取请求方法
+	 * 
+	 * @return string
+	 */
+	public function method() {
+		return $this->_method;
+	}
 	
 	/**
 	 * 获取所有头信息
 	 */
-	public function allHeaders() {
+	public function headers() {
 		return $this->_headers;
 	}
 
@@ -148,17 +159,12 @@ class Request {
 	public function header($name) {
 		return ( isset( $this->_headers[ $name ] ) ? $this->_headers[ $name ] : null );
 	}
-
-	/**
-	 * 获取请求方法
-	 * 
-	 * @return string
-	 */
-	public function method() {
-		return $this->_method;
+	
+	public function inputs() {
+		return $this->_inputs;
 	}
 	
-	private function input($key, $mode='a') {
+	public function input($key, $mode='a') {
 		static $map = array(
 			self::METHOD_GET => 'g',
 			self::METHOD_POST => 'p',
@@ -220,7 +226,7 @@ class Request {
 		$_type = (is_array($type) ? 'enum' : $type);
 		switch ($_type) {
 			case 'bool':		// 布尔值
-				$value = !!$value;
+				$value = ( !!$value && $value != 0 );
 				break;
 			case 'int':			// 整数
 				$value = intval($value);

@@ -149,11 +149,30 @@ class Response {
 	/**
 	 * 设置状态码
 	 * 
-	 * @param string $status
+	 * @param int $status
 	 */
 	public function setStatus($status) {
 		$this->_status = intval($status);
 		return $this;
+	}
+
+	/**
+	 * 获取状态码
+	 * 
+	 * @return int
+	 */
+	public function getStatus() {
+		return $this->_status;
+	}
+
+	/**
+	 * 根据status获取相应的状态描述
+	 * 
+	 * @return string
+	 */
+	public function getStatusMessage() {
+		return isset($this->_statusMessage[$this->_status]) ?
+				$this->_statusMessage[$this->_status] : 'Unknown';
 	}
 
 	/**
@@ -164,6 +183,15 @@ class Response {
 	public function setBody($body) {
 		$this->_body = strval( $body );
 		return $this;
+	}
+
+	/**
+	 * 获取媒体内容
+	 * 
+	 * @return string
+	 */
+	public function getBody() {
+		return $this->_body;
 	}
 
 	/**
@@ -196,6 +224,15 @@ class Response {
 	}
 
 	/**
+	 * 获取媒体编码
+	 * 
+	 * @return string
+	 */
+	public function getCharset() {
+		return $this->_charset;
+	}
+
+	/**
 	 * 设置HTTP头
 	 * 
 	 * @param string $name 配置
@@ -217,16 +254,6 @@ class Response {
 			$this->setHeader($name, $value);
 		}
 		return $this;
-	}
-
-	/**
-	 * 根据status获取相应的状态描述
-	 * 
-	 * @return string
-	 */
-	public function getStatusMessage() {
-		return isset($this->_statusMessage[$this->_status]) ?
-				$this->_statusMessage[$this->_status] : 'Unknown';
 	}
 
 }
