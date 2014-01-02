@@ -453,8 +453,8 @@ class Melon {
 	 * @return mixed
 	 */
 	final static public function env( $var = null ) {
-		return is_null( $var ) ? self::$_melon->env : 
-			( isset( self::$_melon->env[ $var ] ) ? self::$_melon->env[ $var ] : null );
+		return ( is_null( $var ) ? self::$_melon->env : 
+			( isset( self::$_melon->env[ $var ] ) ? self::$_melon->env[ $var ] : null ) );
 	}
 	
 	final static public function httpRequest() {
@@ -473,14 +473,18 @@ class Melon {
 		return new Http\Route( $config );
 	}
 	
-	final static public function httpSimpleRest( $route = null, $response = null, $matchMode = Http\SimpleRest::MATCH_ONE ) {
+	final static public function httpSimpleRest( $route = null, $request = null,
+			$response = null, $matchMode = Http\SimpleRest::MATCH_ONE ) {
 		if( is_null( $route ) ) {
 			$route = self::httpRoute();
+		}
+		if( is_null( $request ) ) {
+			$request = self::httpRequest();
 		}
 		if( is_null( $response ) ) {
 			$response = self::httpResponse();
 		}
-		return new Http\SimpleRest( $route, $response, $matchMode );
+		return new Http\SimpleRest( $route, $request, $response, $matchMode );
 	}
 	
 	static public function cache() {
@@ -518,6 +522,7 @@ M::init();
 //todo::env支持以.的方式获取
 //todo::支持自定义错误页面
 //todo::增加php版本判断，如果少于5.3则不允许使用
+//todo::将私有都设置为可继承
 
 $rest = M::httpSimpleRest();
 $rest->get('/', function() {

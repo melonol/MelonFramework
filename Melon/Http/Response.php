@@ -4,28 +4,38 @@ namespace Melon\Http;
 
 defined('IN_MELON') or die('Permission denied');
 
+/**
+ * Response用于简单的回应HTTP请求
+ * 
+ * 没有做过多处理，只有非常简单的回应头、状态码、媒体类型和内容的设置
+ * 大部分情况都够用，同时已针对cgi请求做了处理
+ */
 class Response {
 
 	/**
 	 * HTTP版本
+	 * 
 	 * @var string
 	 */
 	private $_httpVersion;
 
 	/**
 	 * 状态码
+	 * 
 	 * @var type 
 	 */
 	private $_status = 200;
 
 	/**
 	 * 媒体内容
+	 * 
 	 * @var string
 	 */
 	private $_body;
 
 	/**
 	 * 媒体类型
+	 * 
 	 * @var string
 	 * @link http://zh.wikipedia.org/wiki/%E4%BA%92%E8%81%94%E7%BD%91%E5%AA%92%E4%BD%93%E7%B1%BB%E5%9E%8B
 	 */
@@ -33,12 +43,14 @@ class Response {
 
 	/**
 	 * 媒体编码
+	 * 
 	 * @var string
 	 */
 	private $_charset;
 
 	/**
 	 * HTTP头设置
+	 * 
 	 * @var array
 	 * @link http://kb.cnblogs.com/page/92320/
 	 * @link http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
@@ -47,6 +59,7 @@ class Response {
 
 	/**
 	 * 状态码消息
+	 * 
 	 * @var array
 	 * @link http://zh.wikipedia.org/wiki/HTTP%E7%8A%B6%E6%80%81%E7%A0%81
 	 */
@@ -103,8 +116,10 @@ class Response {
 	 * 构造器
 	 * 
 	 * @param string $httpVersion [optional] 要使用哪个HTTP版本，为空则使用默认值
+	 * @param string $charset [optional] 回应内容的编码
+	 * @param string $contentType [optional] 媒体类型
 	 */
-	public function __construct($httpVersion = '1.1', $charset = 'utf-8', $contentType = 'text/html') {
+	public function __construct( $httpVersion = '1.1', $charset = 'utf-8', $contentType = 'text/html' ) {
 		$this->_httpVersion = $httpVersion;
 		$this->_charset = $charset;
 		$this->_contentType = $contentType;
@@ -113,34 +128,39 @@ class Response {
 	/**
 	 * 发送回应结果
 	 * 
-	 * @param string $body [optional] 媒体内容
-	 * @param int $status [optional] 状态码
-	 * @param string $contentType [optional] 媒体格式
+	 * 如果已经在调用本方法前输出过内容，则程序不会再调用header
+	 * 即使用过setHeader或者setHeaderItem设置的头信息将会失效
+	 * 
+	 * @param string $body [optional] 媒体内容，如果为空则使用预设值
+	 * @param int $status [optional] 状态码，如果为空则使用预设值
+	 * @param string $contentType [optional] 媒体格式，如果为空则使用预设值
 	 */
-	public function send($body = '', $status = null, $contentType = null) {
-		if (!empty($body)) {
-			$this->setBody($body);
+	public function send( $body = '', $status = null, $contentType = null ) {
+		if( ! empty( $body ) ) {
+			$this->setBody( $body );
 		}
-		if (!is_null($status)) {
-			$this->setStatus($status);
+		if( ! is_null( $status ) ) {
+			$this->setStatus( $status );
 		}
-		if (!empty($contentType)) {
-			$this->setContentType($contentType);
+		if( ! empty( $contentType ) ) {
+			$this->setContentType( $contentType );
 		}
+		
+		// 如果已经发送了内容，则再使用header是无效的，也会报错
 		if( ! headers_sent() ) {
 			$message = $this->getStatusMessage();
-			if(\Melon::env( 'clientType' ) === 'cgi') {
-				header("Status:{$message}");
+			if( \Melon::env( 'clientType' ) === 'cgi' ) {
+				header( "Status:{$message}" );
 			} else {
-				header("HTTP/{$this->_httpVersion} {$this->_status} {$message}");
+				header( "HTTP/{$this->_httpVersion} {$this->_status} {$message}" );
 			}
-			header("Content-Type:{$this->_contentType};charset={$this->_charset}");
-			foreach ($this->_header as $name => $value) {
-				header("{$name}:{$value}");
+			header( "Content-Type:{$this->_contentType};charset={$this->_charset}" );
+			foreach ( $this->_header as $name => $value ) {
+				header( "{$name}:{$value}" );
 			}
 		}
-		//内容
-		if (!empty($this->_body)) {
+		// 输出内容
+		if ( ! empty( $this->_body ) ) {
 			echo $this->_body;
 		}
 		return $this;
@@ -151,8 +171,8 @@ class Response {
 	 * 
 	 * @param int $status
 	 */
-	public function setStatus($status) {
-		$this->_status = intval($status);
+	public function setStatus( $status ) {
+		$this->_status = intval( $status );
 		return $this;
 	}
 
@@ -171,8 +191,8 @@ class Response {
 	 * @return string
 	 */
 	public function getStatusMessage() {
-		return isset($this->_statusMessage[$this->_status]) ?
-				$this->_statusMessage[$this->_status] : 'Unknown';
+		return ( isset( $this->_statusMessage[ $this->_status ] ) ?
+				$this->_statusMessage[ $this->_status ] : 'Unknown' );
 	}
 
 	/**
@@ -180,7 +200,7 @@ class Response {
 	 * 
 	 * @param string $body
 	 */
-	public function setBody($body) {
+	public function setBody( $body ) {
 		$this->_body = strval( $body );
 		return $this;
 	}
@@ -199,7 +219,7 @@ class Response {
 	 * 
 	 * @param string $contentType
 	 */
-	public function setContentType($contentType) {
+	public function setContentType( $contentType ) {
 		$this->_contentType = $contentType;
 		return $this;
 	}
@@ -218,7 +238,7 @@ class Response {
 	 * 
 	 * @param string $charset
 	 */
-	public function setCharset($charset) {
+	public function setCharset( $charset ) {
 		$this->_charset = $charset;
 		return $this;
 	}
@@ -235,23 +255,22 @@ class Response {
 	/**
 	 * 设置HTTP头
 	 * 
-	 * @param string $name 配置
+	 * @param string $name 名称
 	 * @param string $value 值
 	 */
-	public function setHeader($name, $value) {
-		$this->_header[$name] = $value;
+	public function setHeader( $name, $value ) {
+		$this->_header[ $name ] = $value;
 		return $this;
 	}
 
 	/**
-	 * 设置HTTP头
+	 * 设置一组HTTP头
 	 * 
-	 * @param string $name 配置
-	 * @param string $value 值
+	 * @param array $headers array( string => 名称, string => 值 )
 	 */
-	public function setHeaderItem($headers) {
-		foreach($headers as $name => $value) {
-			$this->setHeader($name, $value);
+	public function setHeaderItem( $headers ) {
+		foreach( $headers as $name => $value ) {
+			$this->setHeader( $name, $value );
 		}
 		return $this;
 	}
