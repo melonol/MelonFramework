@@ -5,12 +5,13 @@ namespace Melon\Http;
 defined('IN_MELON') or die('Permission denied');
 
 /**
- * 正如其名，一个简单的REST封装类
+ * 正如其名，一个简单的REST封装，引用了Route和Request，Response类
  * 
  * <pre>
- * 引用了Route和Response类（路由规则请参考Route）
  * 例：
  * // 设置各种规则，一旦被匹配到，则马上会执行
+ * // 路由规则请参考Route类
+ * 
  * $simpleRest->get('/', function() {
  *	echo '欢迎来到Melon的世界！';
  * });

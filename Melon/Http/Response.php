@@ -64,7 +64,7 @@ class Response {
 	 * @link http://zh.wikipedia.org/wiki/HTTP%E7%8A%B6%E6%80%81%E7%A0%81
 	 */
 	private $_statusMessage = array(
-		//请求消息
+		// 请求消息
 		100 => 'Continue',
 		101 => 'Switching Protocols',
 		//成功
@@ -75,7 +75,7 @@ class Response {
 		204 => 'No Content',
 		205 => 'Reset Content',
 		206 => 'Partial Content',
-		//重定向
+		// 重定向
 		300 => 'Multiple Choices',
 		301 => 'Moved Permanently',
 		302 => 'Found',
@@ -84,7 +84,7 @@ class Response {
 		305 => 'Use Proxy',
 		306 => '(Unused)',
 		307 => 'Temporary Redirect',
-		//请求错误
+		// 请求错误
 		400 => 'Bad Request',
 		401 => 'Unauthorized',
 		402 => 'Payment Required',
