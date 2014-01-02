@@ -102,7 +102,7 @@ class DebugMessage {
 	 */
 	public function parse( $showType = self::DISPLAY_AUTO, $showCodeSnippet = true ) {
 		if( $showType === self::DISPLAY_AUTO ) {
-			$_showType = ( CLIENT_TYPE === 'BROWSER' ? self::DISPLAY_HTML : self::DISPLAY_TEXT );
+			$_showType = ( \Melon::env( 'clientType' ) === 'browser' ? self::DISPLAY_HTML : self::DISPLAY_TEXT );
 		} else {
 			$_showType = ( $showType === self::DISPLAY_HTML ? self::DISPLAY_HTML : self::DISPLAY_TEXT );
 		}

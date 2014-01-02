@@ -12,24 +12,12 @@ if( function_exists( 'set_magic_quotes_runtime' ) ) {
 	@set_magic_quotes_runtime(0);
 }
 
-// 客户端连类型
-if( ( isset( $_SERVER["HTTP_X_REQUESTED_WITH"] ) &&
-	strtolower( $_SERVER["HTTP_X_REQUESTED_WITH"] ) === 'xmlhttprequest' ) ||
-	( isset( $_REQUEST['inajax'] ) && $_REQUEST['inajax'] == 1 ) ) {
-	define( 'CLIENT_TYPE', 'AJAX' );
-} elseif( isset( $_SERVER['HTTP_USER_AGENT'] ) ) {
-	define( 'CLIENT_TYPE', 'BROWSER' );
-} elseif( stripos( PHP_SAPI, 'CGI' ) === 0 ) {
-	define( 'CLIENT_TYPE', 'CGI' );
-} else {
-	define( 'CLIENT_TYPE', 'OTHER' );
-}
-
 // 异常错误，和E_系列的常量一起被用于框架的错误处理
 // 当然它不能用于error_reporting之类的原生错误处理函数
-// 65534是根据E_常量的定义规则，由E_ALL x 2得出
-define( 'E_EXCEPTION', 65534 );
-
+if( ! defined( 'E_EXCEPTION' ) ) {
+	// 65534是根据E_常量的定义规则，由E_ALL x 2得出
+	define( 'E_EXCEPTION', 65534 );
+}
 
 class Melon {
 	
@@ -75,10 +63,22 @@ class Melon {
 		// 用单属性的话，到时只需要管住它就可以了
 		$melon = self::$_melon = new \stdClass();
 		
+		// 客户端连类型
+		$clientType = 'other';
+		if( ( isset( $_SERVER["HTTP_X_REQUESTED_WITH"] ) &&
+			strtolower( $_SERVER["HTTP_X_REQUESTED_WITH"] ) === 'xmlhttprequest' ) ||
+			( isset( $_REQUEST['inajax'] ) && $_REQUEST['inajax'] == 1 ) ) {
+			$clientType = 'ajax';
+		} elseif( isset( $_SERVER['HTTP_USER_AGENT'] ) ) {
+			$clientType = 'browser';
+		} elseif( stripos( PHP_SAPI, 'CGI' ) === 0 ) {
+			$clientType = 'cgi';
+		}
 		// env负责保存一些系统基本的信息
 		$melon->env = array(
 			'root' => __DIR__,
 			'library' =>  __DIR__  . DIRECTORY_SEPARATOR . 'Melon',
+			'clientType' => $clientType
 		);
 		
 		// 载入基础配置
@@ -130,6 +130,7 @@ class Melon {
 		$scripts = array();
 		// MELON_TEST是我做单元测试的时候创建的
 		// 直接整合进来有点不太好，不过这是最简单的方式
+		// todo::去掉一個
 		if( defined( 'MELON_TEST' ) ) {
 			foreach( $autoload as $script ) {
 				require_once $script;
@@ -456,27 +457,28 @@ class Melon {
 			( isset( self::$_melon->env[ $var ] ) ? self::$_melon->env[ $var ] : null );
 	}
 	
-	final static public function HttpRequest() {
+	final static public function httpRequest() {
 		return Http\Request::getInstance();
 	}
 	
-	final static public function HttpResponse( $httpVersion = '1.1', $charset = '', $contentType = 'text/html' ) {
+	final static public function httpResponse( $httpVersion = '1.1', $charset = '', $contentType = 'text/html' ) {
 		if( ! $charset ) {
-			$charset = self::env( 'charset' );
+			// todo::支持.的方式获取
+			$charset = self::env( 'config.charset' );
 		}
 		return new Http\Response( $httpVersion, $charset, $contentType );
 	}
 	
-	final static public function HttpRoute( $config = array() ) {
+	final static public function httpRoute( $config = array() ) {
 		return new Http\Route( $config );
 	}
 	
-	final static public function HttpSimpleRest( $route = null, $response = null, $matchMode = Http\SimpleRest::MATCH_ONE ) {
+	final static public function httpSimpleRest( $route = null, $response = null, $matchMode = Http\SimpleRest::MATCH_ONE ) {
 		if( is_null( $route ) ) {
-			$route = self::HttpRoute();
+			$route = self::httpRoute();
 		}
 		if( is_null( $response ) ) {
-			$response = self::HttpResponse();
+			$response = self::httpResponse();
 		}
 		return new Http\SimpleRest( $route, $response, $matchMode );
 	}
@@ -515,21 +517,22 @@ M::init();
 
 //todo::env支持以.的方式获取
 //todo::支持自定义错误页面
+//todo::增加php版本判断，如果少于5.3则不允许使用
 
-$rest = M::HttpSimpleRest();
-$rest->put('/', function() {
-	$request = M::HttpRequest();
+$rest = M::httpSimpleRest();
+$rest->get('/', function() {
+	$request = M::httpRequest();
 	M::debug($request->inputs());
 });
 
 $rest->get('/[id]/[book]/[dd]', function($id, $book) {
-	M::HttpResponse()->send($book);
+	M::httpResponse()->send($book);
 });
 
 $rest->get('/[id]/[book:\w+]', function($id, $book) {
-	M::HttpResponse()->send($book);
+	M::httpResponse()->send($book);
 });
 
 if(!$rest->matchTotal()) {
-	echo '你要的页面找不到了！';
+	echo '你要的页面找不到了！' . $a;
 }

@@ -19,7 +19,7 @@ class Route {
 	public function __construct($config = array()) {
 		$this->setConfig($config);
 		$this->_setPathInfo();
-		$this->_method = strtolower( \Melon::HttpRequest()->method() );
+		$this->_method = strtolower( \Melon::httpRequest()->method() );
 	}
 	
 	public function setConfig($config) {
@@ -28,9 +28,8 @@ class Route {
 	}
 	
 	private function _getRules() {
-		$rules = isset($this->_config['default']) && is_array($this->_config['default']) ?
-			$this->_config['default'] : array();
-		//todo::method改为从Request.php里取
+		$rules = isset($this->_config['global']) && is_array($this->_config['global']) ?
+			$this->_config['global'] : array();
 		if(isset($this->_config[$this->_method]) && is_array($this->_config[$this->_method])) {
 			foreach($this->_config[$this->_method] as $exp => $replace) {
 				if(isset($rules[$exp])) {
@@ -51,8 +50,7 @@ class Route {
 		//如果服务器不支持PATH_INFO，则使用REQUEST_URI解析
 		if (empty($pathInfo) ) {
 			$match = array();
-			//todo::改进，不应该只判断PHP，可以考虑在$_SERVER[PHP_SHLF]这些参数中找相关信息
-			if( stripos($_SERVER['REQUEST_URI'], '.php?') === false &&
+			if( isset($_SERVER['REQUEST_URI']) && stripos($_SERVER['REQUEST_URI'], '.php?') === false &&
 				substr($_SERVER['REQUEST_URI'], -4) !== '.php' &&
 				preg_match("#^[^?]+#", $_SERVER['REQUEST_URI'], $match)) {
 				//替换多余的 / 号
@@ -82,7 +80,7 @@ class Route {
 				if( $_exp && $elem[0] === '[' && preg_match( '/^\[(\w+)(?::(.*))?\]$/', $elem, $matchGroup ) ) {
 					$group[ $matchGroup[1] ] = "[{$matchGroup[1]}]";
 					$elem = ( isset( $matchGroup[2] ) ?
-						"(?<$matchGroup[1]>{$matchGroup[2]})" : "(?<$matchGroup[1]>[^\/]+)" );
+						"(?<{$matchGroup[1]}>{$matchGroup[2]})" : "(?<{$matchGroup[1]}>[^\/]+)" );
 				}
 				$expInfo[] = $elem;
 			}

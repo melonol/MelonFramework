@@ -23,7 +23,7 @@ class SimpleRest {
 		$this->_route = $route;
 		$this->_response = $response;
 		$this->_matchMode = ( $matchMode === self::MATCH_ALL ? self::MATCH_ALL : self::MATCH_ONE );
-		$this->_method = strtolower( \Melon::HttpRequest()->method() );
+		$this->_method = strtolower( \Melon::httpRequest()->method() );
 	}
 	
 	private function _parse($method, $rule, $callback) {
