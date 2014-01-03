@@ -120,7 +120,6 @@ class Logger {
 				$this->_setFile();
 			}
 		}
-		//TODO::使用error_log
 		$handle = @fopen( $this->_file, 'a' );
 		if( ! $handle ) {
 			throw new \Melon\Exception\RuntimeException( "无法写入日志：{$this->_file}" );

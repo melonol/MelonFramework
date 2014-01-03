@@ -8,16 +8,13 @@ use Melon\File;
 use Melon\Util;
 use Melon\Http;
 
-if( function_exists( 'set_magic_quotes_runtime' ) ) {
-	@set_magic_quotes_runtime(0);
-}
+
+function_exists( 'set_magic_quotes_runtime' ) and @set_magic_quotes_runtime(0);
 
 // 异常错误，和E_系列的常量一起被用于框架的错误处理
 // 当然它不能用于error_reporting之类的原生错误处理函数
-if( ! defined( 'E_EXCEPTION' ) ) {
-	// 65534是根据E_常量的定义规则，由E_ALL x 2得出
-	define( 'E_EXCEPTION', 65534 );
-}
+// 65534是根据E_常量的定义规则，由E_ALL x 2得出
+defined( 'E_EXCEPTION' ) or define( 'E_EXCEPTION', 65534 );
 
 class Melon {
 	
@@ -90,7 +87,9 @@ class Melon {
 		$melon->env['config'] = &$melon->conf;
 		
 		// 设置编码
-		header( 'Content-Type: text/html; charset=' . $melon->conf['charset'] );
+		if( ! headers_sent() ) {
+			header( 'Content-Type: text/html; charset=' . $melon->conf['charset'] );
+		}
 		
 		// 设置时间
 		if( ! empty( $melon->conf['timezone'] ) ) {
@@ -346,8 +345,8 @@ class Melon {
 	final static public function acquire( $script ) {
 		$load = File\PathTrace::repair( $script, true );
 		if( ! $load ) {
-			// TODO::改为抛出警告
-			throw new Exception\RuntimeException( "无法识别{$script}脚本" );
+			trigger_error( "无法识别{$script}脚本", E_USER_WARNING );
+			return false;
 		}
 		return self::_acquire( $load['source'], $load['target'] );
 	}
@@ -441,7 +440,7 @@ class Melon {
 				return substr( $sourceDir, 0, $epos );
 			}
 		}
-		// TODO::抛出警告
+		self::log( E_USER_ERROR, '当前脚本不存在于任何包中' );
 		return null;
 	}
 	
@@ -461,6 +460,10 @@ class Melon {
 		return Base\Func\getValue( self::$_melon->env, $var );
 	}
 	
+	final static public function httpRoute( $config = array() ) {
+		return new Http\Route( $config );
+	}
+	
 	final static public function httpRequest() {
 		return Http\Request::getInstance();
 	}
@@ -470,10 +473,6 @@ class Melon {
 			$charset = self::env( 'config.charset' );
 		}
 		return new Http\Response( $httpVersion, $charset, $contentType );
-	}
-	
-	final static public function httpRoute( $config = array() ) {
-		return new Http\Route( $config );
 	}
 	
 	final static public function httpSimpleRest( $route = null, $request = null,
@@ -522,9 +521,8 @@ M::init();
 //
 //echo number_format(microtime(true) - $s, 4);
 
-//todo::env支持以.的方式获取
 //todo::支持自定义错误页面
-//todo::将私有都设置为可继承
+//todo::将私有尽量设置为可继承
 
 $rest = M::httpSimpleRest();
 $rest->get('/', function() {

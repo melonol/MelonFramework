@@ -136,7 +136,6 @@ final class PathTrace {
 					$sourceTrace['line'] = $reflection->getStartLine();
 				} catch ( \Exception $e ) {
 					$sourceTrace = false;
-					//TODO::记录错误日志
 				}
 			}
 			return $sourceTrace;
