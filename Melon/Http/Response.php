@@ -115,9 +115,9 @@ class Response {
 	/**
 	 * 构造器
 	 * 
-	 * @param string $httpVersion [optional] 要使用哪个HTTP版本，为空则使用默认值
-	 * @param string $charset [optional] 回应内容的编码
-	 * @param string $contentType [optional] 媒体类型
+	 * @param string $httpVersion [可选] 要使用哪个HTTP版本，为空则使用默认值
+	 * @param string $charset [可选] 回应内容的编码
+	 * @param string $contentType [可选] 媒体类型
 	 */
 	public function __construct( $httpVersion = '1.1', $charset = 'utf-8', $contentType = 'text/html' ) {
 		$this->_httpVersion = $httpVersion;
@@ -131,9 +131,9 @@ class Response {
 	 * 如果已经在调用本方法前输出过内容，则程序不会再调用header
 	 * 即使用过setHeader或者setHeaderItem设置的头信息将会失效
 	 * 
-	 * @param string $body [optional] 媒体内容，如果为空则使用预设值
-	 * @param int $status [optional] 状态码，如果为空则使用预设值
-	 * @param string $contentType [optional] 媒体格式，如果为空则使用预设值
+	 * @param string $body [可选] 媒体内容，如果为空则使用预设值
+	 * @param int $status [可选] 状态码，如果为空则使用预设值
+	 * @param string $contentType [可选] 媒体格式，如果为空则使用预设值
 	 */
 	public function send( $body = '', $status = null, $contentType = null ) {
 		if( ! empty( $body ) ) {

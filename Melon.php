@@ -102,11 +102,10 @@ class Melon {
 		
 		// 初始化loader
 		self::_initLoader();
+		require $melon->env['library'] . DIRECTORY_SEPARATOR . 'Base' . DIRECTORY_SEPARATOR . 'Func.php';
+		
 		$melon->logger = new Base\Logger( $melon->env['library'] . DIRECTORY_SEPARATOR .
 			'Data' . DIRECTORY_SEPARATOR . 'Log', 'runtime', $melon->conf['logSplitSize'] );
-		
-		//TODO::重构
-		require $melon->env['library'] . DIRECTORY_SEPARATOR . 'Base' . DIRECTORY_SEPARATOR . 'Func.php';
 		define( 'MELON_INIT', true );
 	}
 	
@@ -449,12 +448,17 @@ class Melon {
 	/**
 	 * 获取框架的一些基本信息
 	 * 
+	 * 你可以使用 . 号分隔的形式获取多维数组里的值：
+	 * Melon::env( 'config.charset' );
+	 * 
 	 * @param string $var [可选] 指定获取哪个值，如果不填此项，则返回所有
 	 * @return mixed
 	 */
 	final static public function env( $var = null ) {
-		return ( is_null( $var ) ? self::$_melon->env : 
-			( isset( self::$_melon->env[ $var ] ) ? self::$_melon->env[ $var ] : null ) );
+		if( is_null( $var ) ) {
+			return self::$_melon->env;
+		}
+		return Base\Func\getValue( self::$_melon->env, $var );
 	}
 	
 	final static public function httpRequest() {
@@ -463,7 +467,6 @@ class Melon {
 	
 	final static public function httpResponse( $httpVersion = '1.1', $charset = '', $contentType = 'text/html' ) {
 		if( ! $charset ) {
-			// todo::支持.的方式获取
 			$charset = self::env( 'config.charset' );
 		}
 		return new Http\Response( $httpVersion, $charset, $contentType );
@@ -521,7 +524,6 @@ M::init();
 
 //todo::env支持以.的方式获取
 //todo::支持自定义错误页面
-//todo::增加php版本判断，如果少于5.3则不允许使用
 //todo::将私有都设置为可继承
 
 $rest = M::httpSimpleRest();

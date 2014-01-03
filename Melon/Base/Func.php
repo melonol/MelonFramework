@@ -29,3 +29,45 @@ function isAbsolutePath( $path = '' ) {
 		( stripos( $path, 'PHAR://' ) === 0 ) );
 	return $isAbsolute;
 }
+
+/**
+ * 根据键名获取数组的某个值
+ * 
+ * <pre>
+ * 函数简化了常规的多维数组获取某个值的方式：
+ * $arr = array(
+ *	'l1' => array(
+ *		'l2' => array(
+ *			'l3' => array(
+ *				'k' => 'v'
+ *			)
+ *		)
+ *	)
+ * );
+ * echo getValue( $arr, 'l1.l2.l3.k' ); // v
+ * </pre>
+ * 
+ * @param array $arr 数组
+ * @param string $key 键名，键名可以由多个$delimiter隔开，表示要获取的值的层级关系
+ * @param string $delimiter [可选] 分隔符
+ * @return mixed 当元素不存在时返回null
+ */
+function getValue( array & $arr , $key, $delimiter = '.' ) {
+	if( strpos( $key, $delimiter ) ) {
+		$value = null;
+		$level = 0;
+		foreach( explode( $delimiter, $key ) as $segmentKey ) {
+			if( $level > 0 && is_array( $value ) && isset( $value[ $segmentKey ] ) ) {
+				$value =& $value[ $segmentKey ];
+				$level++;
+			} elseif( $level === 0 && isset( $arr[ $segmentKey ] ) ) {
+				$value =& $arr[ $segmentKey ];
+				$level++;
+			} else {
+				return null;
+			}
+		}
+		return $value;
+	}
+	return ( isset( $arr[ $key ] ) ? $arr[ $key ] : null );
+}
