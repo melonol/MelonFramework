@@ -9,7 +9,7 @@ defined('IN_MELON') or die('Permission denied');
  * 
  * <pre>
  * 例：
- * // 设置各种规则，一旦被匹配到，则马上会执行
+ * // 设置各种规则，一旦被匹配到，则马上会执行回调函数
  * // 路由规则请参考Route类
  * 
  * $simpleRest->get('/', function() {

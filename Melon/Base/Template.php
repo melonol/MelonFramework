@@ -235,7 +235,7 @@ class Template {
 		}
 		$_targetDir = realpath( $targetDir );
 		$_sourceFile = realpath( $template );
-		if( ! $template ) {
+		if( ! $_sourceFile ) {
 			throw new \Melon\Exception\RuntimeException( "模板文件{$template}不存在" );
 		}
 		$compileFile = $_targetDir . DIRECTORY_SEPARATOR . md5( $_sourceFile ) . '.php';

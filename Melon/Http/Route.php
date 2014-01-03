@@ -11,7 +11,7 @@ defined('IN_MELON') or die('Permission denied');
  * 使用路由需要在服务器中添加一条重写规则，把所有路径重写到当前域名根目录下的某个文件中，一般是index.php
  * 你可以参考本框架目录下的.htaccess文件
  * 
- * 路由的作用是根据配置规则匹配URL中的PATHINFO，并替换为对应的URL
+ * 路由的作用是根据配置规则，以/号作为路径目录分割符，匹配URL中的PATHINFO，并替换为对应的URL
  * 如果没有PATHINFO，则使用REQUEST_URI来解释
  * 
  * 规则有两种匹配模式，每条规则只能使用其中一种，不能混用
@@ -23,6 +23,7 @@ defined('IN_MELON') or die('Permission denied');
  * 也可以在:号后添加正则表达式的规则：
  * /[type:\w+]/[id:\d+] => /category/[type]/[id]
  * 某些情况，如果你需要在表达式中使用/号，请在前面加上\号进行转义，否则会被认为是路径目录分割符
+ * 如果要使用*号（通配符），请加上?号进入懒惰匹配模式，否则可能会把余下分组的信息覆盖，因为*包含/分割符
  * 
  * 2.普通正则匹配，例
  * 配置： /(\w+)/(\d+) => /category/$1/$2
@@ -149,9 +150,10 @@ class Route {
 	/**
 	 * 解释路由
 	 * 
-	 * @param array $parseInfo 解释成功后，会把相关匹配信息保存到该变量中，里面有两个值：
-	 * 2. rule		string	匹配成功的路由规则
-	 * 1. args	array	匹配到的URL分组数据
+	 * @param &array $parseInfo 解释成功后，会把相关匹配信息填充到该变量中，如果解释失败，则不会填充
+	 * 里面有两个值：
+	 * 1. rule		string	匹配成功的路由规则
+	 * 2. args		array	匹配到的URL分组数据
 	 * @return string 经过匹配并替换后的URL
 	 */
 	public function parse( & $parseInfo = array() ) {
