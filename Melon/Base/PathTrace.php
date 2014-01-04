@@ -74,10 +74,6 @@ final class PathTrace {
 				'target' => $realPath,
 			);
 		}
-		// 如果获取失败了，尽可能返回原本的路径
-		if( $realPath === false && $getSource === false ) {
-			return $targetPath;
-		}
 		return $realPath;
 	}
 	
