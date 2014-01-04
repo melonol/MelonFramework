@@ -1,6 +1,6 @@
 <?php
 
-namespace Melon\File;
+namespace Melon\Base;
 
 defined( 'IN_MELON' ) or die( 'Permission denied' );
 
@@ -26,14 +26,14 @@ final class PathTrace {
 	 * 相对路径是相对于执行这个 parse 方法的文件所在目录路径来说的。
 	 * 比如在 /MelonFramework/Melon.php 文件中：
 	 * <pre>
-	 * echo PathTrace::repair( './Melon/System/PathTrace.php' );
+	 * echo PathTrace::real( './Melon/System/PathTrace.php' );
 	 * // 输出：/MelonFramework/Melon/System/PathTrace.php
 	 * </pre>
 	 * 
 	 * @param boolean $getSource [可选] 是否获取调用者的文件路径。一般它用来做一些权限之类的验证
 	 * 在 /MelonFramework/Melon.php 文件中：
 	 * <pre>
-	 * print_r( PathTrace::repair( './Melon/System/PathTrace.php', true ) );
+	 * print_r( PathTrace::real( './Melon/System/PathTrace.php', true ) );
 	 * // 输出：
 	 * Array
 	 * (
@@ -44,7 +44,7 @@ final class PathTrace {
 	 * 
 	 * @return string|array|false
 	 */
-	public static function repair( $targetPath, $getSource = false ) {
+	public static function real( $targetPath, $getSource = false ) {
 		if( empty( $targetPath ) ) {
 			return false;
 		}
@@ -86,7 +86,7 @@ final class PathTrace {
 	 * 
 	 * @return string|false
 	 */
-	public static function sourceFile() {
+	public static function source() {
 		$sourceTrace = self::_getSourceTrace();
 		return empty( $sourceTrace ) ? false : $sourceTrace['file'];
 	}

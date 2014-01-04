@@ -173,7 +173,7 @@ class Template {
 	 * @return \Melon\Base\Template
 	 */
 	public function setTemplateDir( $templateDir ) {
-		$this->_templateDir = \Melon\File\PathTrace::repair( $templateDir );
+		$this->_templateDir = \Melon\Base\PathTrace::real( $templateDir );
 		return $this;
 	}
 	
@@ -184,7 +184,7 @@ class Template {
 	 * @return \Melon\Base\Template
 	 */
 	public function setCompileDir( $compileDir ) {
-		$this->_compileDir = \Melon\File\PathTrace::repair( $compileDir );
+		$this->_compileDir = \Melon\Base\PathTrace::real( $compileDir );
 		return $this;
 	}
 	
@@ -547,7 +547,7 @@ class Template {
 		if( $this->_templateDir ) {
 			$this->_template = $this->_templateDir . DIRECTORY_SEPARATOR . $template;
 		} else {
-			$this->_template = \Melon\File\PathTrace::repair( $template );
+			$this->_template = \Melon\Base\PathTrace::real( $template );
 		}
 		$this->_show();
 		$content = ob_get_contents();
@@ -565,7 +565,7 @@ class Template {
 		if( $this->_templateDir ) {
 			$this->_template = $this->_templateDir . DIRECTORY_SEPARATOR . $template;
 		} else {
-			$this->_template = \Melon\File\PathTrace::repair( $template );
+			$this->_template = \Melon\Base\PathTrace::real( $template );
 		}
 		$this->_show();
 	}

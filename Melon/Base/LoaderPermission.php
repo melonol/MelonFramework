@@ -3,7 +3,7 @@
  * 
  */
 
-namespace Melon\File;
+namespace Melon\Base;
 use \Melon\Exception;
 
 defined( 'IN_MELON' ) or die( 'Permission denied' );

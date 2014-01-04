@@ -4,7 +4,6 @@ define( 'IN_MELON', true );
 
 use Melon\Base;
 use Melon\Exception;
-use Melon\File;
 use Melon\Util;
 use Melon\Http;
 
@@ -102,7 +101,6 @@ class Melon {
 		// 初始化loader
 		self::_initLoader();
 		require $melon->env['library'] . DIRECTORY_SEPARATOR . 'Base' . DIRECTORY_SEPARATOR . 'Func.php';
-		
 		$melon->logger = new Base\Logger( $melon->env['library'] . DIRECTORY_SEPARATOR .
 			'Data' . DIRECTORY_SEPARATOR . 'Log', 'runtime', $melon->conf['logSplitSize'] );
 		define( 'MELON_INIT', true );
@@ -119,9 +117,9 @@ class Melon {
 		// 现在准备一些必需的类
 		$autoload = array(
 			$library . 'Util' . DIRECTORY_SEPARATOR . 'Set.php',
-			$library . 'File' . DIRECTORY_SEPARATOR . 'LoaderSet.php',
-			$library . 'File' . DIRECTORY_SEPARATOR . 'PathTrace.php',
-			$library . 'File' . DIRECTORY_SEPARATOR . 'LoaderPermission.php',
+			$library . 'Base' . DIRECTORY_SEPARATOR . 'LoaderSet.php',
+			$library . 'Base' . DIRECTORY_SEPARATOR . 'PathTrace.php',
+			$library . 'Base' . DIRECTORY_SEPARATOR . 'LoaderPermission.php',
 		);
 		// 用一个数组来保存上面的类的信息
 		// 因为等下我要告诉loader，它们已经被载入过了，不要重复载入
@@ -144,10 +142,10 @@ class Melon {
 		// 我需要一个保存已载入的脚本文件信息的对象
 		// 这样可以不需要使用include_once或者require_once，也可以达到它们那样的效果
 		// 把刚才已加载的类的信息添加进去
-		self::$_melon->loaderSet = new File\LoaderSet( $scripts,
-			File\LoaderSet::REPLACE_NOT );
+		self::$_melon->loaderSet = new Base\LoaderSet( $scripts,
+			Base\LoaderSet::REPLACE_NOT );
 		// 载入文件时还需要一个权限审查对象
-		self::$_melon->loaderPermission = new File\LoaderPermission(
+		self::$_melon->loaderPermission = new Base\LoaderPermission(
 			self::$_melon->conf['includePath'], self::$_melon->conf['privatePre']
 		);
 	}
@@ -281,7 +279,7 @@ class Melon {
 	 * @throws Exception\RuntimeException
 	 */
 	final static public function load( $script ) {
-		$load = File\PathTrace::repair( $script, true );
+		$load = Base\PathTrace::real( $script, true );
 		if( ! $load ) {
 			throw new Exception\RuntimeException( "无法识别{$script}脚本文件" );
 		}
@@ -303,7 +301,7 @@ class Melon {
 		foreach( self::$_melon->conf['includePath'] as $path ) {
 			$script = realpath( $path . DIRECTORY_SEPARATOR . $file );
 			if( $script ) {
-				self::_load( File\PathTrace::sourceFile(), $script );
+				self::_load( Base\PathTrace::source(), $script );
 			}
 		}
 	}
@@ -343,7 +341,7 @@ class Melon {
 	 * @throws Exception\RuntimeException
 	 */
 	final static public function acquire( $script ) {
-		$load = File\PathTrace::repair( $script, true );
+		$load = Base\PathTrace::real( $script, true );
 		if( ! $load ) {
 			trigger_error( "无法识别{$script}脚本", E_USER_WARNING );
 			return false;
@@ -386,7 +384,7 @@ class Melon {
 	 * @throws Exception\RuntimeException
 	 */
 	final static public function packageLoad( $script ) {
-		$source = File\PathTrace::sourceFile();
+		$source = Base\PathTrace::source();
 		$packageDir = self::_packageDir( $source );
 		$target = realpath( dirname( $source ) . DIRECTORY_SEPARATOR . $script );
 		if( ! $target ) {
@@ -406,7 +404,7 @@ class Melon {
 	 * @throws Exception\RuntimeException
 	 */
 	final static public function packageAcquire( $script ) {
-		$source = File\PathTrace::sourceFile();
+		$source = Base\PathTrace::source();
 		$packageDir = self::_packageDir( $source );
 		$target = realpath( dirname( $source ) . DIRECTORY_SEPARATOR . $script );
 		if( ! $target ) {
@@ -421,7 +419,7 @@ class Melon {
 	 * @return string 包的路径
 	 */
 	final static public function packageDir() {
-		return self::_packageDir( File\PathTrace::sourceFile() );
+		return self::_packageDir( Base\PathTrace::source() );
 	}
 	
 	/**
@@ -440,7 +438,7 @@ class Melon {
 				return substr( $sourceDir, 0, $epos );
 			}
 		}
-		self::log( E_USER_ERROR, '当前脚本不存在于任何包中' );
+		trigger_error( '当前脚本不存在于任何包中', E_USER_ERROR );
 		return null;
 	}
 	
