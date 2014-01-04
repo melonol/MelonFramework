@@ -37,21 +37,21 @@ class Route {
 	 * 
 	 * @var array
 	 */
-	private $_config = array();
+	protected $_config = array();
 	
 	/**
 	 * 当前请求方法
 	 * 
 	 * @var string
 	 */
-	private $_method;
+	protected $_method;
 	
 	/**
 	 * URL中的PATHINFO
 	 * 
 	 * @var string
 	 */
-	private $_pathInfo;
+	protected $_pathInfo;
 
 	/**
 	 * 构造器，实例化时请提供相关配置参数
@@ -102,7 +102,7 @@ class Route {
 	 * 
 	 * @return array
 	 */
-	private function _getRules() {
+	protected function _getRules() {
 		$rules = ( isset( $this->_config['global'] ) && is_array( $this->_config['global'] ) ?
 			$this->_config['global'] : array() );
 		if( isset( $this->_config[ $this->_method ] ) && is_array( $this->_config[ $this->_method] ) ) {
@@ -130,7 +130,7 @@ class Route {
 	 * 
 	 * @return void
 	 */
-	private function _setPathInfo() {
+	protected function _setPathInfo() {
 		$pathInfo = ( isset($_SERVER['PATH_INFO'] ) ? $_SERVER['PATH_INFO'] : @getenv('PATH_INFO') );
 		//如果服务器不支持PATH_INFO，则使用REQUEST_URI解析
 		if( empty( $pathInfo ) ) {

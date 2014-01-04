@@ -11,31 +11,31 @@ class Logger {
 	 * 日志目录路径
 	 * @var string
 	 */
-	private $_dir;
+	protected $_dir;
 	
 	/**
 	 * 日志文件路径
 	 * @var string
 	 */
-	private $_file;
+	protected $_file;
 	
 	/**
 	 * 日志前缀名
 	 * @var string
 	 */
-	private $_filePrefix;
+	protected $_filePrefix;
 	
 	/**
 	 * 日志分割大小
 	 * @var int
 	 */
-	private $_splitSize;
+	protected $_splitSize;
 	
 	/**
 	 * 命名格式
 	 * @var string
 	 */
-	private $_type = 'txt';
+	protected $_type = 'txt';
 	
 	/**
 	 * 日志文件日期后缀
@@ -45,7 +45,7 @@ class Logger {
 	 * 依次类推
 	 * @var array
 	 */
-	private $_dateSuffix = array(
+	protected $_dateSuffix = array(
 		'_H', ':i', ':s'
 	);
 	
@@ -53,7 +53,7 @@ class Logger {
 	 * 默认使用的日期后缀
 	 * @var string
 	 */
-	private $_date = 'Y-m-d';
+	protected $_date = 'Y-m-d';
 	
 	/**
 	 * 是否锁定写入动作
@@ -94,7 +94,7 @@ class Logger {
 	 * 根据时间来设置
 	 * @return void
 	 */
-	private function _setFile() {
+	protected function _setFile() {
 		$dateSuffix = date( $this->_date, \Melon::env( 'time' ) );
 		$file = $this->_filePrefix . '-' . $dateSuffix . '.' . $this->_type;
 		$this->_file = $this->_dir . DIRECTORY_SEPARATOR . $file;

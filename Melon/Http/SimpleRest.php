@@ -44,35 +44,35 @@ class SimpleRest {
 	 * 
 	 * @var int 
 	 */
-	private $_matchMode;
+	protected $_matchMode;
 	
 	/**
 	 * 路由
 	 * 
 	 * @var Melon\Http\Route 
 	 */
-	private $_route;
+	protected $_route;
 	
 	/**
 	 * response
 	 * 
 	 * @var Melon\Http\Response
 	 */
-	private $_response;
+	protected $_response;
 	
 	/**
 	 * 当前请求方法
 	 * 
 	 * @var string 
 	 */
-	private $_method;
+	protected $_method;
 	
 	/**
 	 * 匹配总数
 	 * 
 	 * @var int 
 	 */
-	private $_matchTotal = 0;
+	protected $_matchTotal = 0;
 	
 	/**
 	 * 
@@ -96,7 +96,7 @@ class SimpleRest {
 	 * @param callble $callback 回调函数
 	 * @return void
 	 */
-	private function _parse( $method, $rule, $callback ) {
+	protected function _parse( $method, $rule, $callback ) {
 		if( $method !== $this->_method || ! $rule ||
 			( $this->_matchMode === self::MATCH_ONE && $this->_matchTotal > 0 ) ) {
 			return;

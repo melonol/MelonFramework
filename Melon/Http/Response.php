@@ -17,21 +17,21 @@ class Response {
 	 * 
 	 * @var string
 	 */
-	private $_httpVersion;
+	protected $_httpVersion;
 
 	/**
 	 * 状态码
 	 * 
 	 * @var type 
 	 */
-	private $_status = 200;
+	protected $_status = 200;
 
 	/**
 	 * 媒体内容
 	 * 
 	 * @var string
 	 */
-	private $_body;
+	protected $_body;
 
 	/**
 	 * 媒体类型
@@ -39,14 +39,14 @@ class Response {
 	 * @var string
 	 * @link http://zh.wikipedia.org/wiki/%E4%BA%92%E8%81%94%E7%BD%91%E5%AA%92%E4%BD%93%E7%B1%BB%E5%9E%8B
 	 */
-	private $_contentType;
+	protected $_contentType;
 
 	/**
 	 * 媒体编码
 	 * 
 	 * @var string
 	 */
-	private $_charset;
+	protected $_charset;
 
 	/**
 	 * HTTP头设置
@@ -55,7 +55,7 @@ class Response {
 	 * @link http://kb.cnblogs.com/page/92320/
 	 * @link http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
 	 */
-	private $_header = array();
+	protected $_header = array();
 
 	/**
 	 * 状态码消息
@@ -63,7 +63,7 @@ class Response {
 	 * @var array
 	 * @link http://zh.wikipedia.org/wiki/HTTP%E7%8A%B6%E6%80%81%E7%A0%81
 	 */
-	private $_statusMessage = array(
+	protected $_statusMessage = array(
 		// 请求消息
 		100 => 'Continue',
 		101 => 'Switching Protocols',
