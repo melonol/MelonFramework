@@ -1,6 +1,6 @@
 <?php
 
-namespace Melon\Base;
+namespace Melon\Util;
 
 defined('IN_MELON') or die('Permission denied');
 

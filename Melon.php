@@ -509,7 +509,7 @@ class M extends Melon {}
 
 M::init();
 //$s = microtime(true);
-//$template = new Base\Template();
+//$template = new Util\Template();
 //$template->setCompileDir( './Melon/Data/' )->setTemplateDir('./Melon/Data/')->assign('arr', array(1, 2, 3))->assignTag('list', array(
 //	'callable' => '\Melon::callable',
 //	'args' => array(
