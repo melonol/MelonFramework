@@ -15,12 +15,12 @@ class Melon {
 		;
 	}
 	
-	static public function init() {
+	static public function init( $root = null, $config = array() ) {
 		if( ! self::$_melon ) {
 			require __DIR__ . DIRECTORY_SEPARATOR . 'Melon' . DIRECTORY_SEPARATOR . 'Base' . 
 				DIRECTORY_SEPARATOR . 'Core.php';
 			self::$_melon = new Base\Core();
-			self::$_melon->init();
+			self::$_melon->init( $root, $config );
 		}
 	}
 		
@@ -239,7 +239,12 @@ class Melon {
 
 class M extends Melon {}
 
-M::init();
+M::init( null, array(
+	'logLevel' => 0,
+	'logDisplayLevel' => 0,
+	'includePath' => array()
+) );
+
 //$s = microtime(true);
 //$template = new Util\Template();
 //$template->setCompileDir( './Melon/Data/' )->setTemplateDir('./Melon/Data/')->assign('arr', array(1, 2, 3))->assignTag('list', array(
@@ -256,7 +261,7 @@ M::init();
 $rest = M::httpSimpleRest();
 $rest->get('/', function() {
 	$request = M::httpRequest();
-	M::debugWithTrace($request->inputs());
+	M::debugWithTrace($request->inputse());
 });
 
 $rest->get('/[id]/[book]/[dd]', function($id, $book) {

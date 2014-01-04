@@ -39,18 +39,24 @@ class Core {
 		;
 	}
 	
-	public function init() {
+	public function init( $root = null, $config = array() ) {
 		if( $this->_init ) {
 			return;
 		}
-		$this->_initConf();
+		$this->_initConf( $root, $config );
 		$this->_initLoader();
 		$this->_initPhpRigster();
 		$this->_initLogger();
+		
+		// 一切就绪后屏蔽错误
+		error_reporting( 0 );
 		$this->_init = true;
 	}
 	
-	protected function _initConf() {
+	protected function _initConf( $root, $config ) {
+		if( $root && ! is_dir( $root ) ) {
+			exit( 'root目录无效' );
+		}
 		// 客户端连接类型
 		$clientType = 'other';
 		if( ( isset( $_SERVER["HTTP_X_REQUESTED_WITH"] ) &&
@@ -63,19 +69,21 @@ class Core {
 			$clientType = 'cgi';
 		}
 		// 环境变量
-		$root = realpath( __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' );
+		$melonRoot = realpath( __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' );
 		$this->env = array(
-			'root' => $root,
-			'library' =>  $root . DIRECTORY_SEPARATOR . 'Melon',
+			'root' => $root ?: $melonRoot,
+			'melonRoot' => $melonRoot,
+			'melonLibrary' =>  $melonRoot . DIRECTORY_SEPARATOR . 'Melon',
 			'clientType' => $clientType
 		);
 		
 		// 载入基础配置
-		$this->conf = require ( $this->env['library'] . DIRECTORY_SEPARATOR .
+		$this->conf = require ( $this->env['melonLibrary'] . DIRECTORY_SEPARATOR .
 				'Data' . DIRECTORY_SEPARATOR . 'Conf' . DIRECTORY_SEPARATOR . 'Base.php' );
+		$this->conf = array_merge( $this->conf, $config );
 		// includePath是loader － 包括autoload、权限审查等函数的工作范围
 		// 需要把MELON的基础目录添加到includePath中
-		$this->conf['includePath'][] = $this->env['root'];
+		$this->conf['includePath'][] = $this->env['melonRoot'];
 		$this->env['config'] = &$this->conf;
 		
 		// 设置编码
@@ -93,14 +101,14 @@ class Core {
 	}
 	
 	protected function _initLoader() {
-		$library = $this->env['library'] . DIRECTORY_SEPARATOR;
+		$melonLibrary = $this->env['melonLibrary'] . DIRECTORY_SEPARATOR;
 		// 现在准备一些必需的类
 		$autoload = array(
-			$library . 'Util' . DIRECTORY_SEPARATOR . 'Set.php',
-			$library . 'Base' . DIRECTORY_SEPARATOR . 'Func.php',
-			$library . 'Base' . DIRECTORY_SEPARATOR . 'LoaderSet.php',
-			$library . 'Base' . DIRECTORY_SEPARATOR . 'PathTrace.php',
-			$library . 'Base' . DIRECTORY_SEPARATOR . 'LoaderPermission.php',
+			$melonLibrary . 'Util' . DIRECTORY_SEPARATOR . 'Set.php',
+			$melonLibrary . 'Base' . DIRECTORY_SEPARATOR . 'Func.php',
+			$melonLibrary . 'Base' . DIRECTORY_SEPARATOR . 'LoaderSet.php',
+			$melonLibrary . 'Base' . DIRECTORY_SEPARATOR . 'PathTrace.php',
+			$melonLibrary . 'Base' . DIRECTORY_SEPARATOR . 'LoaderPermission.php',
 		);
 		// 用一个数组来保存上面的类的信息
 		// 因为等下我要告诉loader，它们已经被载入过了，不要重复载入
@@ -146,8 +154,8 @@ class Core {
 	}
 	
 	protected function _initLogger() {
-		$this->logger = new Base\Logger( $this->env['library'] . DIRECTORY_SEPARATOR .
-			'Data' . DIRECTORY_SEPARATOR . 'Log', 'runtime', $this->conf['logSplitSize'] );
+		$this->logger = new Base\Logger( $this->env['root'] . DIRECTORY_SEPARATOR .
+			$this->conf['logDir'], 'runtime', $this->conf['logSplitSize'] );
 	}
 	
 	/**
@@ -296,12 +304,12 @@ class Core {
 				$callback( $debugMessage );
 			}
 		};
-		// 显示
+		// 显示日志信息
 		$showCodeSnippet = !! $this->conf['htmlShowCodeSnippet'];
 		$logHandler( $this->conf['logDisplayLevel'], function( $debugMessage ) use ( $showCodeSnippet ) {
 			$debugMessage->show( Base\DebugMessage::DISPLAY_AUTO, true, $showCodeSnippet );
 		} );
-		// 写入
+		// 写入日志信息
 		if( isset( $this->logger ) ) {
 			$logger = $this->logger;
 			$logHandler( $this->conf['logLevel'], function( $debugMessage ) use ( $logger, $type ) {
@@ -310,6 +318,20 @@ class Core {
 				$text = $debugMessage->parse( Base\DebugMessage::DISPLAY_TEXT, $showTrace );
 				$logger->write( $text );
 			} );
+		}
+		
+		// 显示出错信息
+		if( in_array( $type, array( E_ERROR, E_PARSE,  E_COMPILE_ERROR, E_CORE_ERROR,
+			E_EXCEPTION ) ) ) {
+			$errorPage = $this->env['root'] . DIRECTORY_SEPARATOR . $this->conf['errorPage'];
+			$errorMessage = '';
+			if( $this->env['clientType'] === 'browser' && file_exists( $errorPage ) ) {
+				ob_start();
+				@include $errorPage;
+				$errorMessage = ob_get_contents();
+				ob_clean();
+			}
+			\Melon::httpResponse()->send( $errorMessage ?: 'Server error.', 500 );
 		}
 	}
 }
