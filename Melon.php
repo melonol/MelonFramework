@@ -54,7 +54,7 @@ class Melon {
 		$trace = debug_backtrace();
 		$firstTrace = array_shift( $trace );
 		foreach( func_get_args() as $message ) {
-			self::$_melon->log( 'Debug', $message, $firstTrace['file'], $firstTrace['line'] );
+			self::$_melon->log( MELON_DEBUG, $message, $firstTrace['file'], $firstTrace['line'] );
 		}
 	}
 	
@@ -74,7 +74,7 @@ class Melon {
 		$file = $firstTrace['file'];
 		$line = $firstTrace['line'];
 		foreach( func_get_args() as $message ) {
-			self::$_melon->log( 'Debug', $message, $firstTrace['file'], $firstTrace['line'], $trace );
+			self::$_melon->log( MELON_DEBUG, $message, $firstTrace['file'], $firstTrace['line'], $trace );
 		}
 	}
 	
@@ -91,7 +91,7 @@ class Melon {
 		return new Base\Logger( $dir, $filePrefix, $splitSize );
 	}
 	
-	final static public function thowException( $message, $code, $previous ) {
+	final static public function thowException( $message, $code = null, $previous = null ) {
 		throw new Exception\RuntimeException( $message, $code, $previous );
 	}
 
@@ -240,24 +240,24 @@ class Melon {
 class M extends Melon {}
 
 M::init();
-$s = microtime(true);
-$template = new Util\Template();
-$template->setCompileDir( './Melon/Data/' )->setTemplateDir('./Melon/Data/')->assign('arr', array(1, 2, 3))->assignTag('list', array(
-	'callable' => '\Melon::callable',
-	'args' => array(
-		'name' => 'haha'
-	)
-))->display('subTemplate.html');
-
-echo number_format(microtime(true) - $s, 4);
+//$s = microtime(true);
+//$template = new Util\Template();
+//$template->setCompileDir( './Melon/Data/' )->setTemplateDir('./Melon/Data/')->assign('arr', array(1, 2, 3))->assignTag('list', array(
+//	'callable' => '\Melon::callable',
+//	'args' => array(
+//		'name' => 'haha'
+//	)
+//))->display('subTemplate.html');
+//
+//echo number_format(microtime(true) - $s, 4);
 
 //todo::支持自定义错误页面
-//todo::将私有尽量设置为可继承
+//todo::日志只有致命错误才记录trace
 
 $rest = M::httpSimpleRest();
 $rest->get('/', function() {
 	$request = M::httpRequest();
-	M::debug($request->inputs());
+	M::debugWithTrace($request->inputs());
 });
 
 $rest->get('/[id]/[book]/[dd]', function($id, $book) {

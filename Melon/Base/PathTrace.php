@@ -105,8 +105,15 @@ final class PathTrace {
 		} else {
 			$debugBacktrace = debug_backtrace();
 		}
-		$sourceTrace = $debugBacktrace[ $ignoreTrace - 1 ];
-		
+		$sourceTrace = null;
+		// 忽略自身
+		if( isset( $debugBacktrace[ $ignoreTrace - 1 ] ) ) {
+			$sourceTrace = $debugBacktrace[ $ignoreTrace - 1 ];
+			// 闭包是没有路径的，但可以在下一个栈里取
+			if( $sourceTrace['function'] === '{closure}' ) {
+				$sourceTrace = $debugBacktrace[ $ignoreTrace - 2 ];
+			}
+		}
 		if( ! empty( $sourceTrace ) ) {
 			// 由于PHP提供的内部动态调用方法（比如call_user_func、invoke等）不会产生栈来源，即没有file这个值
 			// 这会对我们的操作产生影响，必要时要使用反射来确保这些值存在

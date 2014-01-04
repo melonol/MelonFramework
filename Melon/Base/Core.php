@@ -16,6 +16,8 @@ function_exists( 'set_magic_quotes_runtime' ) and @set_magic_quotes_runtime(0);
 // 65534是根据E_常量的定义规则，由E_ALL x 2得出
 defined( 'E_EXCEPTION' ) or define( 'E_EXCEPTION', 65534 );
 
+define( 'MELON_DEBUG', 'Debug' );
+
 /**
  * Melon的扣肉
  */
@@ -301,8 +303,13 @@ class Core {
 		// 写入
 		if( isset( $this->logger ) ) {
 			$logger = $this->logger;
-			$logHandler( $this->conf['logLevel'], function( $debugMessage ) use ( $logger ) {
-				$text = $debugMessage->parse( Base\DebugMessage::DISPLAY_TEXT );
+			$logHandler( $this->conf['logLevel'], function( $debugMessage ) use ( $logger, $type ) {
+				if( in_array( $type, array( E_ERROR, E_PARSE,  E_COMPILE_ERROR,
+					E_CORE_ERROR, E_EXCEPTION, MELON_DEBUG ) ) ) {
+					$text = $debugMessage->parse( Base\DebugMessage::DISPLAY_TEXT );
+				} else {
+					$text = $debugMessage->parse( Base\DebugMessage::DISPLAY_TEXT, false );
+				}
 				$logger->write( $text );
 			} );
 		}

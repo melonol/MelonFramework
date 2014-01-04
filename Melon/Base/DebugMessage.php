@@ -37,6 +37,13 @@ class DebugMessage {
 	protected $_message;
 	
 	/**
+	 * 格式化后的消息
+	 * 
+	 * @var string
+	 */
+	protected $_messageFormat;
+	
+	/**
 	 * 相关的脚本
 	 * 
 	 * 消息所描述的事件发生在哪个脚本
@@ -59,6 +66,13 @@ class DebugMessage {
 	 * @var array
 	 */
 	protected $_trace;
+	
+	/**
+	 * 是否显示方法栈
+	 * 
+	 * @var boolean 
+	 */
+	protected $_showTrace = true;
 	
 	/**
 	 * 构造函数
@@ -97,10 +111,12 @@ class DebugMessage {
 	 * 1. DebugMessage::SHOW_AUTO	[默认] 自动判断
 	 * 2. DebugMessage::SHOW_TEXT	文本 
 	 * 3. DebugMessage::SHOW_HTML	HTML
+	 * @param boolean $showTrace [可选] 是否显示trace
 	 * @param boolean $showCodeSnippet [可选] 如果输出HTML（输出文本该选项无效），是否输出消息所在位置的代码片段
 	 * @return string
 	 */
-	public function parse( $showType = self::DISPLAY_AUTO, $showCodeSnippet = true ) {
+	public function parse( $showType = self::DISPLAY_AUTO, $showTrace = true, $showCodeSnippet = true ) {
+		$this->_showTrace = !! $showTrace;
 		if( $showType === self::DISPLAY_AUTO ) {
 			$_showType = ( \Melon::env( 'clientType' ) === 'browser' ? self::DISPLAY_HTML : self::DISPLAY_TEXT );
 		} else {
@@ -121,14 +137,14 @@ class DebugMessage {
 	 */
 	protected function _messageFormatText() {
 		if( is_array( $this->_message ) ) {
-			$this->_message = "\r\n" . print_r( $this->_message, true );
+			$this->_messageFormat = "\r\n" . print_r( $this->_message, true );
 		} else if( is_object( $this->_message ) ) {
 			ob_start();
 			var_dump( $this->_message );
-			$this->_message = "\r\n" . ob_get_contents();
+			$this->_messageFormat = "\r\n" . ob_get_contents();
 			ob_end_clean();
 		} else {
-			$this->_message = strval( $this->_message );
+			$this->_messageFormat = strval( $this->_message );
 		}
 	}
 	
@@ -138,14 +154,14 @@ class DebugMessage {
 	 */
 	protected function _messageFormatHtml() {
 		if( is_array( $this->_message ) ) {
-			$this->_message = '<pre>' . print_r( $this->_message, true ) . '</pre>';
+			$this->_messageFormat = '<pre>' . print_r( $this->_message, true ) . '</pre>';
 		} else if( is_object( $this->_message ) ) {
 			ob_start();
 			var_dump( $this->_message );
-			$this->_message = '<pre>' . ob_get_contents() . '</pre>';
+			$this->_messageFormat = '<pre>' . ob_get_contents() . '</pre>';
 			ob_end_clean();
 		} else {
-			$this->_message = htmlspecialchars( strval( $this->_message ) );
+			$this->_messageFormat = htmlspecialchars( strval( $this->_message ) );
 		}
 	}
 	
@@ -163,7 +179,7 @@ class DebugMessage {
 		list( $file, $line ) = $this->_replaceEval( $this->_file, $this->_line );
 		$table .= $this->_setTr( 'th', '', $file, $line, $showCodeSnippet );
 
-		if( is_array( $this->_trace ) && ! empty( $this->_trace ) ) {
+		if( $this->_showTrace && is_array( $this->_trace ) && ! empty( $this->_trace ) ) {
 			foreach( $this->_trace as $info ) {
 				if( ! isset( $info['function'] ) ) {
 					continue;
@@ -197,7 +213,7 @@ class DebugMessage {
 		$tr = '<tr>';
 		if( ! is_null( $file ) && file_exists( $file ) && ! is_null( $line ) ) {
 			if( $elem === 'th' ) {
-				$title = "{$this->_type}: {$this->_message} in {$file}({$line})";
+				$title = "{$this->_type}: {$this->_messageFormat} in {$file}({$line})";
 			} else {
 				$title = "{$file}({$line}) --> {$func}";
 			}
@@ -230,9 +246,9 @@ class DebugMessage {
 			$tr .= "</{$elem}>";
 		} else {
 			if( $elem === 'th' ) {
-				$title = "{$this->_type}: {$this->_message}";
+				$title = "{$this->_type}: {$this->_messageFormat}";
 			} else {
-				$title = "unknow file --> {$func}";
+				$title = "{$func}";
 			}
 			$tr .= "<{$elem} style=\"border: 1px solid #000; padding: 5px;\">
 					$title
@@ -252,8 +268,8 @@ class DebugMessage {
 		$text = '';
 		$br = "\r\n";
 		list( $file, $line ) = $this->_replaceEval( $this->_file, $this->_line );
-		$text .= "{$this->_type}: {$this->_message} in {$file}({$line}){$br}";
-		if( is_array( $this->_trace ) && ! empty( $this->_trace ) ) {
+		$text .= "{$this->_type}: {$this->_messageFormat} in {$file}({$line}){$br}";
+		if( $this->_showTrace && is_array( $this->_trace ) && ! empty( $this->_trace ) ) {
 			$text .= "Trace: {$br}";
 			foreach( $this->_trace as $info ) {
 				if( ! isset( $info['function'] ) ) {
@@ -267,7 +283,7 @@ class DebugMessage {
 					list( $file, $line ) = $this->_replaceEval( $info['file'], $info['line'] );
 					$text .= "{$file}({$line}) --> {$func}";
 				} else {
-					$text .= "unknow file --> {$func}";
+					$text .= "{$func}";
 				}
 				$text .= $br;
 			}

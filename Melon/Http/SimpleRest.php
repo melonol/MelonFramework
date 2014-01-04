@@ -198,7 +198,7 @@ class SimpleRest {
 	/**
 	 * 得到路由匹配总数
 	 * 
-	 * @return void
+	 * @return int
 	 */
 	public function matchTotal() {
 		return $this->_matchTotal;
