@@ -15,7 +15,7 @@ defined( 'IN_MELON' ) or die( 'Permission denied' );
  */
 final class PathTrace {
 	
-	private function __construct() {
+	protected function __construct() {
 		;
 	}
 	

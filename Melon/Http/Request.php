@@ -27,23 +27,23 @@ class Request {
 	 * 
 	 * @var array
 	 */
-	private $_headers = array();
+	protected $_headers = array();
 	
 	/**
 	 * 请求数据
 	 * 
 	 * @var array
 	 */
-	private $_inputs = array();
+	protected $_inputs = array();
 	
 	/**
 	 * 请求方法
 	 * 
 	 * @var string
 	 */
-	private $_method = '';
+	protected $_method = '';
 
-	private function __construct() {
+	protected function __construct() {
 		$this->_praseHeader();
 		$this->_setMethod();
 		$this->_setInputs();
@@ -70,7 +70,7 @@ class Request {
 	 * 
 	 * @return void
 	 */
-	private function _praseHeader() {
+	protected function _praseHeader() {
 		$header =& $this->_headers;
 		// 这是apache特有的函数，可以很方便取到数据
 		if( function_exists( 'getallheaders' ) ) {
@@ -145,7 +145,7 @@ class Request {
 	 * 
 	 * @return void
 	 */
-	private function _setInputs() {
+	protected function _setInputs() {
 		$this->_inputs['get'] =& $_GET;
 		$this->_inputs['post'] =& $_POST;
 		$this->_inputs['cookie'] =& $_COOKIE;
@@ -172,7 +172,7 @@ class Request {
 	 * 
 	 * @return void
 	 */
-	private function _setMethod() {
+	protected function _setMethod() {
 		if( isset( $_SERVER['REQUEST_METHOD'] ) ) {
 			$this->_method = strtoupper( $_SERVER['REQUEST_METHOD'] );
 		}

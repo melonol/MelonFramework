@@ -65,43 +65,43 @@ class Template {
 	 *  模板路径
 	 *  @var string
 	 */
-	private $_template;
+	protected $_template;
 	
 	/**
 	 *  模板目录
 	 *  @var string
 	 */
-	private $_templateDir;
+	protected $_templateDir;
 	
 	/**
 	 * 模板的编译文件保存路径
 	 * @var string
 	 */
-	private $_compileDir;
+	protected $_compileDir;
 	
 	/**
 	 * 注入的变量
 	 * @var array 
 	 */
-	private $_vars = array();
+	protected $_vars = array();
 	
 	/**
 	 * 注入的自定义标签
 	 * @var array
 	 */
-	private $_tags = array();
+	protected $_tags = array();
 	
 	/**
 	 * 模板标签起始符
 	 * @var string
 	 */
-	private $_beginTag;
+	protected $_beginTag;
 	
 	/**
 	 * 模板标签结束符
 	 * @var string
 	 */
-	private $_endTag;
+	protected $_endTag;
 	
 	/**
 	 * 
@@ -227,7 +227,7 @@ class Template {
 	 * @return string 编译后的文件路径
 	 * @throws \Melon\Exception\RuntimeException
 	 */
-	private function _createCompileFile( $template, $forceUpdate = false ) {
+	protected function _createCompileFile( $template, $forceUpdate = false ) {
 		$targetDir = $this->_compileDir;
 		if( ! $targetDir ||
 			( ! is_dir( $targetDir ) && ! mkdir( $targetDir, 0777, true ) ) ) {
@@ -253,7 +253,7 @@ class Template {
 	 * @return string 模板内容
 	 * @throws \Melon\Exception\RuntimeException
 	 */
-	private function _getContent( $template ) {
+	protected function _getContent( $template ) {
 		if( ! file_exists( $template ) ) {
 			throw new \Melon\Exception\RuntimeException( "模板文件{$template}不存在" );
 		}
@@ -266,7 +266,7 @@ class Template {
 	 * @param string $template 模板文件路径
 	 * @return string 编译后的内容
 	 */
-	private function _compile( $template ) {
+	protected function _compile( $template ) {
 		$content = $this->_getContent( $template );
 		
 		//清除标签的注释符
@@ -329,7 +329,7 @@ class Template {
 	 * @param string $content 模板内容
 	 * @return string 编译后的内容
 	 */
-	private function _compileExtend( $dir, &$content ) {
+	protected function _compileExtend( $dir, &$content ) {
 		$extendContent = $this->_compileExtendSnippet( $dir, $content );
 		// 把标签清掉
 		return preg_replace( "/{$this->_beginTag}(block\s+\w+|\/block){$this->_endTag}/i", '', $extendContent );
@@ -350,7 +350,7 @@ class Template {
 	 * @param string $content 模板内容
 	 * @return string 编译后的内容
 	 */
-	private function _compileExtendSnippet( $dir, &$content ) {
+	protected function _compileExtendSnippet( $dir, &$content ) {
 		$b = $this->_beginTag;
 		$e = $this->_endTag;
 		// 检查是否有声明继承
@@ -413,7 +413,7 @@ class Template {
 	 * @param array $parentBlocks 块组
 	 * @return array array( 开始位置, 结束位置 )
 	 */
-	private function _findExtendBlockOffset( $blockName, &$parentBlocks ) {
+	protected function _findExtendBlockOffset( $blockName, &$parentBlocks ) {
 		$b = $this->_beginTag;
 		$e = $this->_endTag;
 		// 在父模板中找出同名的块
@@ -442,7 +442,7 @@ class Template {
 	 * @param string &$content 模板内容
 	 * @return string
 	 */
-	private function _compileInclude( $dir, &$content ) {
+	protected function _compileInclude( $dir, &$content ) {
 		$self = $this;
 		$exp = "/{$this->_beginTag}include\\s+((['\"]?).*?(\\2))\\s*\\/?{$this->_endTag}/i";
 		return preg_replace_callback( $exp, function( $match ) use( $self, $dir ) {
@@ -473,7 +473,7 @@ class Template {
 	 * @return string
 	 * @throws \Melon\Exception\RuntimeException
 	 */
-	private function _compileTag( &$content ) {
+	protected function _compileTag( &$content ) {
 		$exp = "/{$this->_beginTag}tag:(\\w+)(?:{$this->_endTag}|(\\s+.*?){$this->_endTag})/i";
 		$tags = $this->_tags;
 		$content = preg_replace_callback( $exp, function( $match ) use( $tags ) {
@@ -575,7 +575,7 @@ class Template {
 	 * 
 	 * @return void
 	 */
-	private function _show() {
+	protected function _show() {
 		// 得到编译文件
 		$compileFile = $this->_createCompileFile( $this->_template );
 		// 导入变量

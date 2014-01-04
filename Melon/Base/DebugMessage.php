@@ -26,7 +26,7 @@ class DebugMessage {
 	 * 
 	 * @var string
 	 */
-	private $_type;
+	protected $_type;
 	
 	/**
 	 * 消息
@@ -34,7 +34,7 @@ class DebugMessage {
 	 * 它是一个整个事件的主要描述
 	 * @var mixed
 	 */
-	private $_message;
+	protected $_message;
 	
 	/**
 	 * 相关的脚本
@@ -42,7 +42,7 @@ class DebugMessage {
 	 * 消息所描述的事件发生在哪个脚本
 	 * @var string 
 	 */
-	private $_file;
+	protected $_file;
 	
 	/**
 	 * 所在的行
@@ -50,7 +50,7 @@ class DebugMessage {
 	 * 消息所描述的事件发生在脚本中的那一行
 	 * @var int
 	 */
-	private $_line;
+	protected $_line;
 	
 	/**
 	 * 调用方法栈
@@ -58,7 +58,7 @@ class DebugMessage {
 	 * 这个是使用debug_backtrace方法、捕获异常等方式得到的栈
 	 * @var array
 	 */
-	private $_trace;
+	protected $_trace;
 	
 	/**
 	 * 构造函数
@@ -119,7 +119,7 @@ class DebugMessage {
 	 * 根据message的数据类型格式化为普通文本
 	 * 字符串使用htmlspecialchars转义，数组使用print_r，对象使用var_dump
 	 */
-	private function _messageFormatText() {
+	protected function _messageFormatText() {
 		if( is_array( $this->_message ) ) {
 			$this->_message = "\r\n" . print_r( $this->_message, true );
 		} else if( is_object( $this->_message ) ) {
@@ -136,7 +136,7 @@ class DebugMessage {
 	 * 根据message的数据类型格式化为HTML
 	 * 字符串使用htmlspecialchars转义，数组使用print_r，对象使用var_dump
 	 */
-	private function _messageFormatHtml() {
+	protected function _messageFormatHtml() {
 		if( is_array( $this->_message ) ) {
 			$this->_message = '<pre>' . print_r( $this->_message, true ) . '</pre>';
 		} else if( is_object( $this->_message ) ) {
@@ -158,7 +158,7 @@ class DebugMessage {
 	 * @param boolean $showCodeSnippet [可选] 如果输出HTML（输出文本该选项无效），是否输出消息所在位置的代码片段
 	 * @return string
 	 */
-	private function _setHtml( $showCodeSnippet = true ) {
+	protected function _setHtml( $showCodeSnippet = true ) {
 		$table = '<table style="margin: 10px; padding: 5px; border-collapse: collapse; background-color: #eeefff; color: #000;">';
 		list( $file, $line ) = $this->_replaceEval( $this->_file, $this->_line );
 		$table .= $this->_setTr( 'th', '', $file, $line, $showCodeSnippet );
@@ -193,7 +193,7 @@ class DebugMessage {
 	 * @param boolean $showCodeSnippet [可选] 如果输出HTML（输出文本该选项无效），是否根据file和line查找并输出消息所在位置的代码片段
 	 * @return string
 	 */
-	private function _setTr( $elem, $func, $file = null, $line = null, $showCodeSnippet = true ) {
+	protected function _setTr( $elem, $func, $file = null, $line = null, $showCodeSnippet = true ) {
 		$tr = '<tr>';
 		if( ! is_null( $file ) && file_exists( $file ) && ! is_null( $line ) ) {
 			if( $elem === 'th' ) {
@@ -247,7 +247,7 @@ class DebugMessage {
 	 * 它并没有取出消息相关的代码片段，实际上也不能这么干，所以比HTML简单得多
 	 * @return string
 	 */
-	private function _setText() {
+	protected function _setText() {
 		$text = '';
 		$br = "\r\n";
 		list( $file, $line ) = $this->_replaceEval( $this->_file, $this->_line );
@@ -284,7 +284,7 @@ class DebugMessage {
 	 * @param int $line 行号
 	 * @return array( file, line )
 	 */
-	private function _replaceEval( $file, $line ) {
+	protected function _replaceEval( $file, $line ) {
 		if ( strpos( $file, 'eval()\'d code' ) !== false ) {
 			$evalExp = '/\((\d+)\)\s:\seval\(\)\'d\scode/';
 			$match = array();
@@ -311,7 +311,7 @@ class DebugMessage {
 	 * 2. fontSize 字体大小
 	 * @return string
 	 */
-	private function _codeSnippetHtml( $file, $focus, $range = 7, $style = array( 'lineHeight' => 20, 'fontSize' => 13 ) ) {
+	protected function _codeSnippetHtml( $file, $focus, $range = 7, $style = array( 'lineHeight' => 20, 'fontSize' => 13 ) ) {
 		$html = @highlight_file( $file, true );
 		if( ! $html ) {
 			return false;
