@@ -98,10 +98,12 @@ class DebugMessage {
 	 * 1. DebugMessage::SHOW_AUTO	[默认] 自动判断
 	 * 2. DebugMessage::SHOW_TEXT	文本 
 	 * 3. DebugMessage::SHOW_HTML	HTML
+	 * @param boolean $showTrace [可选] 是否显示trace
+	 * @param boolean $showCodeSnippet [可选] 如果输出HTML（输出文本该选项无效），是否输出消息所在位置的代码片段
 	 * @return void
 	 */
-	public function show( $showType = self::DISPLAY_AUTO ) {
-		echo $this->parse( $showType ) . "\r\n";
+	public function show( $showType = self::DISPLAY_AUTO, $showTrace = true, $showCodeSnippet = true ) {
+		echo $this->parse( $showType, $showTrace, $showCodeSnippet ) . "\r\n";
 	}
 	
 	/**

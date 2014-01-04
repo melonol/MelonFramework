@@ -297,19 +297,17 @@ class Core {
 			}
 		};
 		// 显示
-		$logHandler( $this->conf['logDisplayLevel'], function( $debugMessage ) {
-			$debugMessage->show();
+		$showCodeSnippet = !! $this->conf['htmlShowCodeSnippet'];
+		$logHandler( $this->conf['logDisplayLevel'], function( $debugMessage ) use ( $showCodeSnippet ) {
+			$debugMessage->show( Base\DebugMessage::DISPLAY_AUTO, true, $showCodeSnippet );
 		} );
 		// 写入
 		if( isset( $this->logger ) ) {
 			$logger = $this->logger;
 			$logHandler( $this->conf['logLevel'], function( $debugMessage ) use ( $logger, $type ) {
-				if( in_array( $type, array( E_ERROR, E_PARSE,  E_COMPILE_ERROR,
-					E_CORE_ERROR, E_EXCEPTION, MELON_DEBUG ) ) ) {
-					$text = $debugMessage->parse( Base\DebugMessage::DISPLAY_TEXT );
-				} else {
-					$text = $debugMessage->parse( Base\DebugMessage::DISPLAY_TEXT, false );
-				}
+				$showTrace = in_array( $type, array( E_ERROR, E_PARSE,  E_COMPILE_ERROR,
+					E_CORE_ERROR, E_EXCEPTION, MELON_DEBUG ) );
+				$text = $debugMessage->parse( Base\DebugMessage::DISPLAY_TEXT, $showTrace );
 				$logger->write( $text );
 			} );
 		}

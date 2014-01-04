@@ -8,4 +8,5 @@ return array(
 	'logDisplayLevel' => 3,							// 显示系统日志等级，0不显示；1只显示异常和致命错误；2显示所有错误；3显示所有类型
 	'logLevel' => 3,								// 记录系统日志等级，0不记录；1只记录异常和致命错误；2记录所有错误；3记录所有类型
 	'logSplitSize' => 10,							// 系统日志分割大小，单位M
+	'htmlShowCodeSnippet' => true,					// 是否在页面中显示代码片段
 );

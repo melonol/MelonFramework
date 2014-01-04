@@ -252,7 +252,6 @@ M::init();
 //echo number_format(microtime(true) - $s, 4);
 
 //todo::支持自定义错误页面
-//todo::日志只有致命错误才记录trace
 
 $rest = M::httpSimpleRest();
 $rest->get('/', function() {
