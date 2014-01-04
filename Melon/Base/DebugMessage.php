@@ -201,7 +201,8 @@ class DebugMessage {
 			} else {
 				$title = "{$file}({$line}) --> {$func}";
 			}
-			$tr .= "<{$elem} style=\"border: 1px solid #000; padding: 5px; text-align: left;\">";
+			$tr .= "<{$elem} style=\"border: 1px solid #000; padding: 5px; text-align: left;" . (
+					$elem === 'th' ? " font-weight: normal;" : "") ."\">";
 			$codeSnippet = $showCodeSnippet ? $this->_codeSnippetHtml( $file, $line ) : false;
 			// 代码有可能无法获取，比如使用zend加密过的代码
 			if( $codeSnippet ) {

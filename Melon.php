@@ -4,12 +4,12 @@ define( 'IN_MELON', true );
 
 use Melon\Base;
 use Melon\Exception;
-use Melon\Util;
 use Melon\Http;
+use Melon\Util;
 
 class Melon {
 	
-	static private $_melon;
+	static protected $_melon;
 
 	final protected function __construct() {
 		;
@@ -22,6 +22,22 @@ class Melon {
 			self::$_melon = new Base\Core();
 			self::$_melon->init();
 		}
+	}
+		
+	/**
+	 * 获取框架环境信息
+	 * 
+	 * 你可以使用 . 号分隔的形式获取多维数组里的值：
+	 * Melon::env( 'config.charset' );
+	 * 
+	 * @param string $var [可选] 指定获取哪个值，如果不填此项，则返回所有
+	 * @return mixed
+	 */
+	final static public function env( $var = null ) {
+		if( is_null( $var ) ) {
+			return self::$_melon->env;
+		}
+		return Base\Func\getValue( self::$_melon->env, $var );
 	}
 	
 	/**
@@ -52,7 +68,7 @@ class Melon {
 	 * @param mixed $_ 可继续添加调试信息
 	 * @return void
 	 */
-	final static public function debugWithTrace( $message, $_ = null) {
+	final static public function debugWithTrace( $message, $_ = null ) {
 		$trace = debug_backtrace();
 		$firstTrace = array_shift( $trace );
 		$file = $firstTrace['file'];
@@ -61,11 +77,28 @@ class Melon {
 			self::$_melon->log( 'Debug', $message, $firstTrace['file'], $firstTrace['line'], $trace );
 		}
 	}
+	
+	/**
+	 * 日志助手
+	 * 
+	 * @param string $dir 日志存放目录
+	 * @param string [可选] $filePrefix 日志前缀
+	 * @param string [可选] $splitSize 自动分割大小，单位M，当为0时不进行分割
+	 * @throws \Melon\Exception\RuntimeException
+	 */
+	final static public function logger( $dir, $filePrefix = 'log', $splitSize = 10 ) {
+		$dir = Base\PathTrace::real( $dir ) ?: $dir;
+		return new Base\Logger( $dir, $filePrefix, $splitSize );
+	}
+	
+	final static public function thowException( $message, $code, $previous ) {
+		throw new Exception\RuntimeException( $message, $code, $previous );
+	}
 
 
-	/******************************************************************
+	/*************************************
 	 * 加载
-	 ******************************************************************/
+	 *************************************/
 	
 	/**
 	 * 载入一个脚本
@@ -104,9 +137,9 @@ class Melon {
 	}
 	
 	
-	/******************************************************************
+	/*************************************
 	 * 包加载
-	 ******************************************************************/
+	 *************************************/
 	
 	/**
 	 * 从包中载入一个脚本
@@ -156,22 +189,6 @@ class Melon {
 		return self::$_melon->packageDir( Base\PathTrace::source() );
 	}
 	
-	/**
-	 * 获取框架的一些基本信息
-	 * 
-	 * 你可以使用 . 号分隔的形式获取多维数组里的值：
-	 * Melon::env( 'config.charset' );
-	 * 
-	 * @param string $var [可选] 指定获取哪个值，如果不填此项，则返回所有
-	 * @return mixed
-	 */
-	final static public function env( $var = null ) {
-		if( is_null( $var ) ) {
-			return self::$_melon->env;
-		}
-		return Base\Func\getValue( self::$_melon->env, $var );
-	}
-	
 	final static public function httpRoute( $config = array() ) {
 		return new Http\Route( $config );
 	}
@@ -201,13 +218,14 @@ class Melon {
 		return new Http\SimpleRest( $route, $request, $response, $matchMode );
 	}
 	
-	static public function cache() {
-		
+	final static public function set( $items = array(), $replaceMode = Util\Set::REPLACE_ABSOLUTE ) {
+		return new Util\Set( $items, $replaceMode );
 	}
 	
-	final static public function run() {
-		
+	final static public function template( $tag = array( '{', '}' ) ) {
+		return new Util\Template( $tag );
 	}
+	
 	final static public function callable( $name ) {
 		return array( array(
 			'name' => $name,

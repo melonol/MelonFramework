@@ -6,11 +6,6 @@
  */
 namespace Melon\Base\Func;
 
-//TODO::优先获取xdebug的trace
-function debugTrace() {
-	
-}
-
 /**
  * 判断一个路径是否为绝对的
  * 

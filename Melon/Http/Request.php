@@ -14,13 +14,13 @@ defined('IN_MELON') or die('Permission denied');
 class Request {
 	
 	// 方法组
-	const METHOD_GET = 'GET';
-	const METHOD_POST = 'POST';
-	const METHOD_PUT = 'PUT';
-	const METHOD_DELETE = 'DELETE';
-	const METHOD_HEAD = 'HEAD';
-	const METHOD_PATCH = 'PATCH';
-	const METHOD_OPTIONS = 'OPTIONS';
+	const METHOD_GET		= 'GET';
+	const METHOD_POST		= 'POST';
+	const METHOD_PUT		= 'PUT';
+	const METHOD_DELETE		= 'DELETE';
+	const METHOD_HEAD		= 'HEAD';
+	const METHOD_PATCH		= 'PATCH';
+	const METHOD_OPTIONS	= 'OPTIONS';
 	
 	/**
 	 * HTTP头数据
