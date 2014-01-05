@@ -236,9 +236,9 @@ Melon的加载方法解决了php相对路径的问题（当然这对于php来说
 
 错误与调试
 -------------
-常规错误可直接使用原生的<code>rigger_error</code><br />
-异常使用<code>Melon::throwException</code><br />
-调试使用<code>Melon::debug</code>或<code>Melon::debugWithTrace</code>方法<br />
+1. 常规错误可直接使用原生的<code>trigger_error</code><br />
+2. 异常使用<code>Melon::throwException</code><br />
+3. 调试使用<code>Melon::debug</code>或<code>Melon::debugWithTrace</code>方法<br />
 程序会在页面和日志文件中写入相关信息，你可以通过配置来开启或关闭这些功能<br />
 程序还提供了显示代码片段功能，在页面显示错误时点击相应行可展开相关代码片段
 <p>
@@ -248,7 +248,7 @@ Melon的加载方法解决了php相对路径的问题（当然这对于php来说
 
 文档
 -------------
-文档正在筹备中，参阅Melon下的方法就能大概了解整个框架的所有功能
+文档正在筹备中，提示：参阅Melon主体类下的方法就能大概了解整个框架的所有功能
 
 意见和建议
 -------------
