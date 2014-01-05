@@ -7,14 +7,15 @@ MelonFramework不是一个MVC框架（但你可以使用MelonFramework搭建出M
 使用简介
 -------------
 ###初始化
-只要引入Melon.php，执行初始化即可使用
+只要引入Melon.php，执行初始化即可使用<br />
+Melon主体类是一个纯静态类，提供了框架几乎所有操作，你只需要参阅Melon下的方法就能了解整个框架的所有功能
 <pre>
 <code>
 	require './MelonFramework/Melon.php';
 	Melon::init();
 </code>
 </pre>
-Melon主体类是一个纯静态类，提供了框架几乎所有操作，并带有一个快捷方式M（其实是Melon的子类）<br />
+主体类带有一个快捷方式M（其实是Melon的子类）<br />
 你可以<code>Melon::env</code>这样调用一个方法，或者<code>M::env</code><br />
 干脆你不想用它们，也可以自己换一个'马甲'，像M一样继承Melon：<br />
 <pre>
@@ -233,9 +234,21 @@ Melon的加载方法解决了php相对路径的问题（当然这对于php来说
 </code>
 </pre>
 
+错误与调试
+-------------
+常规错误可直接使用原生的<code>rigger_error</code><br />
+异常使用<code>Melon::throwException</code><br />
+调试使用<code>Melon::debug</code>或<code>Melon::debugWithTrace</code>方法<br />
+程序会在页面和日志文件中写入相关信息，你可以通过配置来开启或关闭这些功能<br />
+程序还提供了显示代码片段功能，在页面显示错误时点击相应行可展开相关代码片段
+<p>
+<img src="http://static.oschina.net/uploads/space/2014/0105/220508_7WFM_867608.png" />
+</p>
+另外针对ajax和cgi调用部分做了处理，通过这些接口访问php时会显示文本，而不是html
+
 文档
 -------------
-文档正在筹备中...
+文档正在筹备中，参阅Melon下的方法就能大概了解整个框架的所有功能
 
 意见和建议
 -------------

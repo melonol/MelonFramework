@@ -117,6 +117,7 @@ class Trigger {
 	 * @return mixed
 	 */
 	public function __call( $methodName, $arguments ) {
+		\Melon::throwException( '出错了' );
 		$result = null;
 		if( method_exists( $this->_passivity, $methodName ) && is_callable( array( $this->_passivity, $methodName ) ) ) {
 			try {
