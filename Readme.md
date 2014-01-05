@@ -35,13 +35,15 @@ Melon主体类是一个纯静态类，提供了框架几乎所有操作，并带
 	Melon::init(
 		// root（应用目录）
 		// Melon将以root为参照目录
-		// 计算文件中的errorPage、logFile等文件的绝对路径，同时添加到inlucePath
+		// 计算文件中的errorPage、logDir等文件的绝对路径，同时添加到inlucePath中
 		 __DIR__,
 
 		// 配置信息
 		// 这里的参数值将覆盖Melon/Data/Conf/Base.php文件下的缺省值
 		// 当然你可以增加一些自己的参数，使用Melon::env( 'config.keyname' ) 来获取这些值
 		array(
+			'logDir' => 'Melon/Data/Log',
+			'errorPage' => 'Melon/Data/errorPage.html',
 			'logLevel' => 3,
 			'logDisplayLevel' => 3,
 			'includePath' = array(
@@ -57,7 +59,6 @@ Melon主体类是一个纯静态类，提供了框架几乎所有操作，并带
 如果要载入的文件或目录不在includePath中，它不能被autoLoad，也不具有权限和包的特征
 
 REST
-
 -------------
 如果只想简单的使用REST，框架带有一个小巧的REST类
 <pre>
