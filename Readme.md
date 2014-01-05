@@ -83,7 +83,7 @@ Melon的加载方法解决了php相对路径的问题（当然这对于php来说
 
 包（package）
 -------------
-在了解包之前请先阅读文件载入权限
+在了解包之前请先阅读文件载入权限<br />
 当一个目录被设定为私有时，那么同时它也成为了一个'包'，私有目录必需有一个同名文件作为入口才可以读取里面的文件，这样加强了模块化的作用<br />
 在包里任何脚本都可以使用<code>Melon::packageDir();</code>得到当前包的目录<br />
 同时也可以使用<code>Melon::packageAcquire</code><code>Melon::packageLoad</code>等方法
@@ -105,8 +105,8 @@ Melon的加载方法解决了php相对路径的问题（当然这对于php来说
 	{php php代码/}
 	{php} php代码 {/php}
 	{include 子模板路径}  注：可在模板中引入子模板
-</pre>
 </code>
+</pre>
 
 ###模板继承
 <pre>
@@ -117,8 +117,8 @@ Melon的加载方法解决了php相对路径的问题（当然这对于php来说
 	继承标签由extend和block标签共同完成
 	继承模板中的block会覆盖父模板中的同名block内容
 	如果没有覆盖（同名块）父模板某个block，则使用这个block中默认的内容
-</pre>
 </code>
+</pre>
 
 ###标签扩展
 <pre>
