@@ -8,7 +8,15 @@
 test
 	test
 <code>
-	test
+	/**
+	 * 获取一个模板视图实例
+	 * 
+	 * @param array $tag [可选] 标签名
+	 * @return \Melon\Util\Template
+	 */
+	final static public function template( $tag = array( '{', '}' ) ) {
+		return new Util\Template( $tag );
+	}
 </code>
 
 Restful
