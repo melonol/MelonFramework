@@ -6,6 +6,7 @@ MelonFramework不是一个MVC框架（但你可以使用MelonFramework搭建出M
 
 使用简介
 -------------
+###初始化
 只要引入Melon.php，执行初始化即可使用
 <pre>
 <code>
@@ -13,7 +14,6 @@ MelonFramework不是一个MVC框架（但你可以使用MelonFramework搭建出M
 	Melon::init();
 </code>
 </pre>
-<br />
 Melon主体类是一个纯静态类，提供了框架几乎所有操作，并带有一个快捷方式M（其实是Melon的子类）<br />
 你可以<code>Melon::env</code>这样调用一个方法，或者<code>M::env</code><br />
 干脆你不想用它们，也可以自己换一个'马甲'，像M一样继承Melon：<br />
@@ -26,7 +26,38 @@ Melon主体类是一个纯静态类，提供了框架几乎所有操作，并带
 然后你就可以在任何地方使用它了<br />
 另外继承之后，可以往里添加一些自己的操作方法，非常方便
 
+###配置
+配置文件处于Melon/Data/Conf/Base.php下，一般情况下无需修改<br />
+如果需要自定义，可以在初始化的时候进行
+<pre>
+<code>
+	require './MelonFramework/Melon.php';
+	Melon::init(
+		// root（应用目录）
+		// Melon将以root为参照目录
+		// 计算文件中的errorPage、logFile等文件的绝对路径，同时添加到inlucePath
+		 __DIR__,
+
+		// 配置信息
+		// 这里的参数值将覆盖Melon/Data/Conf/Base.php文件下的缺省值
+		// 当然你可以增加一些自己的参数，使用Melon::env( 'config.keyname' ) 来获取这些值
+		array(
+			'logLevel' => 3,
+			'logDisplayLevel' => 3,
+			'includePath' = array(
+				// 添加更多的包含路径
+			);
+		)
+	);
+</code>
+</pre>
+
+###inlucePath（包含路径）
+配置里有提到inlucePath，它是loader － 包括autoload、权限审查等函数的工作范围<br />
+如果要载入的文件或目录不在includePath中，它不能被autoLoad，也不具有权限和包的特征
+
 REST
+
 -------------
 如果只想简单的使用REST，框架带有一个小巧的REST类
 <pre>
@@ -61,7 +92,7 @@ REST
 
 文件载入权限
 -------------
-当一个文件或目录名字被加上前缀 _ 的时候，它就被添加了相关读取限制，可以理解成设定为私有文件或目录<br />
+在includePath中，当一个文件或目录名字被加上前缀 _ 的时候，它就被添加了相关读取限制，可以理解成设定为私有文件或目录<br />
 在这之前我想介绍一下加载的方法，如Melon::load<br />
 Melon的加载方法解决了php相对路径的问题（当然这对于php来说不是BUG），php是相对于域名根目录，而Melon的加载方法相对于文件，更符合正常的使用习惯
 在任何地方使用Melon::load加载相对路径文件都会被正确的转换为绝对路径
