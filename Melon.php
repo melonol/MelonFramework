@@ -238,7 +238,8 @@ class Melon {
 		$packageDir = self::$_melon->packageDir( $source );
 		$target = realpath( dirname( $source ) . DIRECTORY_SEPARATOR . $script );
 		if( ! $target ) {
-			throw new Exception\RuntimeException( "无法在{$packageDir}目录中找到{$script}脚本文件" );
+			trigger_error( "无法在{$packageDir}目录中找到{$script}脚本", E_USER_WARNING );
+			return false;
 		}
 		return self::$_melon->acquire( $source, $target );
 	}
