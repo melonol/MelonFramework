@@ -348,6 +348,20 @@ class Melon {
 	final static public function template( $tag = array( '{', '}' ) ) {
 		return new Util\Template( $tag );
 	}
+	
+	/**
+	 * 获取一个触发器实例
+	 * 
+	 * @param Object $passivity 触发对象
+	 * @param array $before 执行方法前的操作，每个元素的键名是方法名，值是is_callable可以调用的方法
+	 * 触发器会把调用方法时的参数同样的传进这个方法
+	 * @param array $after 执行方法后的操作，每个元素的键名是方法名，值是is_callable可以调用的方法
+	 * 触发器会把调用方法后的结果同样的传进这个方法
+	 * @return \Melon\Util\Trigger
+	 */
+	final static public function trigger( $passivity, $before = array(), $after = array() ) {
+		return new Util\Trigger( $passivity, $before, $after );
+	}
 }
 
 // 创建Melon的快捷方式

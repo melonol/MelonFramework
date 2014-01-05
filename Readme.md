@@ -129,11 +129,24 @@ Melon的加载方法解决了php相对路径的问题（当然这对于php来说
 模板
 -------------
 模板是通过定义一系统标签，使用正则表达式替换为标准的PHP语法的格式<br />
+<pre>
+<code>
+	Melon::template()
+	// 设置模板目录
+	->setTemplateDir( './' )
+	// 设置编译缓存目录
+	->setCompileDir( './' )
+	// 注入变量
+	->assign( $key, $value )
+	// 显示模板
+	->display( 'index.html' );
+</code>
+</pre>
 可使用的标签如下（以标签符是{}为例子）<br />
 ###常规标签
 <pre>
 <code>
-	{$var} 注：输出一个变量，可使用assign或assignItem方法注入这些变量
+	{$var} 注：输出一个变量，可使用assign或assignItem方法注入这些变量，如果变量是数组，键名无需添加引号：{$arr[key]}
 	{if 条件} 内容 {/if}
 	{if 条件} 内容 {else} 内容 {/if}
 	{if 条件} 内容 {elseif 条件} 内容 {/if}
@@ -202,7 +215,7 @@ Melon的加载方法解决了php相对路径的问题（当然这对于php来说
 	}
 
 	// 绑定触发事件
-	$testTrigger = new Trigger( new Test(), array(
+	$testTrigger = Melon::trigger( new Test(), array(
 		'info' => function( $arg1 ) {
 			echo '执行前，参数是：' . $arg1;
 		}
