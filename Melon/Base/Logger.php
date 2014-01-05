@@ -2,6 +2,8 @@
 
 namespace Melon\Base;
 
+use \Melon\Exception;
+
 defined('IN_MELON') or die('Permission denied');
 
 
@@ -80,7 +82,7 @@ class Logger {
 		if( ! is_dir( $dir ) ) {
 			$mkdir = mkdir( $dir, 0777, true );
 			if( ! $mkdir ) {
-				throw new \Melon\Exception\RuntimeException( "无法创建日志目录：{$dir}" );
+				throw new Exception\RuntimeException( "无法创建日志目录：{$dir}" );
 			}
 		}
 		$this->_dir = $dir;
@@ -123,7 +125,7 @@ class Logger {
 		}
 		$handle = @fopen( $this->_file, 'a' );
 		if( ! $handle ) {
-			throw new \Melon\Exception\RuntimeException( "无法写入日志：{$this->_file}" );
+			throw new Exception\RuntimeException( "无法写入日志：{$this->_file}" );
 		}
 		$date = date( 'Y-m-d H:i:s', \Melon::env( 'time' )  );
 		$write = "[{$date}] {$string}\r\n";

@@ -2,6 +2,7 @@
 
 namespace Melon\Util;
 
+use Melon\Exception;
 defined('IN_MELON') or die('Permission denied');
 
 /**
@@ -231,12 +232,12 @@ class Template {
 		$targetDir = $this->_compileDir;
 		if( ! $targetDir ||
 			( ! is_dir( $targetDir ) && ! mkdir( $targetDir, 0777, true ) ) ) {
-			throw new \Melon\Exception\RuntimeException( "模板编译目录不存在" );
+			throw new Exception\RuntimeException( "模板编译目录不存在" );
 		}
 		$_targetDir = realpath( $targetDir );
 		$_sourceFile = realpath( $template );
 		if( ! $_sourceFile ) {
-			throw new \Melon\Exception\RuntimeException( "模板文件{$template}不存在" );
+			throw new Exception\RuntimeException( "模板文件{$template}不存在" );
 		}
 		$compileFile = $_targetDir . DIRECTORY_SEPARATOR . md5( $_sourceFile ) . '.php';
 		if( $forceUpdate || ! file_exists( $compileFile ) ||  filemtime( $compileFile ) < filemtime( $template ) ) {
@@ -255,7 +256,7 @@ class Template {
 	 */
 	protected function _getContent( $template ) {
 		if( ! file_exists( $template ) ) {
-			throw new \Melon\Exception\RuntimeException( "模板文件{$template}不存在" );
+			throw new Exception\RuntimeException( "模板文件{$template}不存在" );
 		}
 		return file_get_contents( $template );
 	}
@@ -480,7 +481,7 @@ class Template {
 			// 标签名
 			$tagName = $match[1];
 			if( ! isset( $tags[ $tagName ] ) ) {
-				throw new \Melon\Exception\RuntimeException( "没有定义{$tagName}模板标签" );
+				throw new Exception\RuntimeException( "没有定义{$tagName}模板标签" );
 			}
 			// 要被传入的参数
 			$exportArgs = '';
