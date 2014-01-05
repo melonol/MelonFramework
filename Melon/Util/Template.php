@@ -1,4 +1,12 @@
 <?php
+/**
+ * Melon － 可用于php5.3或以上的开源框架
+ * 
+ * @license http://www.apache.org/licenses/LICENSE-2.0
+ * @link http://git.oschina.net/397574898/MelonFramework
+ * @author Melon <denglh1990@qq.com>
+ * @version 0.1.0
+ */
 
 namespace Melon\Util;
 
@@ -59,6 +67,10 @@ defined('IN_MELON') or die('Permission denied');
  * 
  * 在引入编译文件时，会自动注入一个$__melonTemplate变量，指向当前模板对象的实例
  * 程序会使用这个实例进行一些操作，比如检查更新等
+ * 
+ * @package Melon
+ * @since 0.1.0
+ * @author Melon
  */
 class Template {
 	

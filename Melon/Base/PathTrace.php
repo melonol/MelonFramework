@@ -1,4 +1,12 @@
 <?php
+/**
+ * Melon － 可用于php5.3或以上的开源框架
+ * 
+ * @license http://www.apache.org/licenses/LICENSE-2.0
+ * @link http://git.oschina.net/397574898/MelonFramework
+ * @author Melon <denglh1990@qq.com>
+ * @version 0.1.0
+ */
 
 namespace Melon\Base;
 
@@ -12,6 +20,10 @@ defined( 'IN_MELON' ) or die( 'Permission denied' );
  * 
  * 本类使用debug_backtrace函数抓取调用方法栈信息，我把类设置为最简单管理的纯静态
  * 因为debug_backtrace很容易发生变化，非常难把握，不当或过度使用将会让你的代码陷于泥潭中
+ * 
+ * @package Melon
+ * @since 0.1.0
+ * @author Melon
  */
 final class PathTrace {
 	

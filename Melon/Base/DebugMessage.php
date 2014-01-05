@@ -1,4 +1,12 @@
 <?php
+/**
+ * Melon － 可用于php5.3或以上的开源框架
+ * 
+ * @license http://www.apache.org/licenses/LICENSE-2.0
+ * @link http://git.oschina.net/397574898/MelonFramework
+ * @author Melon <denglh1990@qq.com>
+ * @version 0.1.0
+ */
 
 namespace Melon\Base;
 
@@ -11,6 +19,10 @@ defined('IN_MELON') or die('Permission denied');
  * 比如说服务器调用时会输出HTML，命令行调用时输出普通文本
  * 当输出HTML时，甚至可以显示每个被调用方法所在的文件位置的上下文片段，称为代码片段更好点
  * 前提是你要提供足够的信息
+ * 
+ * @package Melon
+ * @since 0.1.0
+ * @author Melon
  */
 class DebugMessage {
 	

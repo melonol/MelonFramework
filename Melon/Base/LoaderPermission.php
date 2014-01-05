@@ -1,6 +1,11 @@
 <?php
 /**
+ * Melon － 可用于php5.3或以上的开源框架
  * 
+ * @license http://www.apache.org/licenses/LICENSE-2.0
+ * @link http://git.oschina.net/397574898/MelonFramework
+ * @author Melon <denglh1990@qq.com>
+ * @version 0.1.0
  */
 
 namespace Melon\Base;
@@ -17,6 +22,10 @@ defined( 'IN_MELON' ) or die( 'Permission denied' );
  * 
  * 类中所使用到的路径参数都必需是一组标准的，没有冗余的系统路径格式
  * 因为程序不会做任何处理，减少realpath的调用
+ * 
+ * @package Melon
+ * @since 0.1.0
+ * @author Melon
  */
 class LoaderPermission {
 	

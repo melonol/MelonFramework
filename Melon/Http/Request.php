@@ -1,4 +1,12 @@
 <?php
+/**
+ * Melon － 可用于php5.3或以上的开源框架
+ * 
+ * @license http://www.apache.org/licenses/LICENSE-2.0
+ * @link http://git.oschina.net/397574898/MelonFramework
+ * @author Melon <denglh1990@qq.com>
+ * @version 0.1.0
+ */
 
 namespace Melon\Http;
 
@@ -10,6 +18,10 @@ defined('IN_MELON') or die('Permission denied');
  * 使用它可以方便得到HTTP请求的基本信息，包括请求头、参数、方法
  * 并提供了格式化参数功能
  * 由于一次请求的值是固定的，所以我设置为单例了，开销会比较少
+ * 
+ * @package Melon
+ * @since 0.1.0
+ * @author Melon
  */
 class Request {
 	

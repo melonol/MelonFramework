@@ -1,4 +1,12 @@
 <?php
+/**
+ * Melon － 可用于php5.3或以上的开源框架
+ * 
+ * @license http://www.apache.org/licenses/LICENSE-2.0
+ * @link http://git.oschina.net/397574898/MelonFramework
+ * @author Melon <denglh1990@qq.com>
+ * @version 0.1.0
+ */
 
 define( 'IN_MELON', true );
 
@@ -26,6 +34,10 @@ use Melon\Util;
  * Name::init();
  * 然后你就可以在任何地方使用它了
  * 另外继承之后，可以往里添加一些自己的操作方法，非常方便
+ * 
+ * @package Melon
+ * @since 0.1.0
+ * @author Melon
  */
 class Melon {
 	
@@ -317,7 +329,7 @@ class Melon {
 	 * @param array $items [可选] 默认数据
 	 * @param enum $replaceMode [可选] 替换模式，如果存在相同键名元素时被触发
 	 * 替换模式分别有：
-	 * 1.\Melon\Util\Set::REPLACE_NOT			不进行替换
+	 * 1. \Melon\Util\Set::REPLACE_NOT			不进行替换
 	 * 2. \Melon\Util\Set::REPLACE_ABSOLUTE	[默认] 严格，无条件替换原来的值
 	 * 3. \Melon\Util\Set::REPLACE_RELAXED		宽松，如果$value能够被PHP empty转为假值（null、''、0、false、空数组），则不替换
 	 * @return \Melon\Util\Set

@@ -1,4 +1,12 @@
 <?php
+/**
+ * Melon － 可用于php5.3或以上的开源框架
+ * 
+ * @license http://www.apache.org/licenses/LICENSE-2.0
+ * @link http://git.oschina.net/397574898/MelonFramework
+ * @author Melon <denglh1990@qq.com>
+ * @version 0.1.0
+ */
 
 namespace Melon\Http;
 
@@ -9,6 +17,10 @@ defined('IN_MELON') or die('Permission denied');
  * 
  * 没有做过多处理，只有非常简单的回应头、状态码、媒体类型和内容的设置
  * 大部分情况都够用，同时已针对cgi请求做了处理
+ * 
+ * @package Melon
+ * @since 0.1.0
+ * @author Melon
  */
 class Response {
 
