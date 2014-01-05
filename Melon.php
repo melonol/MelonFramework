@@ -154,7 +154,7 @@ class Melon {
 	 * @param \Exception $previous [可选] 异常链中的前一个异常
 	 * @throws Exception\RuntimeException
 	 */
-	final static public function thowException( $message, $code = null, $previous = null ) {
+	final static public function throwException( $message, $code = null, $previous = null ) {
 		throw new Exception\RuntimeException( $message, $code, $previous );
 	}
 

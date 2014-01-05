@@ -63,12 +63,19 @@ defined( 'IN_MELON' ) or die( 'Permission denied' );
 class Trigger {
 	
 	/**
-	 * 被触发对象
+	 * 触发对象
 	 * 
 	 * @var Object
 	 */
 	protected $_passivity;
 	
+	/**
+	 * 触发对象的名字
+	 * 
+	 * @var string
+	 */
+	protected $_className;
+
 	/**
 	 * 调用方法前执行的方法组
 	 * 
@@ -94,8 +101,9 @@ class Trigger {
 	 */
 	public function __construct( $passivity, $before = array(), $after = array() ) {
 		if( ! is_object( $passivity ) ) {
-			\Melon::thowException( '触发对象必需是有一个有效的实例对象' );
+			\Melon::throwException( '触发对象必需是有一个有效的实例对象' );
 		}
+		$this->_className = get_class( $passivity );
 		$this->_passivity = $passivity;
 		$this->_before = $before;
 		$this->_after = $after;
@@ -117,13 +125,13 @@ class Trigger {
 					call_user_func_array( $this->_before[ $methodName ], $arguments );
 				}
 			} catch ( \Exception $e ) {
-				\Melon::thowException( "触发{$methodName}方法前发生了异常", null, $e );
+				\Melon::throwException( "触发{$this->_className}类的{$methodName}方法前发生了异常", null, $e );
 			}
 			try {
 				// 调用中
 				$result = call_user_func_array( array( $this->_passivity, $methodName ), $arguments );
 			} catch ( \Exception $e ) {
-				\Melon::thowException( "触发{$methodName}方法时发生了异常", null, $e );
+				\Melon::throwException( "触发{$this->_className}类的{$methodName}方法时发生了异常", null, $e );
 			}
 			try {
 				// 调用后
@@ -131,11 +139,10 @@ class Trigger {
 					call_user_func( $this->_after[ $methodName ], $result );
 				}
 			} catch ( \Exception $e ) {
-				\Melon::thowException( "触发{$methodName}方法后发生了异常", null, $e );
+				\Melon::throwException( "触发{$this->_className}类的{$methodName}方法后发生了异常", null, $e );
 			}
 		} else {
-			$className = get_class( $this->_passivity );
-			\Melon::thowException( "触发器无法在{$className}类中找到可调用的{$methodName}方法" );
+			\Melon::throwException( "触发器无法在{$this->_className}类中找到可调用的{$methodName}方法" );
 		}
 		return $result;
 	}
