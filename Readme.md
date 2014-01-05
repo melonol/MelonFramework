@@ -1,6 +1,6 @@
 什么是MelonFramework
 -------------
-MelonFramework是一个用于php5.3或以上开源的轻量级php框架，基于[Apache Licence 2.0](http://www.apache.org/licenses/LICENSE-2.0)发布。零配置，支持restful程序的构建，并有可动态扩展的模块引擎、独创的包体系、触发器（类AOP）等功能。<br />
+MelonFramework是一个用于php5.3或以上开源的轻量级php框架，基于[Apache Licence 2.0](http://www.apache.org/licenses/LICENSE-2.0)开源协议发布。可零配置，支持restful程序的构建，并有可动态扩展的模块引擎、独创的包体系、触发器（类AOP）等功能。<br />
 MelonFramework不是一个MVC框架（但你可以使用MelonFramework搭建出MVC），目前也不提供ORM操作，因为PDO已经足够好了，后期可能考虑增加简单的ORM。<br />
 这样你不用拘泥于那些开发模式，框架提供了常见的基本操作，可以帮助你快速构建适合自己的开发环境。
 
@@ -19,15 +19,16 @@ Melon主体类是一个纯静态类，提供了框架几乎所有操作，并带
 干脆你不想用它们，也可以自己换一个'马甲'，像M一样继承Melon：<br />
 <pre>
 <code>
+	require './MelonFramework/Melon.php';
 	class Name extends Melon {}
 	Name::init();
 </code>
 </pre>
-然后你就可以在任何地方使用它了<br />
+然后你就可以在任何地方使用Name了<br />
 另外继承之后，可以往里添加一些自己的操作方法，非常方便
 
 ###配置
-配置文件处于Melon/Data/Conf/Base.php下，一般情况下无需修改<br />
+配置文件处于Melon/Data/Conf/Base.php下，它作为缺省配置<br />
 如果需要自定义，可以在初始化的时候进行
 <pre>
 <code>
@@ -56,7 +57,7 @@ Melon主体类是一个纯静态类，提供了框架几乎所有操作，并带
 
 ###inlucePath（包含路径）
 配置里有提到inlucePath，它是loader － 包括autoload、权限审查等函数的工作范围<br />
-如果要载入的文件或目录不在includePath中，它不在autoLoad的检查范围，也不具有权限和包的特征<br />
+如果要载入的文件或目录不在includePath中，则它不在autoLoad的检查范围，也不具有权限和包的特征<br />
 
 ###autoLoad
 autoLoad以命名空间作为目录依据，大部分框架都是这么做的<br />
