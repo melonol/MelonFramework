@@ -16,43 +16,93 @@ function_exists( 'set_magic_quotes_runtime' ) and @set_magic_quotes_runtime(0);
 // 65534是根据E_常量的定义规则，由E_ALL x 2得出
 defined( 'E_EXCEPTION' ) or define( 'E_EXCEPTION', 65534 );
 
+// 调试标记
 define( 'MELON_DEBUG', 'Debug' );
 
 /**
- * Melon的扣肉
+ * Melon的扣肉，提供基本的载入脚本、错误处理、日志等功能
+ * 
+ * 扣肉有自己的env环境变量，保存基本的运行数据
+ * 以includePath为autoLoad、权限管理的工作目录，不在includePath里的文件将无效
+ * 你可以在配置中增加这些目录，程序默认把root（框架的root非系统）添加到includePath中
  */
 class Core {
 	
+	/**
+	 * 环境变量
+	 * 
+	 * @var array 
+	 */
 	public $env = array();
 	
+	/**
+	 * 框架配置
+	 * 
+	 * @var array 
+	 */
 	public $conf = array();
 	
+	/**
+	 * 保存已载入脚本的容器
+	 * 
+	 * @var \Melon\Base\LoaderSet 
+	 */
 	public $loaderSet;
 	
+	/**
+	 * 载入脚本的权限管理器
+	 * 
+	 * @var \Melon\Base\LoaderPermission
+	 */
 	public $loaderPermission;
 	
+	/**
+	 * 日志助手
+	 * 
+	 * @var \Melon\Base\Logger
+	 */
 	public $logger;
 	
-	protected $_init = false;
+	/**
+	 * 初始化标记
+	 * 
+	 * @var boolean 
+	 */
+	protected $_inited = false;
 	
 	public function __construct() {
 		;
 	}
 	
+	/**
+	 * 初始化核心，只能被初始化一次，重复将忽略
+	 * 
+	 * @param string $root 应用根目录，Melon将以root为参照目录
+	 * 计算文件中的errorPage、logFile等文件的绝对路径，同时添加到inlucePath
+	 * @param array $config 框架配置，具体参数请参考Melon/Data/Conf/Base.php文件
+	 * 当然你可以增加一些自己的参数，使用Melon::env( 'config.keyname' ) 来获取这些值
+	 * @return void
+	 */
 	public function init( $root = null, $config = array() ) {
-		if( $this->_init ) {
+		if( $this->_inited ) {
 			return;
 		}
 		$this->_initConf( $root, $config );
 		$this->_initLoader();
 		$this->_initPhpRigster();
 		$this->_initLogger();
-		
-		// 一切就绪后屏蔽错误
-		error_reporting( 0 );
-		$this->_init = true;
+		$this->_inited = true;
 	}
 	
+	/**
+	 * 初始化一些配置信息
+	 * 
+	 * @param string $root 应用根目录，Melon将以root为参照目录
+	 * 计算文件中的errorPage、logFile等文件的绝对路径，同时添加到inlucePath
+	 * @param array $config 框架配置，具体参数请参考Melon/Data/Conf/Base.php文件
+	 * 当然你可以增加一些自己的参数，使用Melon::env( 'config.keyname' ) 来获取这些值
+	 * @return void
+	 */
 	protected function _initConf( $root, $config ) {
 		if( $root && ! is_dir( $root ) ) {
 			exit( 'root目录无效' );
@@ -100,13 +150,26 @@ class Core {
 		$this->env['microtime'] = $microtime;
 	}
 	
+	/**
+	 * 添加一个inlucdePath
+	 * 
+	 * 简单的使用in_array排重，不使用realpath格式化，不能做到完全排重
+	 * 但已经足够了
+	 * 
+	 * @param string $path
+	 * @return void
+	 */
 	protected function _addIncludePath( $path ) {
 		if( ! in_array( $path, $this->conf['includePath'] ) ) {
 			$this->conf['includePath'][] = $path;
 		}
 	}
 
-
+	/**
+	 * 初始化加载器
+	 * 
+	 * @return void
+	 */
 	protected function _initLoader() {
 		$melonLibrary = $this->env['melonLibrary'] . DIRECTORY_SEPARATOR;
 		// 现在准备一些必需的类
@@ -135,6 +198,11 @@ class Core {
 		);
 	}
 	
+	/**
+	 * 添加php注册器－autoload、异常和错误处理事件注册
+	 * 
+	 * @return void
+	 */
 	protected function _initPhpRigster() {
 		$core = $this;
 		
@@ -160,6 +228,11 @@ class Core {
 		} );
 	}
 	
+	/**
+	 * 初始化日志助手
+	 * 
+	 * @return void
+	 */
 	protected function _initLogger() {
 		$this->logger = new Base\Logger( $this->env['root'] . DIRECTORY_SEPARATOR .
 			$this->conf['logDir'], 'runtime', $this->conf['logSplitSize'] );
@@ -260,6 +333,7 @@ class Core {
 	 * @param string $file [可选] 脚本，消息所描述的事件发生在哪个脚本
 	 * @param int $line [可选] 所在的行，消息所描述的事件发生在脚本中的那一行
 	 * @param array $trace [可选] 调用方法栈，这个是使用debug_backtrace方法、捕获异常等方式得到的栈
+	 * @return void
 	 */
 	public function log( $type, $message, $file = null, $line = null, $trace = null ) {
 		static $typeMap = array(

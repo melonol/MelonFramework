@@ -5,7 +5,7 @@ namespace Melon\Base;
 defined( 'IN_MELON' ) or die( 'Permission denied' );
 
 /**
- * 保存加载信息的类
+ * 保存加载信息的容器，主要作用是排重
  */
 class LoaderSet extends \Melon\Util\Set {
 	

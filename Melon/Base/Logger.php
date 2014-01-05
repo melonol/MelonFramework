@@ -6,7 +6,11 @@ use \Melon\Exception;
 
 defined('IN_MELON') or die('Permission denied');
 
-
+/**
+ * 日志助手
+ * 
+ * 以时间命名自动分割日志文件，简化写入操作
+ */
 class Logger {
 	
 	/**

@@ -7,14 +7,53 @@ use Melon\Exception;
 use Melon\Http;
 use Melon\Util;
 
+/**
+ * 框架的主体类
+ * 
+ * 主体类是一个纯静态的类，你可以把它作为一个'接口通道'
+ * 或者说是快捷方式，提供了框架里基本上所有类的实例操作
+ * 当然也有其它实用的方法，比如获取配置、载入脚本、调试等等
+ * 所以如果你不熟悉命名空间，也几乎可以不使用命名空间进行开发但还是建议你先对PHP命名空间有基本的认识
+ * 
+ * 初始化：
+ * 使用前请先调用init方法进行初始化
+ * 
+ * 扩展：
+ * Melon提供了一个快捷方式M（其实是Melon的子类）
+ * 你可以Melon::env这样调用一个方法，或者M::env
+ * 干脆你不想用它们，也可以自己换一个'马甲'，像M一样继承Melon：
+ * class Name extends Melon {}
+ * Name::init();
+ * 然后你就可以在任何地方使用它了
+ * 另外继承之后，可以往里添加一些自己的操作方法，非常方便
+ */
 class Melon {
 	
+	/**
+	 * 核心类的实例，提供一系列较底层操作
+	 * 子类也可直接使用，注意不要随意覆盖核心类的属性，可能导致程序不正常运行
+	 * 
+	 * @var \Melon\Base\Core
+	 */
 	static protected $_melon;
-
+	
+	/**
+	 * 纯静态类不允许实例化
+	 */
 	final protected function __construct() {
 		;
 	}
 	
+	/**
+	 * 初始化框架
+	 * 
+	 * 初始化操作委托至Core类，具体信息请参考\Melon\Base\Core
+	 * 该方法一次调用即可，多次调用无效
+	 * 
+	 * @param string $root 应用根目录
+	 * @param array $config 框架配置
+	 * @return void
+	 */
 	static public function init( $root = null, $config = array() ) {
 		if( ! self::$_melon ) {
 			require __DIR__ . DIRECTORY_SEPARATOR . 'Melon' . DIRECTORY_SEPARATOR . 'Base' . 
@@ -23,6 +62,11 @@ class Melon {
 			self::$_melon->init( $root, $config );
 		}
 	}
+	
+	
+	/*************************************
+	 * 环境、调试与异常
+	 *************************************/
 		
 	/**
 	 * 获取框架环境信息
@@ -41,9 +85,8 @@ class Melon {
 	}
 	
 	/**
-	 * 调试信息
+	 * 调试
 	 * 
-	 * 对{@link \Melon::logMessage}的封装
 	 * 它根据程序配置，可以输出到浏览器，也可以写入日志文件
 	 * 
 	 * @param mixed $message 调试信息
@@ -59,9 +102,8 @@ class Melon {
 	}
 	
 	/**
-	 * 调试信息，显示方法栈
+	 * 调试，会显示方法栈
 	 * 
-	 * 对{@link \Melon::logMessage}的封装
 	 * 它根据程序配置，可以输出到浏览器，也可以写入日志文件
 	 * 
 	 * @param mixed $message 调试信息
@@ -79,11 +121,12 @@ class Melon {
 	}
 	
 	/**
-	 * 日志助手
+	 * 获取一个日志助手实例
 	 * 
 	 * @param string $dir 日志存放目录
 	 * @param string [可选] $filePrefix 日志前缀
 	 * @param string [可选] $splitSize 自动分割大小，单位M，当为0时不进行分割
+	 * @return \Melon\Base\Logger
 	 * @throws \Melon\Exception\RuntimeException
 	 */
 	final static public function logger( $dir, $filePrefix = 'log', $splitSize = 10 ) {
@@ -91,13 +134,21 @@ class Melon {
 		return new Base\Logger( $dir, $filePrefix, $splitSize );
 	}
 	
+	/**
+	 * 抛出一个异常
+	 * 
+	 * @param string $message 异常消息
+	 * @param string $code [可选] 异常代码
+	 * @param \Exception $previous [可选] 异常链中的前一个异常
+	 * @throws Exception\RuntimeException
+	 */
 	final static public function thowException( $message, $code = null, $previous = null ) {
 		throw new Exception\RuntimeException( $message, $code, $previous );
 	}
 
 
 	/*************************************
-	 * 加载
+	 * 基础加载
 	 *************************************/
 	
 	/**
@@ -121,7 +172,7 @@ class Melon {
 	 * 获取载入脚本文件时返回的数据
 	 * 
 	 * 经常用在载入配置文件、语言包等直接返回原生PHP数组的脚本文件
-	 * 它不会像{@link Melon::load}那样，可以防止重复载入同一个脚本文件
+	 * 它不会像Melon::load那样，可以防止重复载入同一个脚本文件
 	 * 
 	 * @param string $script 脚本路径
 	 * @return mixed
@@ -144,7 +195,7 @@ class Melon {
 	/**
 	 * 从包中载入一个脚本
 	 * 
-	 * 和{@link Melon::load}一样，它也会防止重复载入同一个脚本
+	 * 和Melon::load一样，它也会防止重复载入同一个脚本
 	 * 
 	 * @param string $script 脚本路径，必需是相对于包的路径
 	 * @return void
@@ -164,7 +215,7 @@ class Melon {
 	 * 从包中获取载入脚本文件时返回的数据
 	 * 
 	 * 经常用在载入配置文件、语言包等直接返回原生PHP数组的脚本文件
-	 * 它不会像{@link Melon::load}那样，可以防止重复载入同一个脚本文件
+	 * 它不会像Melon::load那样，可以防止重复载入同一个脚本文件
 	 * 
 	 * @param string $script 脚本路径，必需是相对于包的路径
 	 * @return mixed
@@ -189,14 +240,40 @@ class Melon {
 		return self::$_melon->packageDir( Base\PathTrace::source() );
 	}
 	
+	
+	/*************************************
+	 * HTTP库
+	 *************************************/
+	
+	/**
+	 * 获得一个路由实例
+	 * 
+	 * @param array $config 路由配置
+	 * @return \Melon\Http\Route
+	 */
 	final static public function httpRoute( $config = array() ) {
 		return new Http\Route( $config );
 	}
 	
+	/**
+	 * 获得一个用于HTTP请求处理的实例
+	 * 
+	 * Request是单例对象，所以不用担心多次调用而增加消耗
+	 * 
+	 * @return \Melon\Http\Request
+	 */
 	final static public function httpRequest() {
 		return Http\Request::getInstance();
 	}
 	
+	/**
+	 * 获得一个用于HTTP回应的实例
+	 * 
+	 * @param string $httpVersion [可选] 要使用哪个HTTP版本，为空则使用默认值
+	 * @param string $charset [可选] 回应内容的编码
+	 * @param string $contentType [可选] 媒体类型
+	 * @return \Melon\Http\Response
+	 */
 	final static public function httpResponse( $httpVersion = '1.1', $charset = '', $contentType = 'text/html' ) {
 		if( ! $charset ) {
 			$charset = self::env( 'config.charset' );
@@ -204,6 +281,17 @@ class Melon {
 		return new Http\Response( $httpVersion, $charset, $contentType );
 	}
 	
+	/**
+	 * 获取一个Rest实例
+	 * 
+	 * @param \Melon\Http\Route $route [可选] 路由
+	 * @param \Melon\Http\Request $request [可选] HTTP请求处理
+	 * @param \Melon\Http\Response $response [可选] HTTP回应处理
+	 * @param enum $matchMode 匹配模式
+	 * 1. \Melon\Http\SimpleRest::MATCH_ALL 匹配所有符合规则的路由
+	 * 2. \Melon\Http\SimpleRest::MATCH_ONE 只匹配第一个符合规则的路由，之后都会被忽略
+	 * @return \Melon\Http\SimpleRest
+	 */
 	final static public function httpSimpleRest( $route = null, $request = null,
 			$response = null, $matchMode = Http\SimpleRest::MATCH_ONE ) {
 		if( is_null( $route ) ) {
@@ -218,13 +306,36 @@ class Melon {
 		return new Http\SimpleRest( $route, $request, $response, $matchMode );
 	}
 	
+	
+	/*************************************
+	 * 其它实用工具
+	 *************************************/
+	
+	/**
+	 * 获取一个Set容器实例
+	 * 
+	 * @param array $items [可选] 默认数据
+	 * @param enum $replaceMode [可选] 替换模式，如果存在相同键名元素时被触发
+	 * 替换模式分别有：
+	 * 1.\Melon\Util\Set::REPLACE_NOT			不进行替换
+	 * 2. \Melon\Util\Set::REPLACE_ABSOLUTE	[默认] 严格，无条件替换原来的值
+	 * 3. \Melon\Util\Set::REPLACE_RELAXED		宽松，如果$value能够被PHP empty转为假值（null、''、0、false、空数组），则不替换
+	 * @return \Melon\Util\Set
+	 */
 	final static public function set( $items = array(), $replaceMode = Util\Set::REPLACE_ABSOLUTE ) {
 		return new Util\Set( $items, $replaceMode );
 	}
 	
+	/**
+	 * 获取一个模板视图实例
+	 * 
+	 * @param array $tag [可选] 标签名
+	 * @return \Melon\Util\Template
+	 */
 	final static public function template( $tag = array( '{', '}' ) ) {
 		return new Util\Template( $tag );
 	}
 }
 
-class M extends Melon {}
+// 创建Melon的快捷方式
+class M extends Melon { }

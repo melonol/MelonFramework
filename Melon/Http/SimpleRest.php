@@ -79,7 +79,9 @@ class SimpleRest {
 	 * @param \Melon\Http\Route $route
 	 * @param \Melon\Http\Request $request
 	 * @param \Melon\Http\Response $response
-	 * @param int $matchMode 匹配模式 0 匹配所有符合规则的路由， 1 只匹配第一个符合规则的路由，之后都会被忽略
+	 * @param enum $matchMode 匹配模式
+	 * 1. self::MATCH_ALL 匹配所有符合规则的路由
+	 * 2. self::MATCH_ONE 只匹配第一个符合规则的路由，之后都会被忽略
 	 */
 	public function __construct( Route $route, Request $request, Response $response,  $matchMode = self::MATCH_ONE ) {
 		$this->_route = $route;
