@@ -94,7 +94,7 @@ final class PathTrace {
 	 * 为了正确取得值，需要把自己调用的信息忽略掉
 	 * @return array|false
 	 */
-	private static function _getSourceTrace( $ignoreTrace = 3 ) {
+	private static function _getSourceTrace( $ignoreTrace = 2 ) {
 		// debug_backtrace的性能还是不错的，不过需要注意的是要开启DEBUG_BACKTRACE_IGNORE_ARGS
 		// 它是PHP5.3.6才开始被支持的，正因为增加了这项特性才让我的想法得以实现
 		// DEBUG_BACKTRACE_IGNORE_ARGS会忽略方法栈的参数
@@ -106,14 +106,20 @@ final class PathTrace {
 			$debugBacktrace = debug_backtrace();
 		}
 		$sourceTrace = null;
-		// 忽略自身
-		if( isset( $debugBacktrace[ $ignoreTrace - 1 ] ) ) {
-			$sourceTrace = $debugBacktrace[ $ignoreTrace - 1 ];
+		// 忽略自身，因为数组索引从0开始，所以索引也不用减1
+		if( isset( $debugBacktrace[ $ignoreTrace ] ) ) {
+			$sourceTrace = $debugBacktrace[ $ignoreTrace ];
 			// 闭包是没有路径的，但可以在下一个栈里取
 			if( $sourceTrace['function'] === '{closure}' ) {
-				$sourceTrace = $debugBacktrace[ $ignoreTrace - 2 ];
+				$sourceTrace = $debugBacktrace[ $ignoreTrace - 1 ];
 			}
+		
 		}
+		// 当只有两个的时候，说明在域名根目录下
+		else if( count( $debugBacktrace ) === 2 ) {
+			$sourceTrace = $debugBacktrace[1];
+		}
+		
 		if( ! empty( $sourceTrace ) ) {
 			// 由于PHP提供的内部动态调用方法（比如call_user_func、invoke等）不会产生栈来源，即没有file这个值
 			// 这会对我们的操作产生影响，必要时要使用反射来确保这些值存在

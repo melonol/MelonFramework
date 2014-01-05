@@ -80,12 +80,12 @@ class Core {
 		// 载入基础配置
 		$this->conf = require ( $this->env['melonLibrary'] . DIRECTORY_SEPARATOR .
 				'Data' . DIRECTORY_SEPARATOR . 'Conf' . DIRECTORY_SEPARATOR . 'Base.php' );
+		$this->env['config'] = &$this->conf;
 		$this->conf = array_merge( $this->conf, $config );
 		// includePath是loader － 包括autoload、权限审查等函数的工作范围
 		// 需要把MELON的基础目录添加到includePath中
-		$this->conf['includePath'][] = $this->env['melonRoot'];
-		$this->env['config'] = &$this->conf;
-		
+		$this->_addIncludePath( $this->env['root'] );
+		$this->_addIncludePath( $this->env['melonRoot'] );
 		// 设置编码
 		if( ! headers_sent() ) {
 			header( 'Content-Type: text/html; charset=' . $this->conf['charset'] );
@@ -100,6 +100,13 @@ class Core {
 		$this->env['microtime'] = $microtime;
 	}
 	
+	protected function _addIncludePath( $path ) {
+		if( ! in_array( $path, $this->conf['includePath'] ) ) {
+			$this->conf['includePath'][] = $path;
+		}
+	}
+
+
 	protected function _initLoader() {
 		$melonLibrary = $this->env['melonLibrary'] . DIRECTORY_SEPARATOR;
 		// 现在准备一些必需的类
@@ -309,6 +316,7 @@ class Core {
 		$logHandler( $this->conf['logDisplayLevel'], function( $debugMessage ) use ( $showCodeSnippet ) {
 			$debugMessage->show( Base\DebugMessage::DISPLAY_AUTO, true, $showCodeSnippet );
 		} );
+		
 		// 写入日志信息
 		if( isset( $this->logger ) ) {
 			$logger = $this->logger;
@@ -324,7 +332,7 @@ class Core {
 		if( in_array( $type, array( E_ERROR, E_PARSE,  E_COMPILE_ERROR, E_CORE_ERROR,
 			E_EXCEPTION ) ) ) {
 			$errorPage = $this->env['root'] . DIRECTORY_SEPARATOR . $this->conf['errorPage'];
-			$errorMessage = '';
+			$errorMessage = $this->conf['errorMessage'];
 			if( $this->env['clientType'] === 'browser' && file_exists( $errorPage ) ) {
 				ob_start();
 				@include $errorPage;

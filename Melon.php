@@ -225,53 +225,6 @@ class Melon {
 	final static public function template( $tag = array( '{', '}' ) ) {
 		return new Util\Template( $tag );
 	}
-	
-	final static public function callable( $name ) {
-		return array( array(
-			'name' => $name,
-			'pic' => '1'
-		),  array(
-			'name' => 'test.txt',
-			'pic' => '1'
-		));
-	}
 }
 
 class M extends Melon {}
-
-M::init( null, array(
-	'logLevel' => 0,
-	'logDisplayLevel' => 0,
-	'includePath' => array()
-) );
-
-//$s = microtime(true);
-//$template = new Util\Template();
-//$template->setCompileDir( './Melon/Data/' )->setTemplateDir('./Melon/Data/')->assign('arr', array(1, 2, 3))->assignTag('list', array(
-//	'callable' => '\Melon::callable',
-//	'args' => array(
-//		'name' => 'haha'
-//	)
-//))->display('subTemplate.html');
-//
-//echo number_format(microtime(true) - $s, 4);
-
-//todo::支持自定义错误页面
-
-$rest = M::httpSimpleRest();
-$rest->get('/', function() {
-	$request = M::httpRequest();
-	M::debugWithTrace($request->inputse());
-});
-
-$rest->get('/[id]/[book]/[dd]', function($id, $book) {
-	M::httpResponse()->send($book);
-});
-
-$rest->get('/[id]/[book:\w+]', function($id, $book) {
-	M::httpResponse()->send($book);
-});
-
-if(!$rest->matchTotal()) {
-	echo '你要的页面找不到了！' . $a;
-}
