@@ -129,7 +129,7 @@ Melon的加载方法解决了php相对路径的问题（当然这对于php来说
 
 模板
 -------------
-模板是通过定义一系统标签，使用正则表达式替换为标准的PHP语法的格式<br />
+模板是通过自定义一系列标签，使用正则表达式替换为标准的PHP语法的格式<br />
 <pre>
 <code>
 	Melon::template()
@@ -156,7 +156,7 @@ Melon的加载方法解决了php相对路径的问题（当然这对于php来说
 	{print 变量或函数}  注：可以使用print标签对内容进行处理，比如 {print date( 'Y-m-d', 
 	{php php代码/}
 	{php} php代码 {/php}
-	{include 子模板路径}  注：可在模板中引入子模板
+	{include 子模板路径}  注：可在模板中引入子模板，子模板路径可使用变量，但要使用双引号括起来：{include "$path/index.html"}
 </code>
 </pre>
 
@@ -175,13 +175,15 @@ Melon的加载方法解决了php相对路径的问题（当然这对于php来说
 ###标签扩展
 <pre>
 <code>
-	{tag:标签名 属性=值} 内容 {/tag}  注：可使用assignTag或assignTagItem方法添加自定
-	你可以在模板中使用这个自定义标签
-	// 声明一个获取某个列表数据的函数
+	// 使用方法
+	{tag:标签名 属性=值} 内容 {/tag}  注：可使用assignTag或assignTagItem方法添加
+
+	// 添加扩展方法
+	// 首先声明一个获取某个列表数据的函数
 	function getList( $id, $limit ) {
 			// 返回一个列表数据
 	}
-	// 定义一个list标签
+	// 注入这个list标签
 	$template->assignTag( 'list', array(
 			'callable' => 'getList',
 			'args' => array( 'id' => 1, 'limit' => 10 )
