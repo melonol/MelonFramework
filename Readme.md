@@ -5,8 +5,7 @@
 使用简介
 -------------
 >
-test
-	test
+<pre>
 <code>
 	/**
 	 * 获取一个模板视图实例
@@ -18,6 +17,7 @@ test
 		return new Util\Template( $tag );
 	}
 </code>
+</pre>
 
 Restful
 -------------
