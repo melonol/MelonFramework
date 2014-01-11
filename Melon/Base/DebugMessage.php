@@ -175,7 +175,7 @@ class DebugMessage {
 			$this->_messageFormat = '<pre>' . ob_get_contents() . '</pre>';
 			ob_end_clean();
 		} else {
-			$this->_messageFormat = htmlspecialchars( strval( $this->_message ) );
+			$this->_messageFormat = nl2br( htmlspecialchars( strval( $this->_message ) ) );
 		}
 	}
 	
