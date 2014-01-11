@@ -8,12 +8,12 @@
  * @version 0.1.0
  */
 
-namespace Melon\Database;
+namespace Melon\Database\PDO;
 
 use Melon\Exception;
 defined('IN_MELON') or die('Permission denied');
 
-class PDOStatement extends \PDOStatement {
+class Statement extends \PDOStatement {
 	
 	protected $_lastErrorHandler;
 
@@ -31,7 +31,7 @@ class PDOStatement extends \PDOStatement {
 		$this->_errorHandler = $this->_lastErrorHandler;
 	}
 	
-	public function execute( array $input_parameters = array() ) {
+	public function execute( $input_parameters = array() ) {
 		$result = parent::execute( $input_parameters );
 		if( $result === false && $this->_errorHandler ) {
 			call_user_func_array( $this->_errorHandler, $this->errorInfo() );

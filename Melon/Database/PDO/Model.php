@@ -8,12 +8,12 @@
  * @version 0.1.0
  */
 
-namespace Melon\Database;
+namespace Melon\Database\PDO;
 
 use Melon\Exception;
 defined('IN_MELON') or die('Permission denied');
 
-class PDOModel {
+class Model {
 	
 	protected $_table;
 
@@ -24,11 +24,7 @@ class PDOModel {
 		$this->_pdo = $pdo;
 	}
 	
-	public function openDebuger() {
-		
-	}
-	
-	public function closeDebuger() {
+	public function debug() {
 		
 	}
 	

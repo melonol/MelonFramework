@@ -8,7 +8,7 @@
  * @version 0.1.0
  */
 
-namespace Melon\Database;
+namespace Melon\Database\PDO;
 
 use Melon\Exception;
 defined('IN_MELON') or die('Permission denied');
@@ -18,7 +18,7 @@ class PDO extends \PDO {
 	static protected $_defaultDriverOptions = array(
 		\PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
 		\PDO::ATTR_ERRMODE => \PDO::ERRMODE_WARNING,
-		\PDO::ATTR_STATEMENT_CLASS => array( 'PDOStatemento' )
+		\PDO::ATTR_STATEMENT_CLASS => array( '\Melon\Database\PDO\Statement' )
 	);
 	
 	protected $_lastErrorHandler;
@@ -48,7 +48,7 @@ class PDO extends \PDO {
 		$this->_lastStatement = '';
 	}
 
-	public function prepare( $statement, array $driverOptions = array() ) {
+	public function prepare( $statement, $driverOptions = array() ) {
 		$this->_numStatements++;
 		$this->_lastStatement = $statement;
 		$result = parent::prepare( $statement, $driverOptions );

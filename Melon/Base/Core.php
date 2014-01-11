@@ -188,6 +188,8 @@ class Core {
 		$autoload = array(
 			$melonLibrary . 'Util' . DIRECTORY_SEPARATOR . 'Set.php',
 			$melonLibrary . 'Base' . DIRECTORY_SEPARATOR . 'Func.php',
+			$melonLibrary . 'Base' . DIRECTORY_SEPARATOR . 'Logger.php',
+			$melonLibrary . 'Base' . DIRECTORY_SEPARATOR . 'DebugMessage.php',
 			$melonLibrary . 'Base' . DIRECTORY_SEPARATOR . 'LoaderSet.php',
 			$melonLibrary . 'Base' . DIRECTORY_SEPARATOR . 'PathTrace.php',
 			$melonLibrary . 'Base' . DIRECTORY_SEPARATOR . 'LoaderPermission.php',
