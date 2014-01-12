@@ -136,7 +136,7 @@ class Model {
 	 * 触发一个错误
 	 * 
 	 * 根据pdo的\PDO::ATTR_ERRMODE配置，如果是\PDO::ERRMODE_EXCEPTION，则抛出异常
-	 * 否则只抛出一个wargin警告
+	 * 否则只抛出一个warning警告
 	 * 
 	 * @param string $message 错误消息
 	 * @throws \Melon\Exception\RuntimeException
