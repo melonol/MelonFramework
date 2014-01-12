@@ -155,15 +155,15 @@ class Model {
 	 * 
 	 * 如果数据表名不带数据库前缀或不包含`，则使用`号括起来
 	 * 
-	 * @param string $table 数据表名，表名只能包含英文字母 数字 ` - 以及 . 这些字符，否则抛出一个异常
+	 * @param string $table 数据表名，表名只能包含英文字母 数字 ` 以及 . 这些字符，否则抛出一个异常
 	 * @throws \Melon\Exception\RuntimeException
 	 * @return void
 	 */
 	protected function _setTable( $table ) {
-		if( ! preg_match( '/^[\w\`\-\.]+$/', $table ) ) {
-			\Melon::throwException( "数据库表{$table}不合法" );
+		if( ! preg_match( '/^[\w\`\.]+$/', $table ) ) {
+			\Melon::throwException( "数据库表名{$table}不合法" );
 		}
-		if( strpos( '`', $table ) === false && strpos( '.', $table ) === false ) {
+		if( strpos( $table, '`' ) === false && strpos( $table, '.' ) === false ) {
 			$this->_table = '`' . $table . '`';
 		} else {
 			$this->_table = $table;

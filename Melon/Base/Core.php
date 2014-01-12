@@ -16,6 +16,8 @@ use Melon\Base;
 use Melon\Exception;
 use Melon\Http;
 use Melon\Util;
+use Melon\Database;
+use Melon\Database\PDO;
 
 function_exists( 'set_magic_quotes_runtime' ) and @set_magic_quotes_runtime(0);
 
@@ -75,13 +77,15 @@ class Core {
 	 */
 	public $logger;
 	
+	public $dbDriver = null;
+	
 	/**
 	 * 初始化标记
 	 * 
 	 * @var boolean 
 	 */
 	protected $_inited = false;
-	
+
 	public function __construct() {
 		;
 	}
@@ -89,36 +93,57 @@ class Core {
 	/**
 	 * 初始化核心，只能被初始化一次，重复将忽略
 	 * 
-	 * @param string $root 应用根目录，Melon将以root为参照目录
+	 * @param array $config 应用配置，程序以$config[path]值为参照目录
 	 * 计算文件中的errorPage、logFile等文件的绝对路径，同时添加到inlucePath
-	 * @param array $config 框架配置，具体参数请参考Melon/Data/Conf/Base.php文件
-	 * 当然你可以增加一些自己的参数，使用Melon::env( 'config.keyname' ) 来获取这些值
+	 * $config[config] 为一些基本处理配置，具体参数请参考Melon/Data/Conf/Base.php文件
+	 * @param array $baseConfig 
 	 * @return void
 	 */
-	public function init( $root = null, $config = array() ) {
+	public function init( $config = null, $baseConfig = array() ) {
 		if( $this->_inited ) {
 			return;
 		}
-		$this->_initConf( $root, $config );
+		$this->_initConf( $config, $baseConfig );
 		$this->_initLoader();
 		$this->_initPhpRigster();
 		$this->_initLogger();
+		// app
+		if( $this->env['runType'] === 'app' ) {
+			$this->_initApp( $config );
+		}
+		// 数据库配置
+		if( isset( $config['dbConfig'] ) && is_array( $config['dbConfig'] ) ) {
+			$this->_initDB( $config['dbConfig'] );
+		}
 		$this->_inited = true;
 	}
 	
 	/**
 	 * 初始化一些配置信息
 	 * 
-	 * @param string $root 应用根目录，Melon将以root为参照目录
+	 * @param array $config 应用配置，程序以$config[path]值为参照目录
 	 * 计算文件中的errorPage、logFile等文件的绝对路径，同时添加到inlucePath
-	 * @param array $config 框架配置，具体参数请参考Melon/Data/Conf/Base.php文件
-	 * 当然你可以增加一些自己的参数，使用Melon::env( 'config.keyname' ) 来获取这些值
+	 * $config[config] 为一些基本处理配置，具体参数请参考Melon/Data/Conf/Base.php文件
 	 * @return void
 	 */
-	protected function _initConf( $root, $config ) {
-		if( $root && ! is_dir( $root ) ) {
-			exit( 'root目录无效' );
+	protected function _initConf( $config, $baseConfig ) {
+		// 兼容0.1版本的初始化模式
+		if( ! is_array( $config ) ) {
+			$root = $config;
+			$baseConfig = is_array( $baseConfig ) ? $baseConfig : array();
+			$config = array(
+				'type' => 'normal',
+				'root' => $root,
+				'baseConfig' => $baseConfig,
+			);
 		}
+		$runType = ( isset( $config['type'] ) && in_array( $config['type'], array( 'normal', 'app' ) ) ?
+				$config['type'] : 'normal' );
+		$rootPath = ( isset( $config['root'] ) ? $config['root'] : null );
+		if( $rootPath && ! is_dir( $rootPath ) ) {
+			throw new Exception\RuntimeException( '应用目录无效' );
+		}
+		
 		// 客户端连接类型
 		$clientType = 'other';
 		if( ( isset( $_SERVER["HTTP_X_REQUESTED_WITH"] ) &&
@@ -133,7 +158,8 @@ class Core {
 		// 环境变量
 		$melonRoot = realpath( __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' );
 		$this->env = array(
-			'root' => $root ?: $melonRoot,
+			'runType' => $runType,
+			'root' => $rootPath ?: $melonRoot,
 			'melonRoot' => $melonRoot,
 			'melonLibrary' =>  $melonRoot . DIRECTORY_SEPARATOR . 'Melon',
 			'clientType' => $clientType
@@ -143,7 +169,10 @@ class Core {
 		$this->conf = require ( $this->env['melonLibrary'] . DIRECTORY_SEPARATOR .
 				'Data' . DIRECTORY_SEPARATOR . 'Conf' . DIRECTORY_SEPARATOR . 'Base.php' );
 		$this->env['config'] = &$this->conf;
-		$this->conf = array_merge( $this->conf, $config );
+		if( isset( $config['baseConfig'] ) && is_array( $config['baseConfig'] ) ) {
+			$this->conf = array_merge( $this->conf, $config['baseConfig'] );
+		}
+		
 		// includePath是loader － 包括autoload、权限审查等函数的工作范围
 		// 需要把MELON的基础目录添加到includePath中
 		$this->_addIncludePath( $this->env['root'] );
@@ -252,6 +281,52 @@ class Core {
 			$this->conf['logDir'], 'runtime', $this->conf['logSplitSize'] );
 	}
 	
+	protected function _initDB( $dbConfig = array() ) {
+		$dbEnv = array();
+		$this->env['db'] =& $dbEnv;
+		$tablePrefix = ( isset( $dbConfig['tablePrefix'] ) ? strval( $dbConfig['tablePrefix'] ) : '' );
+		$dbEnv['tablePrefix'] = $tablePrefix;
+		if( isset( $dbConfig['driver'] ) ) {
+			if(  ! is_object( $dbConfig['driver'] ) && ! isset( $dbConfig['driver']['dsn'] ) ) {
+				throw new Exception\RuntimeException('请提供有效的数据库驱动信息');
+			} else {
+				if( is_object( $dbConfig['driver'] ) ) {
+					$this->dbDriver = $dbConfig['driver'];
+				} elseif( isset( $dbConfig['driver']['dsn'] ) ) {
+					$dsn = $dbConfig['driver']['dsn'];
+					$username = ( isset( $dbConfig['username'] ) ? $dbConfig['username'] : null );
+					$password = ( isset( $dbConfig['password'] ) ? $dbConfig['password'] : null );
+					$options = ( isset( $dbConfig['options'] ) && is_array( $dbConfig['options'] ) ?
+							$dbConfig['options'] : array() );
+					try {
+						$this->dbDriver = new PDO\PDO( $dsn, $username, $password, $options );
+					} catch ( \PDOException $e ) {
+						throw new Exception\RuntimeException( '数据库连接失败', null, $e );
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * 初始化APP（MVC模式）
+	 */
+	protected function _initApp( $config ) {
+		$nameRule = '/^[a-zA-Z_]+\w*$/';
+		$appName = ( isset( $config['appName'] ) && $config['appName'] ?
+				$config['appName'] : null );
+		if( ! preg_match( $nameRule, $appName ) ) {
+			throw new Exception\RuntimeException( '应用名称必需为字母开头，并由字母、数字或下划线组成' );
+		}
+		$this->env['appName'] = $appName;
+		$className = ( isset( $config['appClassName'] ) && $config['appClassName'] ?
+				$config['appClassName'] : $appName );
+		if( ! preg_match( $nameRule, $className ) ) {
+			throw new Exception\RuntimeException( '主体类名称必需为字母开头，并由字母、数字或下划线组成' );
+		}
+		$this->env['className'] = ucwords( $className );
+	}
+
 	/**
 	 * 自动加载类
 	 * 

@@ -14,6 +14,8 @@ use Melon\Base;
 use Melon\Exception;
 use Melon\Http;
 use Melon\Util;
+use Melon\Database;
+use Melon\Database\PDO;
 
 /**
  * 框架的主体类
@@ -62,16 +64,16 @@ class Melon {
 	 * 初始化操作委托至Core类，具体信息请参考\Melon\Base\Core
 	 * 该方法一次调用即可，多次调用无效
 	 * 
-	 * @param string $root 应用根目录
-	 * @param array $config 框架配置
+	 * @param array $config 应用配置
+	 * @param array $dbConfig 数据库配置
 	 * @return void
 	 */
-	static public function init( $root = null, $config = array() ) {
+	static public function init( $config = array(), $dbConfig = array() ) {
 		if( ! self::$_melon ) {
 			require __DIR__ . DIRECTORY_SEPARATOR . 'Melon' . DIRECTORY_SEPARATOR . 'Base' . 
 				DIRECTORY_SEPARATOR . 'Core.php';
 			self::$_melon = new Base\Core();
-			self::$_melon->init( $root, $config );
+			self::$_melon->init( $config, $dbConfig );
 		}
 	}
 	
@@ -251,6 +253,84 @@ class Melon {
 	 */
 	final static public function packageDir() {
 		return self::$_melon->packageDir( Base\PathTrace::source() );
+	}
+	
+	
+	/*************************************
+	 * 数据库
+	 *************************************/
+	
+	/**
+	 * 返回框架初始化时提供的数据库驱动实例，如果没有则抛出一个异常
+	 * 
+	 * 这是为数据库操作提供一个全局的快捷方式
+	 * 其实可以当作一个对象容器，只要是对象实例就可以
+	 * 你可以用自己的数据库驱动，没有具体限制
+	 * 
+	 * @return \object
+	 */
+	final static public function db() {
+		if( ! is_object( self::$_melon->dbDriver ) ) {
+			self::throwException( "数据库驱动实例不存在，不能使用此方法" );
+		}
+		return self::$_melon->dbDriver;
+	}
+	
+	/**
+	 * 为一个数据库表名添加上框架初始化时配置的数据库表前缀，并使用`号括起来
+	 * 
+	 * 如果没有配置，则前缀为空
+	 * 
+	 * @param string $tablename 表名，只能由字母、数字和下划线组成
+	 * @return string
+	 */
+	final static public function table( $tablename, $safe = true ) {
+		if( $safe && ! preg_match( '/^\w+$/', $tablename ) ) {
+			self::throwException( "数据库表名{$tablename}不合法" );
+		}
+		return '`' . self::env( 'db.tablePrefix' ) . $tablename . '`';
+	}
+	
+	/**
+	 * 获得一个PDO实例
+	 * 
+	 * @param string $dsn 包含请求连接到数据库的信息
+	 * @param string $user [可选] DSN字符串中的用户名
+	 * @param string $pass [可选] DSN字符串中的密码
+	 * @param array $driverOptions [可选] 一个具体驱动的连接选项的键=>值数组
+	 * @return \Melon\Database\PDO\PDO
+	 */
+	final static public function PDO( $dsn, $user = null, $pass = null, array $driverOptions = array() ) {
+		return new PDO\PDO( $dsn, $user, $pass, $driverOptions );
+	}
+	
+	/**
+	 * 获得一个PDOStatement实例
+	 * 
+	 * @return \Melon\Database\PDO\Statement
+	 */
+	final static public function PDOStatement() {
+		return new PDO\Statement();
+	}
+	
+	/**
+	 * 获得一个PDO数据模型实例
+	 * 
+	 * @param string $table 数据表名，可带数据库前缀
+	 * @param boolean $table [可选] 是否自动为表添加上框架初始化配置的前缀，默认为ture
+	 * @param mixed $pdo [可选] PDO实例对象，如果为空并且在框架初始化中提供了PDO的数据库驱动信息，则默认使用它，否则抛出一个异常
+	 * @return \Melon\Database\PDO\Model
+	 */
+	final static public function PDOModel( $table, $autoPrefix = true, $pdo = null ) {
+		$_pdo = $pdo;
+		if( is_null( $_pdo ) && is_object( self::$_melon->dbDriver ) ) {
+			$_pdo = self::$_melon->dbDriver;
+		}
+		if( ! $_pdo instanceof \PDO ) {
+			self::throwException( '请提供有效的PDO驱动实例' );
+		}
+		$_table = ( $autoPrefix ? self::table( $table, false ) : $table );
+		return new PDO\Model( $_table, $_pdo );
 	}
 	
 	
