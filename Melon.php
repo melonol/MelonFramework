@@ -65,15 +65,15 @@ class Melon {
 	 * 该方法一次调用即可，多次调用无效
 	 * 
 	 * @param array $config 应用配置
-	 * @param array $dbConfig 数据库配置
+	 * @param array $baseConfig 0.1版的配置项，废器使用，已集成到$config[baseConfig]中
 	 * @return void
 	 */
-	static public function init( $config = array(), $dbConfig = array() ) {
+	static public function init( $config = array(), $baseConfig = array() ) {
 		if( ! self::$_melon ) {
 			require __DIR__ . DIRECTORY_SEPARATOR . 'Melon' . DIRECTORY_SEPARATOR . 'Base' . 
 				DIRECTORY_SEPARATOR . 'Core.php';
 			self::$_melon = new Base\Core();
-			self::$_melon->init( $config, $dbConfig );
+			self::$_melon->init( $config, $baseConfig );
 		}
 	}
 	

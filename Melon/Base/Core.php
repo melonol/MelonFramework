@@ -77,6 +77,11 @@ class Core {
 	 */
 	public $logger;
 	
+	/**
+	 * 数据库驱动实例
+	 * 
+	 * @var \object 
+	 */
 	public $dbDriver = null;
 	
 	/**
@@ -93,10 +98,8 @@ class Core {
 	/**
 	 * 初始化核心，只能被初始化一次，重复将忽略
 	 * 
-	 * @param array $config 应用配置，程序以$config[path]值为参照目录
-	 * 计算文件中的errorPage、logFile等文件的绝对路径，同时添加到inlucePath
-	 * $config[config] 为一些基本处理配置，具体参数请参考Melon/Data/Conf/Base.php文件
-	 * @param array $baseConfig 
+	 * @param array $config 应用配置
+	 * @param array $baseConfig 0.1版的配置项，废器使用，已集成到$config[baseConfig]中
 	 * @return void
 	 */
 	public function init( $config = null, $baseConfig = array() ) {
@@ -121,9 +124,8 @@ class Core {
 	/**
 	 * 初始化一些配置信息
 	 * 
-	 * @param array $config 应用配置，程序以$config[path]值为参照目录
-	 * 计算文件中的errorPage、logFile等文件的绝对路径，同时添加到inlucePath
-	 * $config[config] 为一些基本处理配置，具体参数请参考Melon/Data/Conf/Base.php文件
+	 * @param array $config 应用配置
+	 * @param array $baseConfig 0.1版的配置项，废器使用，已集成到$config[baseConfig]中
 	 * @return void
 	 */
 	protected function _initConf( $config, $baseConfig ) {
@@ -281,6 +283,12 @@ class Core {
 			$this->conf['logDir'], 'runtime', $this->conf['logSplitSize'] );
 	}
 	
+	/**
+	 * 数据库初始化
+	 * 
+	 * @param array $dbConfig 数据库配置
+	 * @throws Exception\RuntimeException
+	 */
 	protected function _initDB( $dbConfig = array() ) {
 		$dbEnv = array();
 		$this->env['db'] =& $dbEnv;
