@@ -69,7 +69,7 @@ defined('IN_MELON') or die('Permission denied');
  * 程序会使用这个实例进行一些操作，比如检查更新等
  * 
  * @package Melon
- * @since 0.1.0
+ * @since 0.3.0
  * @author Melon
  */
 class Template {
@@ -564,7 +564,7 @@ class Template {
 		}
 		$this->_show();
 		$content = ob_get_contents();
-		ob_end_clean();
+		ob_clean();
 		return $content;
 	}
 	

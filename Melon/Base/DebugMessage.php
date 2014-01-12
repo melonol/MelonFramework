@@ -21,7 +21,7 @@ defined('IN_MELON') or die('Permission denied');
  * 前提是你要提供足够的信息
  * 
  * @package Melon
- * @since 0.1.0
+ * @since 0.3.0
  * @author Melon
  */
 class DebugMessage {
@@ -156,7 +156,7 @@ class DebugMessage {
 			ob_start();
 			var_dump( $this->_message );
 			$this->_messageFormat = "\r\n" . ob_get_contents();
-			ob_end_clean();
+			ob_clean();
 		} else {
 			$this->_messageFormat = strval( $this->_message );
 		}

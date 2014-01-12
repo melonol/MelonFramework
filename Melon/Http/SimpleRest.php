@@ -40,7 +40,7 @@ defined('IN_MELON') or die('Permission denied');
  * </pre>
  * 
  * @package Melon
- * @since 0.1.0
+ * @since 0.3.0
  * @author Melon
  */
 class SimpleRest {
@@ -127,7 +127,7 @@ class SimpleRest {
 			ob_start();
 			call_user_func_array( $callback, $parseInfo['args'] );
 			$content = ob_get_contents();
-			ob_end_clean();
+			ob_clean();
 			$this->_response->send( $content );
 		}
 	}
