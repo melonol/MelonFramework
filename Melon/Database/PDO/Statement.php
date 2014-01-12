@@ -55,7 +55,7 @@ class Statement extends \PDOStatement {
 	 */
 	public function setErrorHandler( $callable ) {
 		if( ! is_callable( $callable ) ) {
-			throw new Exception( 'PDOStatement错误处理必需是一个可调用的方法' );
+			\Melon::throwException( 'PDOStatement错误处理必需是一个可调用的方法' );
 		}
 		$this->_lastErrorHandler = $this->_errorHandler;
 		$this->_errorHandler = $callable;
