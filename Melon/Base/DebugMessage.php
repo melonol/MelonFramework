@@ -173,7 +173,7 @@ class DebugMessage {
 			ob_start();
 			var_dump( $this->_message );
 			$this->_messageFormat = '<pre>' . ob_get_contents() . '</pre>';
-			ob_end_clean();
+			ob_clean();
 		} else {
 			$this->_messageFormat = nl2br( htmlspecialchars( strval( $this->_message ) ) );
 		}
