@@ -68,7 +68,7 @@ class Model {
 	/**
 	 * 构造器
 	 * 
-	 * @param type $table 数据表名，可带数据库前缀
+	 * @param string $table 数据表名，可带数据库前缀
 	 * @param \PDO $pdo PDO实例对象
 	 * @return void
 	 */
