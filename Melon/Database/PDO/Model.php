@@ -297,7 +297,7 @@ class Model {
 			$this->_error( '更新数据不应该为空' );
 			return false;
 		}
-		if( ! $where || $where == 1 ) {
+		if( ! $where || trim( $where, ' ;' ) === '1' ) {
 			$this->_error( '更新数据的条件不应该为空或者通配，这是非常危险的' );
 			return false;
 		}
@@ -324,6 +324,7 @@ class Model {
 	public function insert( array $data = array() ) {
 		if( ! $data ) {
 			$this->_error( '插入数据不应该为空' );
+			return false;
 		}
 		$fields = array();
 		$values = array();
@@ -349,7 +350,7 @@ class Model {
 	 * @return mixed 删除成功返回的受影响结果的行数，失败返回false
 	 */
 	public function delete( $where = '', array $bindParams = array() ) {
-		if( ! $where || $where == 1 ) {
+		if( ! $where || trim( $where, ' ;' ) === '1' ) {
 			$this->_error( '删除数据的条件不应该为空或者通配，这是非常危险的' );
 			return false;
 		}
