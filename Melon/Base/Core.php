@@ -35,7 +35,7 @@ define( 'MELON_DEBUG', 'Debug' );
  * 你可以在配置中增加这些目录，程序默认把root（框架的root非系统）添加到includePath中
  * 
  * @package Melon
- * @since 0.1.0
+ * @since 0.3.0
  * @author Melon
  */
 class Core {
