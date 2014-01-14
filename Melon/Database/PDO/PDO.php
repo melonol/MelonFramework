@@ -18,7 +18,7 @@ defined('IN_MELON') or die('Permission denied');
  * 
  * <pre>
  * 增强了错误和调试方面的功能，程序记录了executes、exec以及query的执行次数和相关信息
- * 可以通过errorsCount、executesCount、statementsCount、lastStatement获取这些信息
+ * 可以通过errorsTotal、executesTotal、statementsTotal、lastStatement获取这些信息
  * setErrorHandler可以设置一个查询错误时的处理方法
  * restoreErrorHandler还原上一个错误处理方法
  * 
@@ -228,7 +228,7 @@ class PDO extends \PDO {
 	 * 
 	 * @return int
 	 */
-	public function errorsCount() {
+	public function errorsTotal() {
 		return $this->_numErrors;
 	}
 	
@@ -237,7 +237,7 @@ class PDO extends \PDO {
 	 * 
 	 * @return int
 	 */
-	public function executesCount() {
+	public function executesTotal() {
 		return $this->_numExecutes;
 	}
 	
@@ -246,7 +246,7 @@ class PDO extends \PDO {
 	 * 
 	 * @return int
 	 */
-	public function statementsCount() {
+	public function statementsTotal() {
 		return $this->_numStatements;
 	}
 	
