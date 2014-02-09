@@ -143,7 +143,7 @@ class Core {
 				$config['type'] : 'normal' );
 		$rootPath = ( isset( $config['root'] ) ? $config['root'] : null );
 		if( $rootPath && ! is_dir( $rootPath ) ) {
-			throw new Exception\RuntimeException( '应用目录无效' );
+			exit( '应用目录无效' );
 		}
 		
 		// 客户端连接类型
@@ -201,6 +201,7 @@ class Core {
 	 * 
 	 * @param string $path
 	 * @return void
+	 * @todo 使用realpath格式化
 	 */
 	protected function _addIncludePath( $path ) {
 		if( ! in_array( $path, $this->conf['includePath'] ) ) {
@@ -347,6 +348,7 @@ class Core {
 	 */
 	public function autoLoad( $class ) {
 		$file = str_replace( '\\', DIRECTORY_SEPARATOR, $class ) . '.php';
+		if(strpos($class, '_Demo')) define('test', 1);
 		foreach( $this->conf['includePath'] as $path ) {
 			$script = realpath( $path . DIRECTORY_SEPARATOR . $file );
 			if( $script ) {

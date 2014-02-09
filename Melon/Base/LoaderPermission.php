@@ -75,7 +75,7 @@ class LoaderPermission {
 	 * 1. 目标路径不在检查范围内，即不在包含路径中
 	 * 2. 目标路径文件和父目录都不属于私有的
 	 * 3. 某个父目录属于私有，但是载入源也在这个私有目录或者其子目录下
-	 * 4. 载入源文件名与目标路径的当前父目录同级，载入源文件名（不含.php）加上私有前缀与当前父目录相等，比如 File.php和_File
+	 * 4. 载入源文件名与目标路径的当前私有目录同级，载入源文件名（不含.php）加上私有前缀与当前父目录相等，比如 File.php和_File
 	 * 
 	 * @param string $source 载入源路径，标准的系统路径格式
 	 * @param string $target 目标路径，标准的系统路径格式
@@ -111,15 +111,16 @@ class LoaderPermission {
 			if( $includeTarget ) {
 				return true;
 			}
-			// 反过来，只有在目标路径的父目录同级，并且加上私有前缀的名称与其相等才可以
+			// 反过来，只有在目标路径的私有目录同级，并且加上私有前缀的名称与其相等才可以
 			$includeSource = ( strpos( $targetDir, $sourceDir ) === 0 );
 			if( $includeSource ) {
 				$count = 0;
 				// 谨慎点，我把两边的目录分隔符去掉，无论它是否存在
 				$replaceDir = trim( str_replace( $sourceDir, '', $targetDir, $count ), DIRECTORY_SEPARATOR );
-				$isLastDir = ( ! strpos( $replaceDir, DIRECTORY_SEPARATOR ) );
-				$isPublicInterface = ( $this->_privatePre . basename( $source, '.php' ) === $replaceDir );
-				if( $count && $isLastDir && $isPublicInterface ) {
+				$noPrivate = ( strpos( $replaceDir, DIRECTORY_SEPARATOR . $this->_privatePre ) === false );
+				list( $firstDir ) = explode( DIRECTORY_SEPARATOR, $replaceDir );
+				$isPublicInterface = ( $this->_privatePre . basename( $source, '.php' ) === $firstDir );
+				if( $count && $noPrivate && $isPublicInterface ) {
 					return true;
 				}
 			}

@@ -16,10 +16,11 @@ defined( 'IN_MELON' ) or die( 'Permission denied' );
  * 路径跟踪器
  * 
  * 使用它可以跟踪并解释某次方法调用的所在路径，或者解释一个相对于调用方法所属文件路径的真实路径（绝对路径）
- * 我把PathTrace当作一个魔术类，能根据逻辑的上下文的产生对应的结果，听起来有点绕
+ * PathTrace可以看作一个魔术类
  * 
  * 本类使用debug_backtrace函数抓取调用方法栈信息，我把类设置为最简单管理的纯静态
  * 因为debug_backtrace很容易发生变化，非常难把握，不当或过度使用将会让你的代码陷于泥潭中
+ * 使用途中如果遇到一些的问题，希望你能帮助我一起去完善它
  * 
  * @package Melon
  * @since 0.1.0
@@ -124,10 +125,13 @@ final class PathTrace {
 			// 闭包是没有路径的，但可以在下一个栈里取
 			if( $sourceTrace['function'] === '{closure}' ) {
 				$sourceTrace = $debugBacktrace[ $ignoreTrace - 1 ];
+			} elseif( isset( $debugBacktrace[ $ignoreTrace + 1 ] ) &&
+					$debugBacktrace[ $ignoreTrace + 1 ]['function'] === 'spl_autoload_call' ) {
+				$sourceTrace = $debugBacktrace[ $ignoreTrace + 1 ];
 			}
-		
 		}
-		// 当只有两个的时候，说明在域名根目录下
+		// 当只有两个的时候，直接取第2个
+		// 一般情况下表示在根目录下
 		else if( count( $debugBacktrace ) === 2 ) {
 			$sourceTrace = $debugBacktrace[1];
 		}
