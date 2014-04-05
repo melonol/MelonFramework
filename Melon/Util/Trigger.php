@@ -124,30 +124,18 @@ class Trigger {
 				if( ! is_callable( $this->_before[ $methodName ] ) ) {
 					\Melon::throwException( "{$this->_className}类{$methodName}绑定的执行前调用方法并不是可调用的" );
 				}
-				try {
-					call_user_func_array( $this->_before[ $methodName ], $arguments );
-				} catch ( \Exception $e ) {
-					\Melon::throwException( "触发{$this->_className}类{$methodName}绑定的执行前调用方法时发生了异常：" . $e->getMessage(), null, $e );
-				}
+				call_user_func_array( $this->_before[ $methodName ], $arguments );
 			}
 			
 			// 调用中
-			try {
-				$result = call_user_func_array( array( $this->_passivity, $methodName ), $arguments );
-			} catch ( \Exception $e ) {
-				\Melon::throwException( "触发{$this->_className}类的{$methodName}方法时发生了异常：" . $e->getMessage(), null, $e );
-			}
+			$result = call_user_func_array( array( $this->_passivity, $methodName ), $arguments );
 			
 			// 调用后
 			if( isset( $this->_after[ $methodName ] ) ) {
 				if( ! is_callable( $this->_after[ $methodName ] ) ) {
 					\Melon::throwException( "{$this->_className}类{$methodName}绑定的执行后调用方法不是可调用的" );
 				}
-				try {
-					call_user_func( $this->_after[ $methodName ], $result );
-				} catch ( \Exception $e ) {
-					\Melon::throwException( "触发{$this->_className}类{$methodName}绑定的执行后调用方法时发生了异常：" . $e->getMessage(), null, $e );
-				}
+				call_user_func( $this->_after[ $methodName ], $result );
 			}
 		} else {
 			\Melon::throwException( "触发器无法在{$this->_className}类中找到可调用的{$methodName}方法" );

@@ -21,10 +21,10 @@ class App {
 		$moduleName = ( isset( $config['moduleName'] ) && $config['moduleName'] ?
 				$config['moduleName'] : null );
 		if( ! preg_match( $nameRule, $appName ) ) {
-			throw new Exception\RuntimeException( '应用名称必需为字母开头，并由字母、数字或下划线组成' );
+			throw new Exception\RuntimeException( 'app名称必需为字母开头，并由字母、数字或下划线组成' );
 		}
 		if( ! preg_match( $nameRule, $appName ) ) {
-			throw new Exception\RuntimeException( '模块名称必需为字母开头，并由字母、数字或下划线组成' );
+			throw new Exception\RuntimeException( 'module名称必需为字母开头，并由字母、数字或下划线组成' );
 		}
 		$this->_core->env['appName'] = ucfirst( $appName );
 		$this->_core->env['moduleName'] = ucfirst( $moduleName );
@@ -35,7 +35,7 @@ class App {
 	
 	public function run() {
 		if( $this->_core->env['runType'] !== 'app' ) {
-			throw new Exception\RuntimeException( '当前模式不能运行APP' );
+			throw new Exception\RuntimeException( '当前模式不能运行app' );
 		}
 		if( $this->_core->env['install'] === 'app' ) {
 			$this->_createApp();
@@ -73,7 +73,7 @@ class App {
 		// 现在把控制权交给当前请求的模块
 		$moduleClass = $this->_core->env['className'] . '\Module\\' . $this->_core->env['moduleName'];
 		if( ! file_exists( $this->_core->env['root'] . DIRECTORY_SEPARATOR . str_replace( '\\', DIRECTORY_SEPARATOR, $moduleClass ) . '.php' ) ) {
-			throw new Exception\RuntimeException( "{$this->_core->env['moduleName']}模块不存在" );
+			throw new Exception\RuntimeException( "{$this->_core->env['moduleName']} module不存在" );
 		}
 		$command = new $moduleClass();
 		$command->execute( $pathInfo['controller'], $pathInfo['action'], $pathInfo['args'] );
