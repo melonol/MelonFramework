@@ -27,6 +27,7 @@ function_exists( 'set_magic_quotes_runtime' ) and @set_magic_quotes_runtime(0);
 defined( 'E_EXCEPTION' ) or define( 'E_EXCEPTION', 65534 );
 
 // 调试标记
+// 使用相关log方法时作为TYPE的类型参数，而并不是调试开关
 define( 'MELON_DEBUG', 'Debug' );
 
 /**
@@ -47,7 +48,9 @@ class Core {
 	 * 
 	 * @var array 
 	 */
-	public $env = array();
+	public $env = array(
+		'version' => '0.2.0'
+	);
 	
 	/**
 	 * 框架配置
@@ -85,11 +88,19 @@ class Core {
 	public $dbDriver = null;
 	
 	/**
+	 * 应用运行实例
+	 * 
+	 * @var \Melon\Base\App
+	 */
+	protected $_app = null;
+	
+	/**
 	 * 初始化标记
 	 * 
 	 * @var boolean 
 	 */
 	protected $_inited = false;
+	
 
 	public function __construct() {
 		;
@@ -157,15 +168,15 @@ class Core {
 		} elseif( stripos( PHP_SAPI, 'CGI' ) === 0 ) {
 			$clientType = 'cgi';
 		}
-		// 环境变量
+		
 		$melonRoot = realpath( __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' );
-		$this->env = array(
+		$this->env = array_merge( $this->env, array(
 			'runType' => $runType,
 			'root' => $rootPath ?: $melonRoot,
 			'melonRoot' => $melonRoot,
 			'melonLibrary' =>  $melonRoot . DIRECTORY_SEPARATOR . 'Melon',
 			'clientType' => $clientType
-		);
+		) );
 		
 		// 载入基础配置
 		$this->conf = require ( $this->env['melonLibrary'] . DIRECTORY_SEPARATOR .
@@ -308,6 +319,7 @@ class Core {
 					$options = ( isset( $dbConfig['options'] ) && is_array( $dbConfig['options'] ) ?
 							$dbConfig['options'] : array() );
 					try {
+						// TODO::做懒连接
 						$this->dbDriver = new PDO\PDO( $dsn, $username, $password, $options );
 					} catch ( \PDOException $e ) {
 						throw new Exception\RuntimeException( '数据库连接失败', null, $e );
@@ -321,19 +333,16 @@ class Core {
 	 * 初始化APP（MVC模式）
 	 */
 	protected function _initApp( $config ) {
-		$nameRule = '/^[a-zA-Z_]+\w*$/';
-		$appName = ( isset( $config['appName'] ) && $config['appName'] ?
-				$config['appName'] : null );
-		if( ! preg_match( $nameRule, $appName ) ) {
-			throw new Exception\RuntimeException( '应用名称必需为字母开头，并由字母、数字或下划线组成' );
-		}
-		$this->env['appName'] = $appName;
-		$className = ( isset( $config['appClassName'] ) && $config['appClassName'] ?
-				$config['appClassName'] : $appName );
-		if( ! preg_match( $nameRule, $className ) ) {
-			throw new Exception\RuntimeException( '主体类名称必需为字母开头，并由字母、数字或下划线组成' );
-		}
-		$this->env['className'] = ucwords( $className );
+		$this->load( __FILE__, __DIR__ . DIRECTORY_SEPARATOR . 'App.php' );
+		$this->_app = new App( $this );
+		$this->_app->init( $config );
+	}
+	
+	/**
+	 * 获得app实例
+	 */
+	public function app() {
+		return $this->_app;
 	}
 
 	/**

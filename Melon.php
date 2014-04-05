@@ -77,6 +77,14 @@ class Melon {
 		}
 	}
 	
+	/**
+	 * 运行APP
+	 * 
+	 * @return void
+	 */
+	static public function runApp() {
+		self::$_melon->app()->run();
+	}
 	
 	/*************************************
 	 * 环境、调试与异常
