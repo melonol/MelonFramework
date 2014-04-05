@@ -1,6 +1,6 @@
 <?php
 
-namespace __APPNAME__\Module\___MODULENAME__\Controller;
+namespace __APPNAME__\Module\__PRIVATE_PRE____MODULENAME__\Controller;
 
 class Index extends \Melon\App\Lib\Controller {
 	

@@ -18,7 +18,7 @@ abstract class Controller {
 		
 		$this->_view = \Melon::template();
 		$this->_view->setTemplateDir( \Melon::env( 'appDir' ) . DIRECTORY_SEPARATOR . 'Module' .
-			DIRECTORY_SEPARATOR . '_' . \Melon::env( 'moduleName' ) . DIRECTORY_SEPARATOR . 'View' );
+			DIRECTORY_SEPARATOR . \Melon::env( 'config.privatePre' ) . \Melon::env( 'moduleName' ) . DIRECTORY_SEPARATOR . 'View' . DIRECTORY_SEPARATOR . \Melon::env( 'controller' ) );
 		$this->_view->setCompileDir( \Melon::env( 'appDir' ) . DIRECTORY_SEPARATOR .
 			'Data' . DIRECTORY_SEPARATOR . 'TplCache' );
 	}

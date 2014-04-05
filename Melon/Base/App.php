@@ -43,6 +43,9 @@ class App {
 			$this->_createModule();
 		}
 		
+		if( ! file_exists( $this->_core->env['appDir'] . DIRECTORY_SEPARATOR . $this->_core->env['className'] . '.php' ) ) {
+			throw new Exception\RuntimeException( "{$this->_core->env['appName']} app不存在" );
+		}
 		$this->_core->load( __FILE__, $this->_core->env['appDir'] . DIRECTORY_SEPARATOR . $this->_core->env['className'] . '.php' );
 		
 		// 取得路由配置，然后解释它
@@ -60,6 +63,10 @@ class App {
 				isset( $routeConf['defaultAction'] ) ? $routeConf['defaultAction'] : null ),
 			'args' => ( isset( $_pathInfo[2] ) ? array_splice( $_pathInfo, 2 ) : array() ),
 		);
+		$this->_core->env['controller'] = $pathInfo['controller'];
+		$this->_core->env['action'] = $pathInfo['action'];
+		$this->_core->env['args'] = $pathInfo['args'];
+		
 		// 搞定后清理掉不再用的数据
 		unset( $routeConf, $_pathInfo );
 
@@ -79,13 +86,12 @@ class App {
 		if( is_dir( $this->_core->env['appDir'] ) && ! $this->_isEmptyDir( $this->_core->env['appDir'] ) ) {
 			throw new Exception\RuntimeException( "app目录{$this->_core->env['appDir']}不为空，无法创建" );
 		}
-		$this->_deleteTempDir();
+		$this->_cleanTempDir();
 		$tempDir = $this->_createTempDir( 'App' );
 		$this->_copyDir( $this->_core->env['melonLibrary'] . DIRECTORY_SEPARATOR . 'App' . DIRECTORY_SEPARATOR . 'Template', $tempDir );
-		$this->_replaceContent( $tempDir, '__APPNAME__', $this->_core->env['appName'] );
-		$this->_replaceContent( $tempDir, '__MODULENAME__', $this->_core->env['moduleName'] );
+		$this->_replaceVar( $tempDir );
 		$this->_copyDir( $tempDir, $this->_core->env['root'] );
-		$this->_deleteTempDir();
+		$this->_cleanTempDir();
 	}
 	
 	protected function _createModule() {
@@ -93,19 +99,24 @@ class App {
 		if( ! is_writable( $parentModuleDir ) ) {
 			throw new Exception\RuntimeException( "module根目录{$parentModuleDir}不存在或不可写" );
 		}
-		$moduleDir = $parentModuleDir . DIRECTORY_SEPARATOR . '_' . $this->_core->env['moduleName'];
+		$moduleDir = $parentModuleDir . DIRECTORY_SEPARATOR . $this->_core->conf['privatePre'] . $this->_core->env['moduleName'];
 		if( is_dir( $moduleDir ) ) {
 			throw new Exception\RuntimeException( "module目录{$moduleDir}已存在，无法创建" );
 		}
-		$this->_deleteTempDir();
+		$this->_cleanTempDir();
 		$tempDir = $this->_createTempDir( 'Module' );
 		$this->_copyDir( $this->_core->env['melonLibrary'] . DIRECTORY_SEPARATOR . 'App' . DIRECTORY_SEPARATOR . 'Template' . DIRECTORY_SEPARATOR . '__APPNAME__' . DIRECTORY_SEPARATOR . 'Module', $tempDir );
-		$this->_replaceContent( $tempDir, '__APPNAME__', $this->_core->env['appName'] );
-		$this->_replaceContent( $tempDir, '__MODULENAME__', $this->_core->env['moduleName'] );
+		$this->_replaceVar( $tempDir );
 		$this->_copyDir( $tempDir, $parentModuleDir );
-		$this->_deleteTempDir();
+		$this->_cleanTempDir();
 	}
 	
+	private function _replaceVar( $dir ) {
+		$this->_replaceContent( $dir, '__APPNAME__', $this->_core->env['appName'] );
+		$this->_replaceContent( $dir, '__MODULENAME__', $this->_core->env['moduleName'] );
+		$this->_replaceContent( $dir, '__PRIVATE_PRE__', $this->_core->conf['privatePre'] );
+	}
+
 	private function _createTempDir( $subDirName ) {
 		$tempDir = $this->_core->env['melonLibrary'] . DIRECTORY_SEPARATOR . 'Data' . DIRECTORY_SEPARATOR . 'InstallTemp' . DIRECTORY_SEPARATOR . $subDirName;
 		if( ! is_dir( $tempDir ) ) {
@@ -114,7 +125,7 @@ class App {
 		return $tempDir;
 	}
 	
-	private function _deleteTempDir() {
+	private function _cleanTempDir() {
 		$tempDir = $this->_core->env['melonLibrary'] . DIRECTORY_SEPARATOR . 'Data' . DIRECTORY_SEPARATOR . 'InstallTemp';
 		unlink( $tempDir );
 	}
