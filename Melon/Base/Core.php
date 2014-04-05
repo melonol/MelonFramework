@@ -175,7 +175,8 @@ class Core {
 			'root' => $rootPath ?: $melonRoot,
 			'melonRoot' => $melonRoot,
 			'melonLibrary' =>  $melonRoot . DIRECTORY_SEPARATOR . 'Melon',
-			'clientType' => $clientType
+			'clientType' => $clientType,
+			'install' => ( isset( $config['install'] ) ? $config['install'] : false ),
 		) );
 		
 		// 载入基础配置
