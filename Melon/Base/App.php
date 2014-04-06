@@ -42,6 +42,9 @@ class App {
 		} else if( $this->_core->env['install'] === 'module' ) {
 			$this->_createModule();
 		}
+		// 将日志目录转到app
+		$this->_core->logger = new Logger( $this->_core->env['appDir'] . DIRECTORY_SEPARATOR .
+			$this->_core->conf['logDir'], 'runtime', $this->_core->conf['logSplitSize'] );
 		
 		if( ! file_exists( $this->_core->env['appDir'] . DIRECTORY_SEPARATOR . $this->_core->env['className'] . '.php' ) ) {
 			throw new Exception\RuntimeException( "{$this->_core->env['appName']} app不存在" );
@@ -84,7 +87,7 @@ class App {
 			throw new Exception\RuntimeException( "app目录{$this->_core->env['root']}不存在或不可写" );
 		}
 		if( is_dir( $this->_core->env['appDir'] ) && ! $this->_isEmptyDir( $this->_core->env['appDir'] ) ) {
-			throw new Exception\RuntimeException( "app目录{$this->_core->env['appDir']}不为空，无法创建" );
+			throw new Exception\RuntimeException( "app目录{$this->_core->env['appDir']}不为空，无法创建。如果你已经创建成功，请在初始化中关闭install参数" );
 		}
 		$this->_cleanTempDir();
 		$tempDir = $this->_createTempDir( 'App' );
@@ -100,8 +103,9 @@ class App {
 			throw new Exception\RuntimeException( "module根目录{$parentModuleDir}不存在或不可写" );
 		}
 		$moduleDir = $parentModuleDir . DIRECTORY_SEPARATOR . $this->_core->conf['privatePre'] . $this->_core->env['moduleName'];
-		if( is_dir( $moduleDir ) ) {
-			throw new Exception\RuntimeException( "module目录{$moduleDir}已存在，无法创建" );
+		$moduleEntry = $parentModuleDir . DIRECTORY_SEPARATOR . $this->_core->env['moduleName'] . '.php';
+		if( is_dir( $moduleDir ) || file_exists( $moduleEntry ) ) {
+			throw new Exception\RuntimeException( "module {$moduleDir}已存在，无法创建。如果你已经创建成功，请在初始化中关闭install参数" );
 		}
 		$this->_cleanTempDir();
 		$tempDir = $this->_createTempDir( 'Module' );
@@ -127,7 +131,9 @@ class App {
 	
 	private function _cleanTempDir() {
 		$tempDir = $this->_core->env['melonLibrary'] . DIRECTORY_SEPARATOR . 'Data' . DIRECTORY_SEPARATOR . 'InstallTemp';
-		unlink( $tempDir );
+		if( is_dir( $tempDir ) ) {
+			$this->_deldir( $tempDir );
+		}
 	}
 	
 	private function _isEmptyDir( $dir ) {
@@ -139,6 +145,9 @@ class App {
 			mkdir( $destination, 0777 );
 		}
 		$handle = dir( $source );
+		if(!$handle) {
+			return false;
+		}
 		while( $entry = $handle->read() ) {
 			if( ( $entry != "." ) && ( $entry != ".." ) ) {
 				if( is_dir( $source . DIRECTORY_SEPARATOR . $entry ) ) {
@@ -149,10 +158,35 @@ class App {
 				}
 			}
 		}
+		$handle->close();
+	}
+	
+	private function _deldir($dir) {
+		//先删除目录下的文件：
+		$handle = dir($dir);
+		if(!$handle) {
+			return false;
+		}
+		while ($entry = $handle->read()) {
+			if ($entry != "." && $entry != "..") {
+				$fullpath = $dir . DIRECTORY_SEPARATOR . $entry;
+				if (is_dir($fullpath)) {
+					$this->_deldir($fullpath);
+				} else {
+					unlink($fullpath);
+				}
+			}
+		}
+		$handle->close();
+		//删除当前文件夹：
+		return rmdir($dir);
 	}
 
 	private function _replaceContent( $target, $keyWord, $replace ) {
 		$handle = dir( $target );
+		if(!$handle) {
+			return false;
+		}
 		while( $entry = $handle->read() ) {
 			if( ( $entry != "." ) && ( $entry != ".." ) ) {
 				$replacedEntry = str_replace( $keyWord, $replace, $entry );
@@ -168,5 +202,7 @@ class App {
 				}
 			}
 		}
+		$handle->close();
+		return true;
 	}
 }
