@@ -80,6 +80,10 @@ class Melon {
 	/**
 	 * 运行APP
 	 * 
+	 * APP模式默认是一个MVC，但是这个模式很简单，所以很灵活
+	 * 你可以扩展为其它模式，例如REST
+	 * 要使用APP需要在初始化时声明type和其它APP参数，否则会发生异常
+	 * 
 	 * @return void
 	 */
 	static public function runApp() {

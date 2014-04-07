@@ -1,4 +1,12 @@
 <?php
+/**
+ * Melon － 可用于php5.3或以上的开源框架
+ * 
+ * @license http://www.apache.org/licenses/LICENSE-2.0
+ * @link http://git.oschina.net/397574898/MelonFramework
+ * @author Melon <denglh1990@qq.com>
+ * @version 0.1.0
+ */
 
 namespace Melon\Base;
 
@@ -6,14 +14,42 @@ use \Melon\Exception;
 
 defined('IN_MELON') or die('Permission denied');
 
+/**
+ * APP模式基础运行类
+ * 
+ * 负责初始化信息、创建APP和模块以及加载它们运行
+ * APP模式默认是MVC，但这是可更改的，它只负责解析路由得到控制器、方法和参数的信息
+ * 并不涉及具体操作
+ */
 class App {
 	
+	/**
+	 * Melon扣肉
+	 * 
+	 * 需要它提供一些基础的工具方便初始化
+	 * 
+	 * @param \Melon\Base\Core $core
+	 */
 	protected $_core;
-
+	
+	/**
+	 * Melon扣肉
+	 * 
+	 * @param \Melon\Base\Core $core
+	 */
 	public function __construct( Core $core ) {
 		$this->_core = $core;
 	}
 	
+	/**
+	 * 初始化
+	 * 
+	 * 这个会改变扣肉的一些环境变量（env）
+	 * 
+	 * @param array $config 配置
+	 * @return void
+	 * @throws Exception\RuntimeException
+	 */
 	public function init( $config ) {
 		$nameRule = '/^[a-zA-Z_]+\w*$/';
 		$appName = ( isset( $config['appName'] ) && $config['appName'] ?
@@ -33,6 +69,19 @@ class App {
 		$this->_core->env['appDir'] = $this->_core->env['root'] . DIRECTORY_SEPARATOR . $this->_core->env['className'];
 	}
 	
+	/**
+	 * 运行APP模式
+	 * 
+	 * 你必需在框架初始时把type设定为app，和提供一些必要的信息才能运行
+	 * 当你提供一个install为app的参数时，表示要安装以配置参数中appName为名字的APP
+	 * 当你提供一个install为module的参数时，表示要安装以配置参数中moduleName为名字module
+	 * 
+	 * 正如这个类的介绍一样，它只负责解析路由得到控制器、方法和参数的信息
+	 * 具体操作交由当前运行的module自行处理
+	 * 
+	 * @return void
+	 * @throws Exception\RuntimeException
+	 */
 	public function run() {
 		if( $this->_core->env['runType'] !== 'app' ) {
 			throw new Exception\RuntimeException( '当前模式不能运行app' );
@@ -82,22 +131,41 @@ class App {
 		$command->execute( $pathInfo['controller'], $pathInfo['action'], $pathInfo['args'] );
 	}
 	
+	/**
+	 * 创建一个APP到root目录下
+	 * 
+	 * @return void
+	 * @throws Exception\RuntimeException
+	 */
 	protected function _createApp() {
+		// 要做一些检查，防止覆盖已有的文件，这样我才不会被人骂得狗血淋头
 		if( ! is_writable( $this->_core->env['root'] ) ) {
 			throw new Exception\RuntimeException( "app目录{$this->_core->env['root']}不存在或不可写" );
 		}
 		if( is_dir( $this->_core->env['appDir'] ) && ! $this->_isEmptyDir( $this->_core->env['appDir'] ) ) {
 			throw new Exception\RuntimeException( "app目录{$this->_core->env['appDir']}不为空，无法创建。如果你已经创建成功，请在初始化中关闭install参数" );
 		}
+		// 要创建一个临时目录，把要创建的文件放到里面，因为要进行一些修改
+		// 保险起见，我先清空一次临时目录
 		$this->_cleanTempDir();
 		$tempDir = $this->_createTempDir( 'App' );
 		$this->_copyDir( $this->_core->env['melonLibrary'] . DIRECTORY_SEPARATOR . 'App' . DIRECTORY_SEPARATOR . 'Template', $tempDir );
+		// 替换预定义变量
 		$this->_replaceVar( $tempDir );
+		// 放到root目录下
 		$this->_copyDir( $tempDir, $this->_core->env['root'] );
+		// 搞定，清空临时目录
 		$this->_cleanTempDir();
 	}
 	
+	/**
+	 * 创建一个module到APP的module目录下
+	 * 
+	 * @return void
+	 * @throws Exception\RuntimeException
+	 */
 	protected function _createModule() {
+		// 先做检查，小心覆盖已有文件
 		$parentModuleDir = $this->_core->env['appDir'] . DIRECTORY_SEPARATOR . 'Module';
 		if( ! is_writable( $parentModuleDir ) ) {
 			throw new Exception\RuntimeException( "module根目录{$parentModuleDir}不存在或不可写" );
@@ -107,20 +175,43 @@ class App {
 		if( is_dir( $moduleDir ) || file_exists( $moduleEntry ) ) {
 			throw new Exception\RuntimeException( "module {$moduleDir}已存在，无法创建。如果你已经创建成功，请在初始化中关闭install参数" );
 		}
+		
+		// 要创建一个临时目录，把要创建的文件放到里面，因为要进行一些修改
+		// 先清空一次临时目录
 		$this->_cleanTempDir();
 		$tempDir = $this->_createTempDir( 'Module' );
 		$this->_copyDir( $this->_core->env['melonLibrary'] . DIRECTORY_SEPARATOR . 'App' . DIRECTORY_SEPARATOR . 'Template' . DIRECTORY_SEPARATOR . '__APPNAME__' . DIRECTORY_SEPARATOR . 'Module', $tempDir );
+		// 替换预定义变量
 		$this->_replaceVar( $tempDir );
+		// 放到module目录下
 		$this->_copyDir( $tempDir, $parentModuleDir );
+		// 搞定
 		$this->_cleanTempDir();
 	}
 	
+	/**
+	 * 递归替换目录和文件（包括名字和内容）中指定的变量，包括下面几个
+	 * 
+	 * 变量					替换值
+	 * __APPNAME__			当前运行的APP名字
+	 * __MODULENAME__		当前运行的模块名字
+	 * __PRIVATE_PRE__		私有前缀
+	 * 
+	 * @param string $dir 目录
+	 * @return void
+	 */
 	private function _replaceVar( $dir ) {
 		$this->_replaceContent( $dir, '__APPNAME__', $this->_core->env['appName'] );
 		$this->_replaceContent( $dir, '__MODULENAME__', $this->_core->env['moduleName'] );
 		$this->_replaceContent( $dir, '__PRIVATE_PRE__', $this->_core->conf['privatePre'] );
 	}
-
+	
+	/**
+	 * 创建一个临时目录
+	 * 
+	 * @param string $subDirName 在这个临时目录下创建指定的子目录
+	 * @return string 临时目录下$subDirName子目录路径
+	 */
 	private function _createTempDir( $subDirName ) {
 		$tempDir = $this->_core->env['melonLibrary'] . DIRECTORY_SEPARATOR . 'Data' . DIRECTORY_SEPARATOR . 'InstallTemp' . DIRECTORY_SEPARATOR . $subDirName;
 		if( ! is_dir( $tempDir ) ) {
@@ -129,6 +220,11 @@ class App {
 		return $tempDir;
 	}
 	
+	/**
+	 * 清空临时目录
+	 * 
+	 * @return void
+	 */
 	private function _cleanTempDir() {
 		$tempDir = $this->_core->env['melonLibrary'] . DIRECTORY_SEPARATOR . 'Data' . DIRECTORY_SEPARATOR . 'InstallTemp';
 		if( is_dir( $tempDir ) ) {
@@ -136,59 +232,86 @@ class App {
 		}
 	}
 	
+	/**
+	 * 判断一个目录是否为空
+	 * 
+	 * @param string $dir 目录名字
+	 * @return boolean
+	 */
 	private function _isEmptyDir( $dir ) {
 		return ( count( scandir( $dir ) ) <= 2 );
 	}
 	
-	private function _copyDir( $source, $destination ) {
-		if( ! is_dir( $destination ) ) {
-			mkdir( $destination, 0777 );
+	/**
+	 * 递归复制一个目录
+	 * 
+	 * @param string $source 源目录
+	 * @param string $target 目标目录
+	 * @return boolean
+	 */
+	private function _copyDir( $source, $target ) {
+		if( ! is_dir( $target ) ) {
+			mkdir( $target, 0777 );
 		}
 		$handle = dir( $source );
 		if(!$handle) {
 			return false;
 		}
 		while( $entry = $handle->read() ) {
-			if( ( $entry != "." ) && ( $entry != ".." ) ) {
+			if( $entry !== '.' && $entry !== '..' ) {
 				if( is_dir( $source . DIRECTORY_SEPARATOR . $entry ) ) {
-					$this->_copyDir( $source . DIRECTORY_SEPARATOR . $entry, $destination . DIRECTORY_SEPARATOR . $entry );
+					$this->_copyDir( $source . DIRECTORY_SEPARATOR . $entry, $target . DIRECTORY_SEPARATOR . $entry );
 				}
 				else {
-					copy( $source . DIRECTORY_SEPARATOR . $entry, $destination . DIRECTORY_SEPARATOR . $entry );
+					copy( $source . DIRECTORY_SEPARATOR . $entry, $target . DIRECTORY_SEPARATOR . $entry );
 				}
 			}
 		}
 		$handle->close();
 	}
 	
-	private function _deldir($dir) {
+	/**
+	 * 删除一个目录，包括它自身
+	 * 
+	 * @param string $dir 目录路径
+	 * @return boolean
+	 */
+	private function _deldir( $dir ) {
 		//先删除目录下的文件：
-		$handle = dir($dir);
-		if(!$handle) {
+		$handle = dir( $dir );
+		if( ! $handle ) {
 			return false;
 		}
-		while ($entry = $handle->read()) {
-			if ($entry != "." && $entry != "..") {
+		while( $entry = $handle->read() ) {
+			if( $entry !== '.' && $entry !== '..' ) {
 				$fullpath = $dir . DIRECTORY_SEPARATOR . $entry;
-				if (is_dir($fullpath)) {
-					$this->_deldir($fullpath);
+				if( is_dir( $fullpath ) ) {
+					$this->_deldir( $fullpath );
 				} else {
-					unlink($fullpath);
+					unlink( $fullpath );
 				}
 			}
 		}
 		$handle->close();
 		//删除当前文件夹：
-		return rmdir($dir);
+		return rmdir( $dir );
 	}
-
+	
+	/**
+	 * 递归替换目录和文件（包括名字和内容）中指定的变量
+	 * 
+	 * @param string $target 要替换的目录或文件路径
+	 * @param string $keyWord 关键字
+	 * @param string $replace 替换内容
+	 * @return boolean
+	 */
 	private function _replaceContent( $target, $keyWord, $replace ) {
 		$handle = dir( $target );
 		if(!$handle) {
 			return false;
 		}
 		while( $entry = $handle->read() ) {
-			if( ( $entry != "." ) && ( $entry != ".." ) ) {
+			if( $entry !== '.' && $entry !== '..' ) {
 				$replacedEntry = str_replace( $keyWord, $replace, $entry );
 				$path = $target . DIRECTORY_SEPARATOR . $replacedEntry;
 				rename( $target . DIRECTORY_SEPARATOR . $entry, $path );
