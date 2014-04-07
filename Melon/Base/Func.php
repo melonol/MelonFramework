@@ -5,7 +5,7 @@
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link http://git.oschina.net/397574898/MelonFramework
  * @author Melon <denglh1990@qq.com>
- * @version 0.1.0
+ * @version 0.2.0
  */
 
 /**
