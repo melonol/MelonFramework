@@ -15,80 +15,19 @@ defined( 'IN_MELON' ) or die( 'Permission denied' );
 /**
  * 路径跟踪器
  * 
- * 使用它可以跟踪并解释某次方法调用的所在路径，或者解释一个相对于调用方法所属文件路径的真实路径（绝对路径）
- * PathTrace可以看作一个魔术类
+ * 使用它可以跟踪上一个调用方法的来源，PathTrace可以看作一个魔术类
  * 
  * 本类使用debug_backtrace函数抓取调用方法栈信息，我把类设置为最简单管理的纯静态
  * 因为debug_backtrace很容易发生变化，非常难把握，不当或过度使用将会让你的代码陷于泥潭中
  * 使用途中如果遇到一些的问题，希望你能帮助我一起去完善它
  * 
+ * 从0.2.0开始，去除real方法，原因是跟PHP原生获取路径的方式一致性冲突，而且增加不少的性能损耗
+ * 
  * @package Melon
- * @since 0.1.0
+ * @since 0.2.0
  * @author Melon
  */
 final class PathTrace {
-	
-	protected function __construct() {
-		;
-	}
-	
-	/**
-	 * 解释一个文件或目录路径的真实路径。
-	 * 
-	 * @param string $targetPath 相对或绝对文件、目录路径
-	 * 相对路径是相对于执行这个 parse 方法的文件所在目录路径来说的。
-	 * 比如在 /MelonFramework/Melon.php 文件中：
-	 * <pre>
-	 * echo PathTrace::real( './Melon/System/PathTrace.php' );
-	 * // 输出：/MelonFramework/Melon/System/PathTrace.php
-	 * </pre>
-	 * 
-	 * @param boolean $getSource [可选] 是否获取调用者的文件路径。一般它用来做一些权限之类的验证
-	 * 在 /MelonFramework/Melon.php 文件中：
-	 * <pre>
-	 * print_r( PathTrace::real( './Melon/System/PathTrace.php', true ) );
-	 * // 输出：
-	 * Array
-	 * (
-	 *		[source] => /MelonFramework/Melon.php
-	 *		[target] => /MelonFramework/Melon/System/PathTrace.php
-	 * )
-	 * </pre>
-	 * 
-	 * @return string|array|false
-	 */
-	public static function real( $targetPath, $getSource = false ) {
-		if( empty( $targetPath ) ) {
-			return false;
-		}
-		$_targetPath = $targetPath;
-		// 初始化一个变量来保存调用者的栈信息
-		$sourceTrace = array();
-		// 第一步要做的就是要判断这是绝对路径还是相对路径，这样好分别处理
-		if( ! \Melon\Base\Func\isAbsolutePath( $_targetPath ) ) {
-			// 通过栈得到最近调用源的目录路径，和相对文件路径结合，就可以算出绝对路径
-			$sourceTrace = self::_getSourceTrace();
-			$sourceDir = dirname( $sourceTrace['file'] );
-			$_targetPath = $sourceDir . DIRECTORY_SEPARATOR . $_targetPath;
-		}
-		
-		// 路径计算完毕，我用realpath来检查有效性，顺便格式化它
-		$realPath = realpath( $_targetPath );
-		// 客户端可能要求获取调用者的路径
-		// 如果调用者和被调用者任意一个路径不存在，统一返回假
-		if( $realPath !== false && $getSource ) {
-			$sourceTrace = ( empty( $sourceTrace ) ?
-				self::_getSourceTrace() : $sourceTrace );
-			if( empty( $sourceTrace ) ) {
-				return false;
-			}
-			return array(
-				'source' => $sourceTrace['file'],
-				'target' => $realPath,
-			);
-		}
-		return $realPath;
-	}
 	
 	/**
 	 * 获取调用自己的方法的所在文件

@@ -121,7 +121,8 @@ class App {
 			);
 		} else {
 			$route = \Melon::httpRoute( $routeConf );
-			$_pathInfo = explode( '/', $route->parse() );
+			$parsed = $route->parse();
+			$_pathInfo = ( $parsed ? explode( '/', $parsed ) : array() );
 			// 整理一下
 			$pathInfo = array(
 				'controller' => ( isset( $_pathInfo[0] ) ? $_pathInfo[0] :

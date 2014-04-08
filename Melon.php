@@ -169,7 +169,6 @@ class Melon {
 	 * @throws \Melon\Exception\RuntimeException
 	 */
 	final static public function logger( $dir, $filePrefix = 'log', $splitSize = 10 ) {
-		$dir = Base\PathTrace::real( $dir ) ?: $dir;
 		return new Base\Logger( $dir, $filePrefix, $splitSize );
 	}
 	
@@ -200,11 +199,11 @@ class Melon {
 	 * @throws Exception\RuntimeException
 	 */
 	final static public function load( $script ) {
-		$load = Base\PathTrace::real( $script, true );
-		if( ! $load ) {
+		$_script = realpath( $script );
+		if( ! $_script ) {
 			throw new Exception\RuntimeException( "无法识别{$script}脚本文件" );
 		}
-		self::$_melon->load( $load['source'], $load['target'] );
+		self::$_melon->load( Base\PathTrace::source(), $_script );
 	}
 	
 	/**
@@ -218,12 +217,12 @@ class Melon {
 	 * @throws Exception\RuntimeException
 	 */
 	final static public function acquire( $script ) {
-		$load = Base\PathTrace::real( $script, true );
-		if( ! $load ) {
+		$_script = realpath( $script );
+		if( ! $_script ) {
 			trigger_error( "无法识别{$script}脚本", E_USER_WARNING );
 			return false;
 		}
-		return self::$_melon->acquire( $load['source'], $load['target'] );
+		return self::$_melon->acquire( Base\PathTrace::source(), $_script );
 	}
 	
 	

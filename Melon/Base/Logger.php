@@ -94,7 +94,6 @@ class Logger {
 	 * @throws \Melon\Exception\RuntimeException
 	 */
 	public function __construct( $dir, $filePrefix = 'log', $splitSize = 10 ) {
-		$dir = \Melon\Base\PathTrace::real( $dir ) ?: $dir;
 		if( ! is_dir( $dir ) ) {
 			$mkdir = mkdir( $dir, 0777, true );
 			if( ! $mkdir ) {
