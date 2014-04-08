@@ -11,14 +11,30 @@
 namespace Melon\App\Lib;
 
 use Melon\Util;
+use \Melon\Http;
 
 defined('IN_MELON') or die('Permission denied');
 
+/**
+ * APP视图
+ * 
+ * 视图使用\Melon\Util\Template的基本方法进行组合
+ */
 class View {
 	
+	/**
+	 * 视图对象
+	 * 
+	 * @var \Melon\Util\Template 
+	 */
 	private $_view;
 	
-	protected $_controller;
+	/**
+	 * 控制器对象
+	 * 
+	 * @var Object
+	 */
+	private $_controller;
 
 	public function __construct( $controller ) {
 		$this->_controller = $controller;
@@ -98,9 +114,17 @@ class View {
 	 * @return void
 	 */
 	public function display( $template ) {
+		// 注入语言包
 		if( isset( $this->_controller->lang ) && ( is_array( $this->_controller->lang ) || $this->_controller->lang instanceof Util\Set ) ) {
 			$this->_view->assign( 'lang', $this->_controller->lang );
 		}
+		// 注入请求参数
+		if( isset( $this->_controller->request ) && $this->_controller->request instanceof Http\Request) {
+			$this->_view->assignItem( $this->_controller->request->inputs() );
+		}
+		// 注入环境变量
+		$this->_view->assign( 'env', \Melon::env() );
+		
 		$this->_view->display( $template );
 	}
 	
