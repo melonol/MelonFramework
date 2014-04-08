@@ -84,10 +84,23 @@ class Melon {
 	 * 你可以扩展为其它模式，例如REST
 	 * 要使用APP需要在初始化时声明type和其它APP参数，否则会发生异常
 	 * 
+	 * @param string $module [可选] module名称，如果你在初始化的时候设置了，这时候就不需要指定此参数
+	 * @param string $controller [可选] 控制器，如果不提供此参数，程序则调用Route类尝试解释路径
+	 * @param string $action [可选] 方法
+	 * @param string $args [可选] 参数
 	 * @return void
 	 */
-	static public function runApp() {
-		self::$_melon->app()->run();
+	static public function runApp( $module = null, $controller = null, $action = null, array $args = array() ) {
+		self::$_melon->app()->run( $module, $controller, $action, $args );
+	}
+	
+	/**
+	 * 终止程序，请使用此代替exit
+	 * 
+	 * @param string [可选] $content 内容
+	 */
+	static public function halt( $content = '' ) {
+		exit( $content );
 	}
 	
 	/*************************************

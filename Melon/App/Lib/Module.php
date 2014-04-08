@@ -34,12 +34,14 @@ abstract class Module {
 		$controllerObj = $this->getController( $controller );
 		
 		if( ! is_object( $controllerObj ) ) {
-			throw \Melon::throwException( '请提供有效的控制器对象' );
+			trigger_error( '控制器不存在', E_USER_ERROR );
+			$this->page404();
 		}
-		// TODO::抛出404
 		if( ! is_callable( array( $controllerObj, $action ) ) ) {
-			throw \Melon::throwException( '控制器对象不存在' );
+			trigger_error( '控制器方法不存在', E_USER_ERROR );
+			$this->page404();
 		}
+		
 		$before = $after = array();
 		$ucfirstOfAction = ucfirst( $action );
 		if( method_exists( $controllerObj, 'before' . $ucfirstOfAction ) ) {
@@ -50,6 +52,16 @@ abstract class Module {
 		}
 		$controlTrigger = \Melon::trigger( $controllerObj, $before, $after );
 		call_user_func( array( $controlTrigger, $action ), $args );
+	}
+	
+	/**
+	 * 输出404
+	 * 
+	 * @return void
+	 */
+	public function page404() {
+		\Melon::load( \Melon::env( 'appDir' ) . DIRECTORY_SEPARATOR . \Melon::env( 'routeConfig.404' ) );
+		\Melon::halt();
 	}
 	
 	/**

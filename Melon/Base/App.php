@@ -54,19 +54,16 @@ class App {
 		$nameRule = '/^[a-zA-Z_]+\w*$/';
 		$appName = ( isset( $config['appName'] ) && $config['appName'] ?
 				$config['appName'] : null );
-		$moduleName = ( isset( $config['moduleName'] ) && $config['moduleName'] ?
-				$config['moduleName'] : null );
 		if( ! preg_match( $nameRule, $appName ) ) {
 			throw new Exception\RuntimeException( 'app名称必需为字母开头，并由字母、数字或下划线组成' );
 		}
-		if( ! preg_match( $nameRule, $appName ) ) {
-			throw new Exception\RuntimeException( 'module名称必需为字母开头，并由字母、数字或下划线组成' );
-		}
 		$this->_core->env['appName'] = ucfirst( $appName );
-		$this->_core->env['moduleName'] = ucfirst( $moduleName );
 		$className = $this->_core->env['appName'];
 		$this->_core->env['className'] = $this->_core->env['appName'];
 		$this->_core->env['appDir'] = $this->_core->env['root'] . DIRECTORY_SEPARATOR . $this->_core->env['className'];
+		if( isset( $config['moduleName'] ) ) {
+			$this->_setModule( $config['moduleName'] );
+		}
 	}
 	
 	/**
@@ -79,42 +76,58 @@ class App {
 	 * 正如这个类的介绍一样，它只负责解析路由得到控制器、方法和参数的信息
 	 * 具体操作交由当前运行的module自行处理
 	 * 
+	 * @param string $module [可选] module名称，如果你在初始化的时候设置了，这时候就不需要指定此参数
+	 * @param string $controller [可选] 控制器，如果不提供此参数，程序则调用Route类尝试解释路径
+	 * @param string $action [可选] 方法
+	 * @param string $args [可选] 参数
 	 * @return void
 	 * @throws Exception\RuntimeException
 	 */
-	public function run() {
+	public function run( $module = null, $controller = null, $action = null, array $args = array() ) {
 		if( $this->_core->env['runType'] !== 'app' ) {
 			throw new Exception\RuntimeException( '当前模式不能运行app' );
 		}
+		$this->_setModule( $module );
 		if( $this->_core->env['install'] === 'app' ) {
 			$this->_createApp();
 		} else if( $this->_core->env['install'] === 'module' ) {
 			$this->_createModule();
 		}
-		// 将日志目录转到app
-		$this->_core->logger = new Logger( $this->_core->env['appDir'] . DIRECTORY_SEPARATOR .
-			$this->_core->conf['logDir'], 'runtime', $this->_core->conf['logSplitSize'] );
 		
 		if( ! file_exists( $this->_core->env['appDir'] . DIRECTORY_SEPARATOR . $this->_core->env['className'] . '.php' ) ) {
 			throw new Exception\RuntimeException( "{$this->_core->env['appName']} app不存在" );
 		}
+		// 将日志目录转到app
+		$this->_core->logger = new Logger( $this->_core->env['appDir'] . DIRECTORY_SEPARATOR .
+			$this->_core->conf['logDir'], 'runtime', $this->_core->conf['logSplitSize'] );
+		// 载入APP的主体类
 		$this->_core->load( __FILE__, $this->_core->env['appDir'] . DIRECTORY_SEPARATOR . $this->_core->env['className'] . '.php' );
 		
 		// 取得路由配置，然后解释它
 		$routeConf = $this->_core->acquire( __FILE__, $this->_core->env['appDir'] . DIRECTORY_SEPARATOR .
 			'Conf' . DIRECTORY_SEPARATOR . 'Route.php' );
-		$route = \Melon::httpRoute( $routeConf );
-		$_pathInfo = array();
-		$route->parse( $_pathInfo );
-
-		// 整理一下
-		$pathInfo = array(
-			'controller' => ( isset( $_pathInfo[0] ) ? $_pathInfo[0] :
-				isset( $routeConf['defaultController'] ) ? $routeConf['defaultController'] : null ),
-			'action' => ( isset( $_pathInfo[1] ) ? $_pathInfo[1] :
-				isset( $routeConf['defaultAction'] ) ? $routeConf['defaultAction'] : null ),
-			'args' => ( isset( $_pathInfo[2] ) ? array_splice( $_pathInfo, 2 ) : array() ),
-		);
+		$this->_core->env['routeConfig'] = &$routeConf;
+		if( is_null( $controller ) ) {
+			$route = \Melon::httpRoute( $routeConf );
+			$_pathInfo = array();
+			$route->parse( $_pathInfo );
+			
+			// 整理一下
+			$pathInfo = array(
+				'controller' => ( isset( $_pathInfo[0] ) ? $_pathInfo[0] :
+					( isset( $routeConf['defaultController'] ) ? $routeConf['defaultController'] : null ) ),
+				'action' => ( isset( $_pathInfo[1] ) ? $_pathInfo[1] :
+					( isset( $routeConf['defaultAction'] ) ? $routeConf['defaultAction'] : null ) ),
+				'args' => ( isset( $_pathInfo[2] ) ? array_splice( $_pathInfo, 2 ) : array() ),
+			);
+		} else {
+			$pathInfo = array(
+				'controller' => $controller,
+				'action' => ( ! is_null( $action ) ? $action :
+					( isset( $routeConf['defaultAction'] ) ? $routeConf['defaultAction'] : null ) ),
+				'args' => $args,
+			);
+		}
 		$this->_core->env['controller'] = $pathInfo['controller'];
 		$this->_core->env['action'] = $pathInfo['action'];
 		$this->_core->env['args'] = $pathInfo['args'];
@@ -131,6 +144,20 @@ class App {
 		$command->execute( $pathInfo['controller'], $pathInfo['action'], $pathInfo['args'] );
 	}
 	
+	/**
+	 * 设置module
+	 * 
+	 * @param string $name module名称
+	 */
+	protected function _setModule( $name = null ) {
+		$nameRule = '/^[a-zA-Z_]+\w*$/';
+		if( ! preg_match( $nameRule, $name ) ) {
+			throw new Exception\RuntimeException( 'module名称必需为字母开头，并由字母、数字或下划线组成' );
+		}
+		$this->_core->env['moduleName'] = ucfirst( $name );
+	}
+
+
 	/**
 	 * 创建一个APP到root目录下
 	 * 

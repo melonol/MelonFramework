@@ -292,7 +292,7 @@ class Core {
 	 * @return void
 	 */
 	protected function _initLogger() {
-		$this->logger = new Base\Logger( $this->env['root'] . DIRECTORY_SEPARATOR .
+		$this->logger = new Base\Logger( $this->env['melonLibrary'] . DIRECTORY_SEPARATOR .
 			$this->conf['logDir'], 'runtime', $this->conf['logSplitSize'] );
 	}
 	
@@ -514,7 +514,10 @@ class Core {
 		// 显示出错信息
 		if( in_array( $type, array( E_ERROR, E_PARSE,  E_COMPILE_ERROR, E_CORE_ERROR,
 			E_EXCEPTION ) ) ) {
-			$errorPage = $this->env['root'] . DIRECTORY_SEPARATOR . $this->conf['errorPage'];
+			$pageDir = ( $this->env['runType'] === 'app' ?
+				( isset( $this->env['appDir'] ) ? $this->env['appDir'] : '' ) :
+				$this->env['melonLibrary'] );
+			$errorPage = $pageDir . DIRECTORY_SEPARATOR . $this->conf['errorPage'];
 			$errorMessage = $this->conf['errorMessage'];
 			if( $this->env['clientType'] === 'browser' && file_exists( $errorPage ) ) {
 				ob_start();
