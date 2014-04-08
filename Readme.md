@@ -1,7 +1,6 @@
 什么是MelonFramework
 -------------
-MelonFramework是一个用于php5.3或以上开源的轻量级php框架，基于[Apache Licence 2.0](http://www.apache.org/licenses/LICENSE-2.0)开源协议发布。可零配置，支持restful程序的构建，并有可动态扩展的模块引擎、独创的包体系、触发器（类AOP）等功能。<br />
-MelonFramework拥有可选的MVC模式和基于PDO的简单ORM。<br />
+MelonFramework是一个用于php5.3或以上开源的轻量级php框架，基于[Apache Licence 2.0](http://www.apache.org/licenses/LICENSE-2.0)开源协议发布。可零配置，支持restful程序的构建，并有可动态扩展的模块引擎、独创的包体系、触发器（类AOP）、可选的MVC模式和基于PDO的简单ORM。<br />
 框架提供了常见的基本操作，非常低的偶合度可以帮助你灵活构建适合自己的开发环境。
 
 使用简介
@@ -99,7 +98,7 @@ REST
 </code>
 </pre>
 
-如果你需要更灵活的REST处理，比如HTTP认证、各种状态回应等，Melon::http* 系列方法都提供了相关操作（详情请参阅这些方法）
+如果你需要更灵活的REST处理，比如HTTP认证、各种状态回应等，Melon::http* 系列方法都提供了相关操作（详情请参阅这些方法），并且已经被集成到MVC中。
 
 文件载入权限
 -------------
