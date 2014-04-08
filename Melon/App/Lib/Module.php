@@ -10,7 +10,9 @@
 
 namespace Melon\App\Lib;
 
-use Melon\App\Lib;
+use Melon\Util;
+
+defined('IN_MELON') or die('Permission denied');
 
 /**
  * APP模块入口
@@ -42,6 +44,12 @@ abstract class Module {
 			$this->page404();
 		}
 		
+		// 为控制器设置属性
+		$controllerObj->request = \Melon::httpRequest();
+		$controllerObj->response = \Melon::httpResponse();
+		$controllerObj->lang = new Lang( $this->getCommentLang() );
+		$controllerObj->view = new View( $controllerObj );
+		
 		$before = $after = array();
 		$ucfirstOfAction = ucfirst( $action );
 		if( method_exists( $controllerObj, 'before' . $ucfirstOfAction ) ) {
@@ -72,4 +80,12 @@ abstract class Module {
 	 * @return $controllerObj 控制器对象
 	 */
 	abstract public function getController( $controller );
+	
+	/**
+	 * 
+	 * 由于框架的载入脚本权限问题，需要模块自身去加载公共语言包
+	 * 
+	 * @return $lang
+	 */
+	abstract public function getCommentLang();
 }

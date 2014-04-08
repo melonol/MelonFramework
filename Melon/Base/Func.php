@@ -74,3 +74,24 @@ function getValue( array & $arr , $key, $delimiter = '.' ) {
 	}
 	return ( isset( $arr[ $key ] ) ? $arr[ $key ] : null );
 }
+
+/**
+ * 替换字符串里指定格式的变量
+ * 
+ * 字符串的变量指定为 ${变量名} 这样的格式。一个简单的使用例子：
+ * echo varReplace( 'name', 'Melon', '我的名字是${name}' );
+ * // 输出：我的名字是Melon
+ * 
+ * @param string|array $search 要搜索的变量，如果要搜索多个变量，则参数为数组
+ * @param string|array $replace 替换值，如果要替换为多个值，则参数为数组
+ * @param string $input 输入字符串
+ * @return string 替换后的字符串
+ */
+function varReplace( $search, $replace, $input ) {
+	$searchs = ( is_array( $search ) ? $search : array( $search ) );
+	$replaces = ( is_array( $replace ) ? $replace : array( $replace ) );
+	foreach( $searchs as &$value ) {
+		$value = '${' . $value . '}';
+	}
+	return str_replace( $searchs, $replaces, $input );
+}

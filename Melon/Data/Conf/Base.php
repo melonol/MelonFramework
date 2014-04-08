@@ -15,6 +15,9 @@ return array(
 	
 	'errorPage' => 'Data/errorPage.html',		// 浏览器访问发生错误时显示的页面，相对于Melon环境变量的root目录
 	'errorMessage' => 'Server error.',					// 非浏览器访问（ajax、cgi等）或者errotPage不存在时输出的错误消息
+	
+	'templateTags' => array( '{', '}' ),			//默认模板标签
+	
 	'database' => array(						// PDO数据库接口配置
 		'tablePrefix' => '',					// 表前缀
 		'driver' => array(

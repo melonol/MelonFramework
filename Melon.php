@@ -449,8 +449,8 @@ class Melon {
 	 * @param array $tag [可选] 标签名
 	 * @return \Melon\Util\Template
 	 */
-	final static public function template( $tag = array( '{', '}' ) ) {
-		return new Util\Template( $tag );
+	final static public function template( array $tag = array() ) {
+		return new Util\Template( $tag ?: self::env( 'config.templateTags' ) );
 	}
 	
 	/**
