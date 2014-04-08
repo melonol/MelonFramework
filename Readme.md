@@ -1,8 +1,8 @@
 什么是MelonFramework
 -------------
 MelonFramework是一个用于php5.3或以上开源的轻量级php框架，基于[Apache Licence 2.0](http://www.apache.org/licenses/LICENSE-2.0)开源协议发布。可零配置，支持restful程序的构建，并有可动态扩展的模块引擎、独创的包体系、触发器（类AOP）等功能。<br />
-MelonFramework不是一个MVC框架（但你可以使用MelonFramework搭建出MVC），目前也不提供ORM操作，因为PDO已经足够好了，后期可能考虑增加简单的ORM。<br />
-这样你不用拘泥于那些开发模式，框架提供了常见的基本操作，可以帮助你快速构建适合自己的开发环境。
+MelonFramework拥有可选的MVC模式和基于PDO的简单ORM。<br />
+框架提供了常见的基本操作，非常低的偶合度可以帮助你灵活构建适合自己的开发环境。
 
 使用简介
 -------------
@@ -29,36 +29,39 @@ Melon主体类是一个纯静态类，提供了框架几乎所有操作，你只
 另外继承之后，可以往里添加一些自己的操作方法，非常方便
 
 ###配置
-配置文件处于Melon/Data/Conf/Base.php下，它作为缺省配置<br />
-如果需要自定义，可以在初始化的时候进行
+配置的方式同样简单，可以在Conf/Base.php或者初始化的时候定义
 <pre>
 <code>
 	require './MelonFramework/Melon.php';
-	Melon::init(
-		// root（应用目录）
-		// Melon将以root为参照目录
-		// 计算文件中的errorPage、logDir等文件的绝对路径，同时添加到inlucePath中
-		 __DIR__,
-
-		// 配置信息
-		// 这里的参数值将覆盖Melon/Data/Conf/Base.php文件下的缺省值
-		// 当然你可以增加一些自己的参数，使用Melon::env( 'config.keyname' ) 来获取这些值
-		array(
-			'logDir' => 'Melon/Data/Log',
-			'errorPage' => 'Melon/Data/errorPage.html',
-			'logLevel' => 3,
-			'logDisplayLevel' => 3,
-			'includePath' = array(
-				// 添加更多的包含路径
-			);
+	Melon::init( array(
+		'type' => 'app',
+		'root' => __DIR__,
+		'appName' => 'MyApp',
+		'config' => array(
+			'charset' => 'utf-8',
+			'templateTags' => array( '{', '}' ),
+			...
 		)
-	);
+	) );
 </code>
 </pre>
 
-###inlucePath（包含路径）
-配置里有提到inlucePath，它是loader － 包括autoload、权限审查等函数的工作范围<br />
-如果要载入的文件或目录不在includePath中，则它不在autoLoad的检查范围，也不具有权限和包的特征<br />
+###MVC
+同样你可以使用框架自带MVC模式，一般这样运行
+<pre>
+<code>
+	require './MelonFramework/Melon.php';
+	Melon::init( array(
+		'type' => 'app',
+		'root' => __DIR__,
+		'appName' => 'MyApp'
+	) );
+	
+	Melon::runApp( 'module' );
+</code>
+</pre>
+不过首先你要安装MVC才可以，详细请查看文档。
+安装完成后，在APP目录下有常规的控制器、模型和视图，它们会组成一个模块，并可以设定多个模块。
 
 ###autoLoad
 autoLoad以命名空间作为目录依据，大部分框架都是这么做的<br />
@@ -101,15 +104,6 @@ REST
 文件载入权限
 -------------
 在includePath中，当一个文件或目录名字被加上前缀 _ 的时候，它就被添加了相关读取限制，可以理解成设定为私有文件或目录<br />
-在这之前我想介绍一下加载的方法，如Melon::load<br />
-Melon的加载方法解决了php相对路径的问题（当然这对于php来说不是BUG），php是相对于域名根目录，而Melon的加载方法相对于文件，更符合正常的使用习惯
-在任何地方使用Melon::load加载相对路径文件都会被正确的转换为绝对路径
-<pre>
-<code>
-	// 当前路径 /www/Melon/index.php
-	Melon::load( './app.php' ); // 被转化为/www/Melon/app.php，并载入
-</code>
-</pre>
 原理是我之前通过研究debug_backtrace得到上级调用路径的一些案例，有兴趣的话可以查看这篇文章[PHP debug_backtrace的胡思乱想](http://my.oschina.net/u/867608/blog/129125)了解
 通过debug_backtrace得到调用路径后，可以做一些关于权限的处理
 
