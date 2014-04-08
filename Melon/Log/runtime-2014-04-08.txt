@@ -1,0 +1,22 @@
+[2014-04-08 03:30:04] Exception: app目录F:\www\MelonFrameworks\0.2\test\App1不为空，无法创建。如果你已经创建成功，请在初始化中关闭install参数 in F:\www\MelonFrameworks\0.2\MelonFramework\Melon\Base\App.php(172)
+Trace: 
+F:\www\MelonFrameworks\0.2\MelonFramework\Melon\Base\App.php(92) --> Melon\Base\App->_createApp
+F:\www\MelonFrameworks\0.2\MelonFramework\Melon.php(94) --> Melon\Base\App->run
+F:\www\MelonFrameworks\0.2\test\index.php(25) --> Melon::runApp
+[2014-04-08 03:31:47] Exception: App1 app不存在 in F:\www\MelonFrameworks\0.2\MelonFramework\Melon\Base\App.php(98)
+Trace: 
+F:\www\MelonFrameworks\0.2\MelonFramework\Melon.php(94) --> Melon\Base\App->run
+F:\www\MelonFrameworks\0.2\test\index.php(25) --> Melon::runApp
+[2014-04-08 03:31:48] Exception: App1 app不存在 in F:\www\MelonFrameworks\0.2\MelonFramework\Melon\Base\App.php(98)
+Trace: 
+F:\www\MelonFrameworks\0.2\MelonFramework\Melon.php(94) --> Melon\Base\App->run
+F:\www\MelonFrameworks\0.2\test\index.php(25) --> Melon::runApp
+[2014-04-08 03:31:48] Exception: App1 app不存在 in F:\www\MelonFrameworks\0.2\MelonFramework\Melon\Base\App.php(98)
+Trace: 
+F:\www\MelonFrameworks\0.2\MelonFramework\Melon.php(94) --> Melon\Base\App->run
+F:\www\MelonFrameworks\0.2\test\index.php(25) --> Melon::runApp
+[2014-04-08 03:33:01] Exception: app目录F:\www\MelonFrameworks\0.2\test\App1不为空，无法创建。如果你已经创建成功，请在初始化中关闭install参数 in F:\www\MelonFrameworks\0.2\MelonFramework\Melon\Base\App.php(173)
+Trace: 
+F:\www\MelonFrameworks\0.2\MelonFramework\Melon\Base\App.php(92) --> Melon\Base\App->_createApp
+F:\www\MelonFrameworks\0.2\MelonFramework\Melon.php(94) --> Melon\Base\App->run
+F:\www\MelonFrameworks\0.2\test\index.php(25) --> Melon::runApp
