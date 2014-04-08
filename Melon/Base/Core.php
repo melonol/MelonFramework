@@ -311,7 +311,7 @@ class Core {
 			} else {
 				if( is_object( $dbConfig['driver'] ) ) {
 					$this->dbDriver = $dbConfig['driver'];
-				} elseif( isset( $dbConfig['driver']['dsn'] ) ) {
+				} elseif( isset( $dbConfig['driver']['dsn'] ) && $dbConfig['driver']['dsn'] ) {
 					$dsn = $dbConfig['driver']['dsn'];
 					$username = ( isset( $dbConfig['driver']['username'] ) ? $dbConfig['driver']['username'] : null );
 					$password = ( isset( $dbConfig['driver']['password'] ) ? $dbConfig['driver']['password'] : null );

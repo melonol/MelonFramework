@@ -62,10 +62,6 @@ class App {
 		$this->_core->env['className'] = $this->_core->env['appName'];
 		$this->_core->env['appDir'] = $this->_core->env['root'] . DIRECTORY_SEPARATOR . $this->_core->env['className'];
 		
-		// 载入基础配置
-		$config = require ( $this->_core->env['appDir'] . DIRECTORY_SEPARATOR . 'Conf' . DIRECTORY_SEPARATOR . 'Base.php' );
-		$this->_core->conf = array_replace_recursive( $this->_core->conf, $config );
-		
 		if( isset( $config['moduleName'] ) ) {
 			$this->_setModule( $config['moduleName'] );
 		}
@@ -102,6 +98,9 @@ class App {
 		if( ! file_exists( $this->_core->env['appDir'] . DIRECTORY_SEPARATOR . $this->_core->env['className'] . '.php' ) ) {
 			throw new Exception\RuntimeException( "{$this->_core->env['appName']} app不存在" );
 		}
+		// 载入基础配置
+		$config = require ( $this->_core->env['appDir'] . DIRECTORY_SEPARATOR . 'Conf' . DIRECTORY_SEPARATOR . 'Base.php' );
+		$this->_core->conf = array_replace_recursive( $this->_core->conf, $config );
 		// 将日志目录转到app
 		$this->_core->logger = new Logger( $this->_core->env['appDir'] . DIRECTORY_SEPARATOR .
 			$this->_core->conf['logDir'], 'runtime', $this->_core->conf['logSplitSize'] );

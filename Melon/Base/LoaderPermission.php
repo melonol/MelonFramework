@@ -111,6 +111,10 @@ class LoaderPermission {
 			if( $includeTarget ) {
 				return true;
 			}
+			// 在同一个包下
+			if( $this->_packageDir( $source ) === $this->_packageDir( $target ) ) {
+				return true;
+			}
 			// 反过来，只有在目标路径的私有目录同级，并且加上私有前缀的名称与其相等才可以
 			$includeSource = ( strpos( $targetDir, $sourceDir ) === 0 );
 			if( $includeSource ) {
@@ -126,5 +130,24 @@ class LoaderPermission {
 			}
 		}
 		return false;
+	}
+	
+	/**
+	 * 获取路径的包路径
+	 * 
+	 * @param string $path 路径
+	 * @return string 包的路径
+	 */
+	public function _packageDir( $path ) {
+		$sourceDir = dirname( $path );
+		$parentPos = strrpos( $sourceDir, DIRECTORY_SEPARATOR . $this->_privatePre );
+		if( $parentPos ) {
+			$spos = ( $parentPos + strlen( DIRECTORY_SEPARATOR ) );
+			$epos = strpos( $sourceDir, DIRECTORY_SEPARATOR, $spos );
+			if( $epos ) {
+				return substr( $sourceDir, 0, $epos );
+			}
+		}
+		return null;
 	}
 }
