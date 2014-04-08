@@ -51,7 +51,7 @@ abstract class Module {
 			$after[ $action ] = array( $controllerObj, 'after' . $ucfirstOfAction );
 		}
 		$controlTrigger = \Melon::trigger( $controllerObj, $before, $after );
-		call_user_func( array( $controlTrigger, $action ), $args );
+		call_user_func_array( array( $controlTrigger, $action ), $args );
 	}
 	
 	/**

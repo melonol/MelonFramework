@@ -98,7 +98,7 @@ class App {
 		} else if( $this->_core->env['install'] === 'module' ) {
 			$this->_createModule();
 		}
-		print_r($this->_core->env);
+		
 		if( ! file_exists( $this->_core->env['appDir'] . DIRECTORY_SEPARATOR . $this->_core->env['className'] . '.php' ) ) {
 			throw new Exception\RuntimeException( "{$this->_core->env['appName']} app不存在" );
 		}
@@ -112,11 +112,16 @@ class App {
 		$routeConf = $this->_core->acquire( __FILE__, $this->_core->env['appDir'] . DIRECTORY_SEPARATOR .
 			'Conf' . DIRECTORY_SEPARATOR . 'Route.php' );
 		$this->_core->env['routeConfig'] = &$routeConf;
-		if( is_null( $controller ) ) {
+		if( $controller ) {
+			$pathInfo = array(
+				'controller' => $controller,
+				'action' => ( ! $action ? $action :
+					( isset( $routeConf['defaultAction'] ) ? $routeConf['defaultAction'] : null ) ),
+				'args' => $args,
+			);
+		} else {
 			$route = \Melon::httpRoute( $routeConf );
-			$_pathInfo = array();
-			$route->parse( $_pathInfo );
-			
+			$_pathInfo = explode( '/', $route->parse() );
 			// 整理一下
 			$pathInfo = array(
 				'controller' => ( isset( $_pathInfo[0] ) ? $_pathInfo[0] :
@@ -124,13 +129,6 @@ class App {
 				'action' => ( isset( $_pathInfo[1] ) ? $_pathInfo[1] :
 					( isset( $routeConf['defaultAction'] ) ? $routeConf['defaultAction'] : null ) ),
 				'args' => ( isset( $_pathInfo[2] ) ? array_splice( $_pathInfo, 2 ) : array() ),
-			);
-		} else {
-			$pathInfo = array(
-				'controller' => $controller,
-				'action' => ( ! is_null( $action ) ? $action :
-					( isset( $routeConf['defaultAction'] ) ? $routeConf['defaultAction'] : null ) ),
-				'args' => $args,
 			);
 		}
 		$this->_core->env['controller'] = $pathInfo['controller'];

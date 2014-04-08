@@ -126,10 +126,7 @@ class Core {
 			$this->_initApp( $config );
 		}
 		// 数据库配置
-		if( isset( $config['config']['database'] ) && is_array( $config['config']['database'] ) ) {
-			$this->_initDB( $config['config']['database'] );
-			unset( $config['config']['database'] );
-		}
+		$this->_initDB();
 		$this->_inited = true;
 	}
 	
@@ -137,7 +134,7 @@ class Core {
 	 * 初始化一些配置信息
 	 * 
 	 * @param array $config 应用配置
-	 * @param array $baseConfig 0.1版的配置项，废器使用，已集成到$config[baseConfig]中
+	 * @param array $baseConfig 0.1版的配置项，废器使用，已集成到$config[config]中
 	 * @return void
 	 */
 	protected function _initConf( $config, $baseConfig ) {
@@ -300,12 +297,12 @@ class Core {
 	/**
 	 * 数据库初始化
 	 * 
-	 * @param array $dbConfig 数据库配置
 	 * @throws Exception\RuntimeException
 	 */
-	protected function _initDB( $dbConfig = array() ) {
+	protected function _initDB() {
 		$dbEnv = array();
 		$this->env['db'] =& $dbEnv;
+		$dbConfig = ( isset( $this->conf['database'] ) ? $this->conf['database'] : array() );
 		$tablePrefix = ( isset( $dbConfig['tablePrefix'] ) ? strval( $dbConfig['tablePrefix'] ) : '' );
 		$dbEnv['tablePrefix'] = $tablePrefix;
 		if( isset( $dbConfig['driver'] ) ) {
@@ -316,16 +313,17 @@ class Core {
 					$this->dbDriver = $dbConfig['driver'];
 				} elseif( isset( $dbConfig['driver']['dsn'] ) ) {
 					$dsn = $dbConfig['driver']['dsn'];
-					$username = ( isset( $dbConfig['username'] ) ? $dbConfig['username'] : null );
-					$password = ( isset( $dbConfig['password'] ) ? $dbConfig['password'] : null );
-					$options = ( isset( $dbConfig['options'] ) && is_array( $dbConfig['options'] ) ?
-							$dbConfig['options'] : array() );
+					$username = ( isset( $dbConfig['driver']['username'] ) ? $dbConfig['driver']['username'] : null );
+					$password = ( isset( $dbConfig['driver']['password'] ) ? $dbConfig['driver']['password'] : null );
+					$options = ( isset( $dbConfig['driver']['options'] ) && is_array( $dbConfig['driver']['options'] ) ?
+							$dbConfig['driver']['options'] : array() );
 					try {
 						// TODO::做懒连接
 						$this->dbDriver = new PDO\PDO( $dsn, $username, $password, $options );
 					} catch ( \PDOException $e ) {
 						throw new Exception\RuntimeException( '数据库连接失败', null, $e );
 					}
+					unset( $dbConfig['driver'] );
 				}
 			}
 		}
@@ -341,7 +339,7 @@ class Core {
 	}
 	
 	/**
-	 * 获得app实例
+	 * 获得APP实例
 	 */
 	public function app() {
 		return $this->_app;

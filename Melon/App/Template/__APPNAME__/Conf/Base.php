@@ -14,6 +14,14 @@ return array(
 	'htmlShowCodeSnippet' => true,					// 是否在页面中显示代码片段
 	
 	'errorPage' => 'Data/errorPage.html',		// 浏览器访问发生错误时显示的页面，相对于Melon环境变量的root目录
-	'errorMessage' => 'Server error.'					// 非浏览器访问（ajax、cgi等）或者errotPage不存在时输出的错误消息
-	
+	'errorMessage' => 'Server error.',					// 非浏览器访问（ajax、cgi等）或者errotPage不存在时输出的错误消息
+	'database' => array(						// PDO数据库接口配置
+		'tablePrefix' => '',					// 表前缀
+		'driver' => array(
+			'dsn' => '',						// PDO DSN，例：mysql:host=localhost;dbname=test;
+			'username' => '',					// 数据库帐号
+			'password' => '',					// 数据库密码
+			'options' => array(),				// PDO属性
+		)
+	)
 );
