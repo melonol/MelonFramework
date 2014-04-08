@@ -126,8 +126,9 @@ class Core {
 			$this->_initApp( $config );
 		}
 		// 数据库配置
-		if( isset( $config['dbConfig'] ) && is_array( $config['dbConfig'] ) ) {
-			$this->_initDB( $config['dbConfig'] );
+		if( isset( $config['config']['database'] ) && is_array( $config['config']['database'] ) ) {
+			$this->_initDB( $config['config']['database'] );
+			unset( $config['config']['database'] );
 		}
 		$this->_inited = true;
 	}
@@ -147,7 +148,7 @@ class Core {
 			$config = array(
 				'type' => 'normal',
 				'root' => $root,
-				'baseConfig' => $baseConfig,
+				'config' => $baseConfig,
 			);
 		}
 		$runType = ( isset( $config['type'] ) && in_array( $config['type'], array( 'normal', 'app' ) ) ?
@@ -183,8 +184,8 @@ class Core {
 		$this->conf = require ( $this->env['melonLibrary'] . DIRECTORY_SEPARATOR .
 				'Data' . DIRECTORY_SEPARATOR . 'Conf' . DIRECTORY_SEPARATOR . 'Base.php' );
 		$this->env['config'] = &$this->conf;
-		if( isset( $config['baseConfig'] ) && is_array( $config['baseConfig'] ) ) {
-			$this->conf = array_merge( $this->conf, $config['baseConfig'] );
+		if( isset( $config['config'] ) && is_array( $config['config'] ) ) {
+			$this->conf = array_replace_recursive( $this->conf, $config['config'] );
 		}
 		
 		// includePath是loader － 包括autoload、权限审查等函数的工作范围
