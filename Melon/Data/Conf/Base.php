@@ -20,11 +20,11 @@ return array(
 	
 	'database' => array(						// PDO数据库接口配置
 		'tablePrefix' => '',					// 表前缀
-		'driver' => array(
-			'dsn' => '',						// PDO DSN，例：mysql:host=localhost;dbname=test;
-			'username' => '',					// 数据库帐号
-			'password' => '',					// 数据库密码
-			'options' => array(),				// PDO属性
-		)
+//		'driver' => array(
+//			'dsn' => '',						// PDO DSN，例：mysql:host=localhost;dbname=test;
+//			'username' => '',					// 数据库帐号
+//			'password' => '',					// 数据库密码
+//			'options' => array(),				// PDO属性
+//		)
 	)
 );

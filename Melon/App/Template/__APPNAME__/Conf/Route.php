@@ -6,5 +6,18 @@ return array(
 	'defaultAction' => 'Index',
 	'global' => array(
 		
+	),
+	'get' => array(
+		
+	),
+	'post' => array(
+		
+	),
+	'put' => array(
+		
+	),
+	'delete' => array(
+		
 	)
+	
 );

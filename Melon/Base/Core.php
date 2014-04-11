@@ -342,6 +342,9 @@ class Core {
 	 * 获得APP实例
 	 */
 	public function app() {
+		if( ! $this->_app ) {
+			throw new Exception\RuntimeException( '初始化APP失败，请确认配置是否正确' );
+		}
 		return $this->_app;
 	}
 
