@@ -65,6 +65,24 @@ class App {
 		if( isset( $config['moduleName'] ) ) {
 			$this->_setModule( $config['moduleName'] );
 		}
+		// 安装APP
+		if( $this->_core->env['install'] === 'app' ) {
+			$this->_createApp();
+		}
+		
+		if( ! file_exists( $this->_core->env['appDir'] . DIRECTORY_SEPARATOR . $this->_core->env['className'] . '.php' ) ) {
+			throw new Exception\RuntimeException( "{$this->_core->env['appName']} app不存在" );
+		}
+		// 载入基础配置
+		$config = require ( $this->_core->env['appDir'] . DIRECTORY_SEPARATOR . 'Conf' . DIRECTORY_SEPARATOR . 'Base.php' );
+		// 合并核心配置
+		$this->_core->conf = array_replace_recursive( $this->_core->conf, $config );
+		// 将日志目录转到app
+		$this->_core->logger = new Logger( $this->_core->env['appDir'] . DIRECTORY_SEPARATOR .
+			$this->_core->conf['logDir'], 'runtime', $this->_core->conf['logSplitSize'] );
+		
+		// 载入APP的主体类
+		$this->_core->load( __FILE__, $this->_core->env['appDir'] . DIRECTORY_SEPARATOR . $this->_core->env['className'] . '.php' );
 	}
 	
 	/**
@@ -88,24 +106,11 @@ class App {
 		if( $this->_core->env['runType'] !== 'app' ) {
 			throw new Exception\RuntimeException( '当前模式不能运行app' );
 		}
+		// 设置和安装模块
 		$this->_setModule( $module );
-		if( $this->_core->env['install'] === 'app' ) {
-			$this->_createApp();
-		} else if( $this->_core->env['install'] === 'module' ) {
+		if( $this->_core->env['install'] === 'module' ) {
 			$this->_createModule();
 		}
-		
-		if( ! file_exists( $this->_core->env['appDir'] . DIRECTORY_SEPARATOR . $this->_core->env['className'] . '.php' ) ) {
-			throw new Exception\RuntimeException( "{$this->_core->env['appName']} app不存在" );
-		}
-		// 载入基础配置
-		$config = require ( $this->_core->env['appDir'] . DIRECTORY_SEPARATOR . 'Conf' . DIRECTORY_SEPARATOR . 'Base.php' );
-		$this->_core->conf = array_replace_recursive( $this->_core->conf, $config );
-		// 将日志目录转到app
-		$this->_core->logger = new Logger( $this->_core->env['appDir'] . DIRECTORY_SEPARATOR .
-			$this->_core->conf['logDir'], 'runtime', $this->_core->conf['logSplitSize'] );
-		// 载入APP的主体类
-		$this->_core->load( __FILE__, $this->_core->env['appDir'] . DIRECTORY_SEPARATOR . $this->_core->env['className'] . '.php' );
 		
 		// 取得路由配置，然后解释它
 		$routeConf = $this->_core->acquire( __FILE__, $this->_core->env['appDir'] . DIRECTORY_SEPARATOR .
