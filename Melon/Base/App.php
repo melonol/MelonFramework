@@ -149,7 +149,7 @@ class App {
 			);
 		}
 		
-		$this->_core->env['controller'] = $pathInfo['controller'];
+		$this->_core->env['controller'] = ucfirst( $pathInfo['controller'] );
 		$this->_core->env['action'] = $pathInfo['action'];
 		$this->_core->env['args'] = $pathInfo['args'];
 		

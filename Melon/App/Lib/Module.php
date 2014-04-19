@@ -36,11 +36,11 @@ abstract class Module {
 		$controllerObj = $this->getController( $controller );
 		
 		if( ! is_object( $controllerObj ) ) {
-			trigger_error( '控制器不存在', E_USER_ERROR );
+			trigger_error( "控制器{$controller}不存在", E_USER_ERROR );
 			$this->page404();
 		}
 		if( ! is_callable( array( $controllerObj, $action ) ) ) {
-			trigger_error( '控制器方法不存在', E_USER_ERROR );
+			trigger_error( "控制器方法{$action}不存在", E_USER_ERROR );
 			$this->page404();
 		}
 		

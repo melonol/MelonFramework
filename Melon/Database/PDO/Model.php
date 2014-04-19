@@ -79,6 +79,15 @@ class Model {
 	}
 	
 	/**
+	 * 返回当前模型的PDO对象
+	 * 
+	 * @return \PDO $pdo PDO实例对象
+	 */
+	public function pdo() {
+		return $this->_pdo;
+	}
+	
+	/**
 	 * 打开调试
 	 * 
 	 * <pre>
