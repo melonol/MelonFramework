@@ -150,8 +150,8 @@ class Core {
 		}
 		$runType = ( isset( $config['type'] ) && in_array( $config['type'], array( 'normal', 'app' ) ) ?
 				$config['type'] : 'normal' );
-		$rootPath = ( isset( $config['root'] ) ? $config['root'] : null );
-		if( $rootPath && ! is_dir( $rootPath ) ) {
+		$rootPath = ( isset( $config['root'] ) ? realpath( $config['root'] ) : null );
+		if( isset( $config['root'] ) && ! $rootPath ) {
 			exit( '应用目录无效' );
 		}
 		

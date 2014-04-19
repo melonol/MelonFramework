@@ -11,6 +11,7 @@
 namespace Melon\Base;
 
 use \Melon\Exception;
+use \Melon\Http;
 
 defined('IN_MELON') or die('Permission denied');
 
@@ -71,12 +72,13 @@ class App {
 		}
 		
 		if( ! file_exists( $this->_core->env['appDir'] . DIRECTORY_SEPARATOR . $this->_core->env['className'] . '.php' ) ) {
-			throw new Exception\RuntimeException( "{$this->_core->env['appName']} app不存在" );
+			throw new Exception\RuntimeException( "{$this->_core->env['appName']} app不存在，你需要使用install参数安装它" );
 		}
 		// 载入基础配置
+		$defaultConfig = require ( $this->_core->env['melonLibrary'] . DIRECTORY_SEPARATOR . 'App' . DIRECTORY_SEPARATOR . 'Template' . DIRECTORY_SEPARATOR . 'App' . DIRECTORY_SEPARATOR . '__APPNAME__' . DIRECTORY_SEPARATOR . 'Conf' . DIRECTORY_SEPARATOR . 'Base.php' );
 		$config = require ( $this->_core->env['appDir'] . DIRECTORY_SEPARATOR . 'Conf' . DIRECTORY_SEPARATOR . 'Base.php' );
 		// 合并核心配置
-		$this->_core->conf = array_replace_recursive( $this->_core->conf, $config );
+		$this->_core->conf = array_replace_recursive( $this->_core->conf, $defaultConfig, $config );
 		// 将日志目录转到app
 		$this->_core->logger = new Logger( $this->_core->env['appDir'] . DIRECTORY_SEPARATOR .
 			$this->_core->conf['logDir'], 'runtime', $this->_core->conf['logSplitSize'] );
@@ -97,8 +99,8 @@ class App {
 	 * 
 	 * @param string $module [可选] module名称，如果你在初始化的时候设置了，这时候就不需要指定此参数
 	 * @param string $controller [可选] 控制器，如果不提供此参数，程序则调用Route类尝试解释路径
-	 * @param string $action [可选] 方法
-	 * @param string $args [可选] 参数
+	 * @param string $action [可选] 方法，必需先提供控制器，否则该选项无效
+	 * @param string $args [可选] 参数，必需先提供控制器，否则该选项无效
 	 * @return void
 	 * @throws Exception\RuntimeException
 	 */
@@ -108,45 +110,56 @@ class App {
 		}
 		// 设置和安装模块
 		$this->_setModule( $module );
-		if( $this->_core->env['install'] === 'module' ) {
+		if( $this->_core->env['install'] === 'module' || $this->_core->env['install'] === 'app' ) {
 			$this->_createModule();
 		}
 		
-		// 取得路由配置，然后解释它
-		$routeConf = $this->_core->acquire( __FILE__, $this->_core->env['appDir'] . DIRECTORY_SEPARATOR .
+		// 取得路由配置
+		$defaultConfig = require ( $this->_core->env['melonLibrary'] . DIRECTORY_SEPARATOR . 'App' . DIRECTORY_SEPARATOR . 'Template' . DIRECTORY_SEPARATOR . 'App' . DIRECTORY_SEPARATOR . '__APPNAME__' . DIRECTORY_SEPARATOR . 'Conf' . DIRECTORY_SEPARATOR . 'Route.php' );
+		$routeConfig = $this->_core->acquire( __FILE__, $this->_core->env['appDir'] . DIRECTORY_SEPARATOR .
 			'Conf' . DIRECTORY_SEPARATOR . 'Route.php' );
-		$this->_core->env['routeConfig'] = &$routeConf;
+		$routeConfig = array_replace_recursive( $defaultConfig, $routeConfig );
+		$this->_core->env['routeConfig'] = &$routeConfig;
+		
+		// 如果直接提供了路由器，则直接处理，忽略配置
 		if( $controller ) {
 			$pathInfo = array(
 				'controller' => $controller,
 				'action' => ( ! $action ? $action :
-					( isset( $routeConf['defaultAction'] ) ? $routeConf['defaultAction'] : null ) ),
+					( isset( $routeConfig['defaultAction'] ) ? $routeConfig['defaultAction'] : null ) ),
 				'args' => $args,
 			);
 		} else {
-			$route = \Melon::httpRoute( $routeConf );
+			$map = array(
+				'incompletePathinfo' => Http\Route::TYPE_INCOMPLETE_PATHINFO,
+				'completePathinfo' => Http\Route::TYPE_COMPLETE_PATHINFO,
+				'requestKey' => Http\Route::TYPE_REQUEST_KEY,
+			);
+			$type = ( isset( $map[ $routeConfig['type'] ] ) ? $map[ $routeConfig['type'] ] : 'requestKey' );
+			$route = \Melon::httpRoute( $routeConfig, $type, $routeConfig['requestKey'] );
 			$parsed = $route->parse();
 			$_pathInfo = ( $parsed ? explode( '/', $parsed ) : array() );
 			// 整理一下
 			$pathInfo = array(
 				'controller' => ( isset( $_pathInfo[0] ) ? $_pathInfo[0] :
-					( isset( $routeConf['defaultController'] ) ? $routeConf['defaultController'] : null ) ),
+					( isset( $routeConfig['defaultController'] ) ? $routeConfig['defaultController'] : null ) ),
 				'action' => ( isset( $_pathInfo[1] ) ? $_pathInfo[1] :
-					( isset( $routeConf['defaultAction'] ) ? $routeConf['defaultAction'] : null ) ),
+					( isset( $routeConfig['defaultAction'] ) ? $routeConfig['defaultAction'] : null ) ),
 				'args' => ( isset( $_pathInfo[2] ) ? array_splice( $_pathInfo, 2 ) : array() ),
 			);
 		}
+		
 		$this->_core->env['controller'] = $pathInfo['controller'];
 		$this->_core->env['action'] = $pathInfo['action'];
 		$this->_core->env['args'] = $pathInfo['args'];
 		
 		// 搞定后清理掉不再用的数据
-		unset( $routeConf, $_pathInfo );
+		unset( $routeConfig, $_pathInfo );
 
 		// 现在把控制权交给当前请求的模块
 		$moduleClass = $this->_core->env['className'] . '\Module\\' . $this->_core->env['moduleName'];
 		if( ! file_exists( $this->_core->env['root'] . DIRECTORY_SEPARATOR . str_replace( '\\', DIRECTORY_SEPARATOR, $moduleClass ) . '.php' ) ) {
-			throw new Exception\RuntimeException( "{$this->_core->env['moduleName']} module不存在" );
+			throw new Exception\RuntimeException( "{$this->_core->env['moduleName']} module不存在，你需要使用install参数安装它" );
 		}
 		$command = new $moduleClass();
 		$command->execute( $pathInfo['controller'], $pathInfo['action'], $pathInfo['args'] );
@@ -184,7 +197,7 @@ class App {
 		// 保险起见，我先清空一次临时目录
 		$this->_cleanTempDir();
 		$tempDir = $this->_createTempDir( 'App' );
-		$this->_copyDir( $this->_core->env['melonLibrary'] . DIRECTORY_SEPARATOR . 'App' . DIRECTORY_SEPARATOR . 'Template', $tempDir );
+		$this->_copyDir( $this->_core->env['melonLibrary'] . DIRECTORY_SEPARATOR . 'App' . DIRECTORY_SEPARATOR . 'Template' . DIRECTORY_SEPARATOR . 'App', $tempDir );
 		// 替换预定义变量
 		$this->_replaceVar( $tempDir );
 		// 放到root目录下
@@ -215,7 +228,7 @@ class App {
 		// 先清空一次临时目录
 		$this->_cleanTempDir();
 		$tempDir = $this->_createTempDir( 'Module' );
-		$this->_copyDir( $this->_core->env['melonLibrary'] . DIRECTORY_SEPARATOR . 'App' . DIRECTORY_SEPARATOR . 'Template' . DIRECTORY_SEPARATOR . '__APPNAME__' . DIRECTORY_SEPARATOR . 'Module', $tempDir );
+		$this->_copyDir( $this->_core->env['melonLibrary'] . DIRECTORY_SEPARATOR . 'App' . DIRECTORY_SEPARATOR . 'Template' . DIRECTORY_SEPARATOR . 'Module', $tempDir );
 		// 替换预定义变量
 		$this->_replaceVar( $tempDir );
 		// 放到module目录下
@@ -233,12 +246,20 @@ class App {
 	 * __PRIVATE_PRE__		私有前缀
 	 * 
 	 * @param string $dir 目录
+	 * @param array $ignore 要忽略的关键字，它们将不会被替换
 	 * @return void
 	 */
-	private function _replaceVar( $dir ) {
-		$this->_replaceContent( $dir, '__APPNAME__', $this->_core->env['appName'] );
-		$this->_replaceContent( $dir, '__MODULENAME__', $this->_core->env['moduleName'] );
-		$this->_replaceContent( $dir, '__PRIVATE_PRE__', $this->_core->conf['privatePre'] );
+	private function _replaceVar( $dir, array $ignore = array() ) {
+		$replace = array(
+			'__APPNAME__' => ( isset( $this->_core->env['appName'] ) ? $this->_core->env['appName'] : null ),
+			'__MODULENAME__' => ( isset( $this->_core->env['moduleName'] ) ? $this->_core->env['moduleName'] : null ),
+			'__PRIVATE_PRE__' => ( isset( $this->_core->conf['privatePre'] ) ? $this->_core->conf['privatePre'] : null ),
+		);
+		foreach( $replace as $key => $value ) {
+			if( ! in_array( $key, $ignore ) && $value ) {
+				$this->_replaceContent( $dir, $key, $value );
+			}
+		}
 	}
 	
 	/**
@@ -297,7 +318,8 @@ class App {
 				if( is_dir( $source . DIRECTORY_SEPARATOR . $entry ) ) {
 					$this->_copyDir( $source . DIRECTORY_SEPARATOR . $entry, $target . DIRECTORY_SEPARATOR . $entry );
 				}
-				else {
+				// 过滤被忽略的文件，它们存在的目的是为了让当前目录成功添加到版本库
+				elseif( $entry !== '.ignore' ) {
 					copy( $source . DIRECTORY_SEPARATOR . $entry, $target . DIRECTORY_SEPARATOR . $entry );
 				}
 			}
