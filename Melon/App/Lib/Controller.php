@@ -12,6 +12,8 @@ namespace Melon\App\Lib;
 
 defined('IN_MELON') or die('Permission denied');
 
+\Melon::load( __DIR__ . DIRECTORY_SEPARATOR . 'Func.php' );
+
 /**
  * APP的控制器接口
  * 
@@ -46,5 +48,16 @@ abstract class Controller {
 	 * @var \Melon\App\Lib\Lang
 	 */
 	public $lang;
-
+	
+	/**
+	 * 跳转到指定连接
+	 * 
+	 * @param string $url
+	 * @param boolean $useAlink 是否使用alink，如果是则第一个参数$url为alink格式。
+	 * 关于alink请查看\Melon\App\Lib\Func下的alink函数
+	 */
+	public function location( $url, $useAlink = false ) {
+		$_url = ( $useAlink ? Func\alink( $url ) : $url );
+		\Melon::httpResponse()->setStatus( 301 )->setHeader( 'location', $_url )->send();
+	}
 }

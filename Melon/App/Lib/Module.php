@@ -48,7 +48,7 @@ abstract class Module {
 		$controllerObj->request = \Melon::httpRequest();
 		$controllerObj->response = \Melon::httpResponse();
 		$controllerObj->lang = new Lang( $this->getCommentLang() );
-		$controllerObj->view = new View( $controllerObj );
+		$controllerObj->view = $this->_getView( $controllerObj );
 		
 		$before = $after = array();
 		$ucfirstOfAction = ucfirst( $action );
@@ -60,6 +60,28 @@ abstract class Module {
 		}
 		$controlTrigger = \Melon::trigger( $controllerObj, $before, $after );
 		call_user_func_array( array( $controlTrigger, $action ), $args );
+	}
+	
+	/**
+	 * 获取视图实例
+	 * 
+	 * @param Object $controllerObj 控制器对象
+	 * @return \Melon\App\Lib\View
+	 */
+	private function _getView( $controllerObj ) {
+		\Melon::load( __DIR__ . DIRECTORY_SEPARATOR . 'Func.php' );
+		
+		$view = new View( $controllerObj );
+		
+		// 注入alink标签
+		$view->assignTag( 'alink', array(
+			'callable' => '\Melon\App\Lib\Func\alink',
+			'args' => array(
+				'ln' => '',
+				'comp' => true,
+			)
+		) );
+		return $view;
 	}
 	
 	/**

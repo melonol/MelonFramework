@@ -6,6 +6,7 @@ return array(
 	// 如果不使用路由，将使用以下参数指定控制器和方法
 	'requestKey' => 'p',					// 哪个请求参数表示路由
 	
+	'defaultModule' => '',					// 默认模块
 	'defaultController' => 'Index',			// 默认控制器
 	'defaultAction' => 'Index',				// 默认方法
 	

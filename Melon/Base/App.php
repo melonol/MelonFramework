@@ -55,6 +55,9 @@ class App {
 		$nameRule = '/^[a-zA-Z_]+\w*$/';
 		$appName = ( isset( $config['appName'] ) && $config['appName'] ?
 				$config['appName'] : null );
+		if( ! $appName ) {
+			throw new Exception\RuntimeException( '没有指定app' );
+		}
 		if( ! preg_match( $nameRule, $appName ) ) {
 			throw new Exception\RuntimeException( 'app名称必需为字母开头，并由字母、数字或下划线组成' );
 		}
@@ -76,9 +79,13 @@ class App {
 		}
 		// 载入基础配置
 		$defaultConfig = require ( $this->_core->env['melonLibrary'] . DIRECTORY_SEPARATOR . 'App' . DIRECTORY_SEPARATOR . 'Template' . DIRECTORY_SEPARATOR . 'App' . DIRECTORY_SEPARATOR . '__APPNAME__' . DIRECTORY_SEPARATOR . 'Conf' . DIRECTORY_SEPARATOR . 'Base.php' );
-		$config = require ( $this->_core->env['appDir'] . DIRECTORY_SEPARATOR . 'Conf' . DIRECTORY_SEPARATOR . 'Base.php' );
+		$appConfig = require ( $this->_core->env['appDir'] . DIRECTORY_SEPARATOR . 'Conf' . DIRECTORY_SEPARATOR . 'Base.php' );
 		// 合并核心配置
-		$this->_core->conf = array_replace_recursive( $this->_core->conf, $defaultConfig, $config );
+		if( isset( $config['config'] ) && is_array( $config['config'] ) ) {
+			$this->_core->conf = array_replace_recursive( $this->_core->conf, $defaultConfig, $appConfig, $config['config'] );
+		} else {
+			$this->_core->conf = array_replace_recursive( $this->_core->conf, $defaultConfig, $appConfig );
+		}
 		// 将日志目录转到app
 		$this->_core->logger = new Logger( $this->_core->env['appDir'] . DIRECTORY_SEPARATOR .
 			$this->_core->conf['logDir'], 'runtime', $this->_core->conf['logSplitSize'] );
@@ -108,11 +115,7 @@ class App {
 		if( $this->_core->env['runType'] !== 'app' ) {
 			throw new Exception\RuntimeException( '当前模式不能运行app' );
 		}
-		// 设置和安装模块
-		$this->_setModule( $module );
-		if( $this->_core->env['install'] === 'module' || $this->_core->env['install'] === 'app' ) {
-			$this->_createModule();
-		}
+		$_module = $module;
 		
 		// 取得路由配置
 		$defaultConfig = require ( $this->_core->env['melonLibrary'] . DIRECTORY_SEPARATOR . 'App' . DIRECTORY_SEPARATOR . 'Template' . DIRECTORY_SEPARATOR . 'App' . DIRECTORY_SEPARATOR . '__APPNAME__' . DIRECTORY_SEPARATOR . 'Conf' . DIRECTORY_SEPARATOR . 'Route.php' );
@@ -139,6 +142,15 @@ class App {
 			$route = \Melon::httpRoute( $routeConfig, $type, $routeConfig['requestKey'] );
 			$parsed = $route->parse();
 			$_pathInfo = ( $parsed ? explode( '/', $parsed ) : array() );
+			
+			// 如果没有指定模块，并且假设第一个参数是模块的条件成立时
+			// 将取其值为模块
+			if( ! $_module && $_pathInfo ) {
+				if( file_exists( $this->_core->env['appDir'] . DIRECTORY_SEPARATOR . 'Module' . DIRECTORY_SEPARATOR . ucfirst( $_pathInfo[0] ) . '.php' ) ) {
+					$_module = array_shift( $_pathInfo );
+				}
+			} // else controller
+			
 			// 整理一下
 			$pathInfo = array(
 				'controller' => ( isset( $_pathInfo[0] ) ? $_pathInfo[0] :
@@ -149,12 +161,21 @@ class App {
 			);
 		}
 		
+		if( ! $_module && isset( $routeConfig['defaultModule'] ) ) {
+			$_module = $routeConfig['defaultModule'];
+		}
 		$this->_core->env['controller'] = ucfirst( $pathInfo['controller'] );
 		$this->_core->env['action'] = $pathInfo['action'];
 		$this->_core->env['args'] = $pathInfo['args'];
 		
 		// 搞定后清理掉不再用的数据
 		unset( $routeConfig, $_pathInfo );
+		
+		// 设置和安装模块
+		$this->_setModule( $_module );
+		if( $this->_core->env['install'] === 'module' || $this->_core->env['install'] === 'app' ) {
+			$this->_createModule();
+		}
 
 		// 现在把控制权交给当前请求的模块
 		$moduleClass = $this->_core->env['className'] . '\Module\\' . $this->_core->env['moduleName'];
@@ -171,6 +192,9 @@ class App {
 	 * @param string $name module名称
 	 */
 	protected function _setModule( $name = null ) {
+		if( ! $name ) {
+			throw new Exception\RuntimeException( '没有指定module' );
+		}
 		$nameRule = '/^[a-zA-Z_]+\w*$/';
 		if( ! preg_match( $nameRule, $name ) ) {
 			throw new Exception\RuntimeException( 'module名称必需为字母开头，并由字母、数字或下划线组成' );
