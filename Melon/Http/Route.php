@@ -188,12 +188,17 @@ class Route {
 		$pathInfo = ( isset($_SERVER['PATH_INFO'] ) ? $_SERVER['PATH_INFO'] : @getenv('PATH_INFO') );
 		//如果服务器不支持PATH_INFO，则使用REQUEST_URI解析
 		if( empty( $pathInfo ) && $this->_type !== self::TYPE_REQUEST_KEY ) {
-			$match = array();
 			if( isset( $_SERVER['REQUEST_URI'] ) && stripos( $_SERVER['REQUEST_URI'], '.php?' ) === false &&
-				substr( $_SERVER['REQUEST_URI'], -4 ) !== '.php' &&
-				preg_match( "#^[^?]+#", $_SERVER['REQUEST_URI'], $match ) ) {
-				//替换多余的 / 号
-				$pathInfo = preg_replace( '#/+#', '/', $match[0] );
+				substr( $_SERVER['REQUEST_URI'], -4 ) !== '.php' ) {
+				
+				// 先除掉当前目录，以当前目录为起始向后匹配
+				$quoteDir = '/^' . str_replace( '/', '\/', preg_quote( dirname( $_SERVER['SCRIPT_NAME'] ) ) ) . '/i';
+				$requestUri = preg_replace( $quoteDir, '', $_SERVER['REQUEST_URI'] );
+				$match = array();
+				if( $requestUri && preg_match( "#^[^?]+#", $requestUri, $match ) ) {
+					//替换多余的 / 号
+					$pathInfo = preg_replace( '#/+#', '/', $match[0] );
+				}
 			}
 		}
 		if( $this->_type === self::TYPE_REQUEST_KEY || ( empty( $pathInfo ) && $this->_type === self::TYPE_AUTO ) ) {
