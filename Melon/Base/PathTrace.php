@@ -5,7 +5,7 @@
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link http://framework.melonol.com
  * @author Melon <admin@melonol.com>
- * @version 0.2.0
+ * @version 0.2.1
  */
 
 namespace Melon\Base;
@@ -24,7 +24,7 @@ defined( 'IN_MELON' ) or die( 'Permission denied' );
  * 从0.2.0开始，去除real方法，原因是跟PHP原生获取路径的方式一致性冲突，而且增加不少的性能损耗
  * 
  * @package Melon
- * @since 0.2.0
+ * @since 0.2.1
  * @author Melon
  */
 final class PathTrace {
