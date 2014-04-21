@@ -91,10 +91,10 @@
 						<ul class="menu-sub">
 							<li><a href="#mark_app_initialization">初始化与配置</a></li>
 							<li><a href="#mark_app_tree">目录结构</a></li>
-							<li><a href="#mark_app_route">路由</a></li>
 							<li><a href="#mark_app_controller">控制器</a></li>
 							<li><a href="#mark_app_view">视图</a></li>
 							<li><a href="#mark_app_model">模型</a></li>
+							<li><a href="#mark_app_route">路由与URL</a></li>
 							<li><a href="#mark_app_lang">语言包（国际化）</a></li>
 						</ul>
 					</li>
@@ -110,7 +110,7 @@
 					<p>框架提供了常见的基本操作，非常低的偶合度可以帮助你灵活构建适合自己的开发环境。</p>
 				</div>
 				<div class="introduction-source-links">
-					<span class="introduction-source-version">当前文档版本 - 0.2.0，获取最新版本</span>
+					<span class="introduction-source-version">当前文档版本 - 0.2.1，获取最新版本</span>
 					<a href="http://git.oschina.net/397574898/MelonFramework" target="_blank" class="melon-btn">开源中国Git</a>
 					<a href="https://github.com/melonol/MelonFramework" target="_blank" class="melon-btn">Github</a>
 				</div>
@@ -173,7 +173,7 @@
 	Melon::runApp( 'MyModule' ); //必需调用runApp才能运行
 </code>
 </pre>
-						如果页面出现‘欢迎’的字样，说明你已经安装成功了。下一步记得把<b>'install' => 'app'</b>这句注释或删掉，然后进入APP所处目录下的<b>MyApp/Module/MyModule/</b>目录，熟悉的MVC就在这里了。
+						如果页面出现‘欢迎’的字样，说明你已经安装成功了。下一步记得把<b>'install' => 'app'</b>这句注释或删掉，然后进入APP所处目录下的<b>MyApp/Module/_MyModule/</b>目录，熟悉的MVC就在这里了。
 					</div>
 					
 					<h4 class="melon-h">接下来干什么？</h4>
@@ -194,8 +194,10 @@ Melon    -----------------------------------    <b>框架类库</b>
     App    ---------------------------------    <b>APP应用</b>
         Lib    -----------------------------    <b>APP类库</b>
             Controller.php    --------------    控制器接口
+            Func.php    --------------------    函数库
             Lang.php    --------------------    语言包容器
             Module.php    ------------------    模块接口
+            PDOModel.php    ----------------    PDO模型
             View.php    --------------------    视图类
 		
         Template    ------------------------    <b>APP程序模板目录</b>
@@ -441,11 +443,11 @@ Melon.php    -------------------------------    主体类
 		'root' => __DIR__,
 	) );
 </code>
-</pre>					那这个root是什么呢？root表示当前应用的根目录，它会被作为APP的安装目录和autoload的作用目录。<br />
+</pre>					那这个root是什么呢？root表示当前应用的根目录，它会被作为APP的安装目录和autoload的作用目录，关于autoload请看<a href="#mark_loader" class="melon-mark-link">加载</a>项。<br />
 					
 					<h3 class="melon-h">配置</h3>
 					<div>
-						在<b>MelonFramework/Melon/Data/Conf/Base.php</b>（A）中存在缺省配置，你也可以在初始化中传入（B）
+						在<b>MelonFramework/Melon/Data/Conf/Base.php</b>（A）中存在缺省配置，你也可以在初始化中传入（C）
 <pre>
 <code class="language-php">
 	Melon::init( array(
@@ -456,9 +458,9 @@ Melon.php    -------------------------------    主体类
 	) );
 </code>
 </pre>
-						如果你是使用APP模式，在<b>YourApp/Conf/Base.php</b>（C）下同样存在缺省配置<br />
-						这三处配置的优先级是 C < B < A<br />
-						缺少配置参考
+						如果你是使用APP模式，在<b>MyApp/Conf/Base.php</b>（B）下同样存在缺省配置<br />
+						这三处配置的优先级是 C < B < A，总而言之，初始化时传入的配置优先级总是最高的<br />
+						下面给出了缺省配置参考
 <pre>
 <code class="language-php">
 	'charset' => 'utf-8',			// 脚本编码
@@ -534,12 +536,12 @@ Melon.php    -------------------------------    主体类
 </pre>
 						<h3 class="melon-h">includePath与autoload</h3>
 						<div>
-							includePath指<b>包含路径</b>，包含路径是autoload的作用范围，并且是起点，autoload以这个起点和命名空间作为目录路径搜寻脚本。
+							includePath指<b>包含路径</b>，包含路径是autoload(<a href="http://www.php.net/manual/zh/function.spl-autoload.php" target="_blank">php spl autoload</a>)的作用范围，并且是起点，autoload以这个起点和命名空间作为目录路径搜寻脚本。
 <pre>
 <code class="language-php">
-	// 没有载入stdClass，直接实际它将触发autoload
-	// autoload将查找 includePath . '/MyApp/Module/stdClass.php';
-	$class = new MyApp\Module\stdClass();
+	// 不存在fooClass(没有载入)，它将触发autoload
+	// autoload将查找 includePath . '/MyApp/Module/fooClass.php';
+	$class = new MyApp\Module\fooClass();
 </code>
 </pre>
 							而程序默认将<b>MelonFramework</b>（框架本身的目录）以及<b>root</b>添加到includePath中，按先后顺序查找，查找到符合条件的脚本将马上返回，所以这里有一个顺序和性能的问题要注意。你可以在配置文件中的<b>includePath</b>数组中添加更多includePath。
@@ -775,7 +777,7 @@ Melon.php    -------------------------------    主体类
 					<h3 class="melon-h">增强型PDO</h3>
 					<div>
 						MelonFramework提供的是增强型的PDO接口，增强了错误和调试方面的功能，程序记录了executes、exec以及query的执行次数和相关信息。可以通过<code>errorsTotal</code>、<code>executesTotal</code>、<code>statementsTotal</code>、<code>lastStatement</code>获取这些信息。<code>setErrorHandler</code>可以设置一个查询错误时的处理方法。<code>restoreErrorHandler</code>还原上一个错误处理方法<br /><br />
-						除了初始化提供的PDO接口外，还可以使用<code>Melon::PDO</code>方法实例新的PDO对象
+						除了配置中提供的PDO接口外，还可以使用<code>Melon::PDO</code>方法实例新的PDO对象
 					</div>
 					
 					<h3 class="melon-h">模型（Model）</h3>
@@ -803,6 +805,24 @@ Melon.php    -------------------------------    主体类
 </code>
 </pre>
 					</div>
+				</div>
+				<h3 class="melon-h">防注入</h3>
+				<div>
+					PDO原生就提供了SQL预处理功能，有很好的防注入作用，而模型基于此封装了更方便的防注入操作。如果你不了解PDO预处理，要先看看<a href="http://www.php.net/manual/zh/pdo.prepare.php" target="_blank">PDO::prepare</a>
+<pre>
+<code class="language-php">
+// 使用匿名的占位符
+$model->delete( '`id`=? AND `type`=?', array( '123', 'hot' ) );
+// 使用名字占位符
+$model->delete( '`id`=:id AND `type`=:type', array( ':id' => '123', ':type' => 'hot' ) );
+
+// 规律：参数凡是SQL语句的，都可以使用占位符，在紧接的下一个参数中写占位符的值，像上面那样
+// 更多示例
+$model->fetch( '`id`=? AND `type`=?', array( '123', 'hot' ) );
+$model->fetchAll( '*', '`id`=? AND `type`=?', array( '123', 'hot' ) );
+...
+</code>
+</pre>
 				</div>
 				
 				<div class="melon-item">
@@ -1202,51 +1222,6 @@ class Index extends \Melon\App\Lib\Controller {
 				</div>
 				
 				<div class="melon-item">
-					<a name="mark_app_route" class="melon-mark"></a>
-					<h2 class="melon-h">路由</h2>
-					<div>
-						路由配置文件在<b>MyApp/Conf/Route.php</b>下，规则请看<a href="#mark_route" class="melon-mark-link">路由</a>说明。
-						默认的程序只支持PATHINFO模式，以/号分割参数，第一个参数为控制器，第二个参数为方法，后面的作为方法参数依次传入。
-<pre>
-<code class="language-php">
-	// 假设当前入口是http://domain.com/index.php
-	// 访问http://domain.com/index.php/index/index/melon
-	// PATH INFO是/index/index/melon
-	// 即控制器为index，方法为index，第一个参数值为melon
-
-	namespace MyApp\Module\_MyModule\Controller;
-
-	class Index extends \Melon\App\Lib\Controller {
-
-		public function index( $name ) {
-			echo $name; //melon
-		}
-	}
-</code>
-</pre>
-						如果你不想使用PATHINFO怎么办呢，<b>Melon::runApp</b>提供了直接调用控制器方法的命令
-<pre>
-<code class="language-php">
-	Melon::init( array(
-		'type' => 'app',
-		'root' => __DIR__,
-		'appName' => 'MyApp',
-	) );
-	
-	// 此处也可以通过更多计算出控制器和方法
-	// 比如使用Melon::httpRoute
-	
-	$controler = $_GET['c'];
-	$action = $_GET['a'];
-	$args = $_GET['args'];
-	Melon::runApp( 'MyModule', $controler, $action, $args );
-</code>
-</pre>
-						这样就不必受到限制，随意定义自己的路由方式，甚至可以动态访问模块。
-					</div>
-				</div>
-				
-				<div class="melon-item">
 					<a name="mark_app_controller" class="melon-mark"></a>
 					<h2 class="melon-h">控制器</h2>
 					<div>
@@ -1291,6 +1266,36 @@ class Index extends \Melon\App\Lib\Controller {
 					<h2 class="melon-h">视图</h2>
 					<div>
 						视图基于<a href="#mark_template" class="melon-mark-link">模板类</a>，在控制器使用$view属性可得到其实例，模板目录也被设定在当前Module的<b>View/当前控制器</b>目录下。值得注意的是，视图默认注入了<b>环境变量env</b>、<b>语言包变量lang</b>，以及<b>请求参数</b>（get、post等），可以直接在模板中{$env[key]}这样使用它们
+<pre>
+<code class="language-php">
+namespace MyApp\Module\_MyModule\Controller;
+
+class Index extends \Melon\App\Lib\Controller {
+	
+	public function index() {
+			
+		// 注入变量
+		$this->view->assign( 'welcome', 你好！欢迎来到Melon的世界' );
+		
+		// 可使用assignTag动态注入自定义标签，规则请看模板文档
+		// 注入alink标签
+		//$this->view->assignTag( 'alink', array(
+			'callable' => '\Melon\App\Lib\Func\alink',
+			'args' => array(
+				'ln' => '',
+				'comp' => true,
+			)
+		) );
+
+		// 显示View/Index/hello.html
+		$this->view->display( 'hello.html' );
+
+		// 视图中body标签写上{$welcome}
+		// 输出：欢迎来到Melon的世界
+	}
+}
+</code>
+</pre>
 					</div>
 				</div>
 				
@@ -1298,7 +1303,7 @@ class Index extends \Melon\App\Lib\Controller {
 					<a name="mark_app_model" class="melon-mark"></a>
 					<h2 class="melon-h">模型</h2>
 					<div>
-						模型可以使用框架提供的PDOModel（请看<a href="#mark_database" class="melon-mark-link">数据库接口</a>），扩展可直接继承<code>\Melon\Database\PDO\Model</code>，扩展类应该存放在Model目录下，如果要获取实例，可以直接new
+						模型可以使用框架提供的PDOModel（请看<a href="#mark_database" class="melon-mark-link">数据库接口</a>），扩展可直接继承<code>\Melon\App\Lib\PDOModel</code>，扩展类应该存放在Model目录下，如果要获取实例，可以直接new
 <pre>
 <code class="language-php">
 namespace MyApp\Module\_MyModule\Controller;
@@ -1317,6 +1322,154 @@ class Index extends \Melon\App\Lib\Controller {
 </pre>
 					</div>
 				</div>
+				
+				
+				<div class="melon-item">
+					<a name="mark_app_route" class="melon-mark"></a>
+					<h2 class="melon-h">路由与URL</h2>
+					<div>
+						路由配置文件在<b>MyApp/Conf/Route.php</b>下。
+								路由可配置三种模式，都是取得URL中的PATHINFO信息，由配置文件中的type值决定。
+								<ul class="melon-list">
+									<li>
+								1. incompletePathinfo，不完整的PATHINFO(带.php)，即 http://domain.com/index.php/index/login 这样的形式
+									</li>
+									<li>
+								2. completePathinfo，完整的PATHINFO(不带.php)，即 http://domain.com/index/login 
+									</li>
+									<li>
+								3. requestKey，通过请求参数来决定，例如 http://domain.com/index.php?p=/index/login ，这个参数p是可以设为其它值的，由配置文件中的requestKey值决定
+									</li>
+								</ul>
+							
+								程序取得PATHINFO后，以/号分割参数，第一个参数为<b>控制器</b>，第二个参数为<b>控制器方法</b>，后面的作为方法参数依次传入。<br /><br />
+								下面在配置文件中创建一些路由规则的示例（详细规则请看<a href="#mark_route" class="melon-mark-link"><b>路由</b></a>说明），这些规则都是对PATHINFO的值作匹配
+<pre>
+<code class="language-php">
+	// 匹配全局URL
+	'global' => array(
+		'/[type]/[id]' => '/category/[type]/[id]',
+		'/user/(\w+)' => '/user/id/$1'
+	),
+	// 匹配get方法请求URL
+	'get' => array(
+		'/comment/hot/[uid]' => '/bolg/comment/type/hot/user/[uid]'
+		...
+	),
+	// 匹配post请求URL
+	'post' => array( ... ),
+</code>
+</pre><br /><br />
+								如果你想要通过URL动态调用模块，是可以的，你要在入口把runApp方法中的模块去掉
+<pre>
+<code class="language-php">
+// 原来是这样
+Melon::runApp( 'MyModule' );
+
+// 改为这样
+Melon::runApp();
+</code>
+</pre>
+							然后PATHINFO中第一个参数就是模块了，想要缺省的调用，可以在配置文件中配置<b>defaultModule</b>、<b>defaultController</b>、<b>defaultAction</b> 这三个值，这样你可以在PATHINFO中省略它们。例如
+<pre>
+<code class="language-php">
+	'type' => 'requestKey',				// 将路由模式设为requestKey
+	'requestKey' => 'p',				// 将requestKey设为p
+	
+	'defaultModule' => 'MyModule',			// 默认模块
+	'defaultController' => 'Index',			// 默认控制器
+	'defaultAction' => 'Index',			// 默认方法
+	
+	/* 假设APP中存在模块MyModule，控制器Index，方法Index */
+	
+	// 访问 http://domain.com/index.php?p=/MyModule/Index/Index
+	// 1. 程序首先要决定模块的值，取到PATHINFO第一个参数MyModule，MyModule模块存在，设其为模块
+	// 2. 得到模块后，第二个参数Index为控制器
+	// 3. 得到控制器后，第三个参数Index为方法
+	
+	// 访问 http://domain.com/index.php?p=/Index/Index
+	// 1. 程序首先要决定模块的值，取到PATHINFO第一个参数Index，Index模块不存在，取defaultModule的值，即MyModule
+	// 2. 得到模块后，这个Index将视为控制器
+	// 3. 得到控制器后，第二个参数Index为方法
+	
+	// 访问 http://domain.com/index.php?p=/Login
+	// 1. 程序首先要决定模块的值，取到PATHINFO第一个参数Login，Login模块不存在，取defaultModule的值，即MyModule
+	// 2. 得到模块后，这个Login将视为控制器，但是Login控制器也不存在，这时程序会抛出异常。
+	// 所以第一个参数只能是模块或控制器，而不可能是方法，这样是出于代码逻辑和性能方面的考虑
+	
+	// 访问 http://domain.com/index.php?p= 或 http://domain.com/index.php
+	// 由于PATHINFO为空，所以全部取默认值
+</code>
+</pre>
+							再看一个带参数的例子
+<pre>
+<code class="language-php">
+	// 访问http://domain.com/index.php?p=/Index/Index/melon/123
+	// PATH INFO是/Index/Index/melon/123
+	// 即控制器为index，方法为index，第一个参数值为melon，第二个参数为123
+
+	namespace MyApp\Module\_MyModule\Controller;
+
+	class Index extends \Melon\App\Lib\Controller {
+
+		public function index( $name, $id ) {
+			echo $name; //melon
+			echo $id; //123
+		}
+	}
+</code>
+</pre>
+							<h3 class="melon-h">alink</h3>
+							<div>
+								alink(auto link)可以根据当前的路由配置生成对应规则的URL。<br /><br />
+								在控制器中使用alink函数或者location方法
+<pre>
+<code class="language-php">
+	class Index extends \Melon\App\Lib\Controller {
+
+		public function index( $name, $id ) {
+			echo \Melon\App\Lib\Func\alink( '/Index/Index?param=xxx' ); // 可带GET参数
+			// 1. type为incompletePathinfo时，输出 http://domain.com/index.php/Index/Index?param=xxx
+			// 2. type为incompletePathinfo时，输出 http://domain.com/Index/Index?param=xxx
+			// 3. type为requestKey时，输出 http://domain.com/index.php?p=/Index/Index&param=xxx
+			
+			// 使用location直接跳转
+			$this->location( '/Index/Index?param=xxx', 1 ); // 注意第二个参数值要为真，否则location视其为正常连接
+		}
+	}
+</code>
+</pre>
+								同样你可以在视图中使用alink标签，该标签基于模板引擎的动态扩展
+<pre>
+<code class="language-php">
+	{tag:alink ln="/Index/Index" /}
+</code>
+</pre>
+							</div>
+							<h3 class="melon-h">自定义</h3>
+						如果你不想使用上面的所有规则怎么办呢，<b>Melon::runApp</b>提供了直接调用控制器方法的命令
+<pre>
+<code class="language-php">
+	Melon::init( array(
+		'type' => 'app',
+		'root' => __DIR__,
+		'appName' => 'MyApp',
+	) );
+	
+	// 此处也可以通过更多计算出控制器和方法
+	// 比如使用Melon::httpRoute
+	
+	$controler = $_GET['c'];
+	$action = $_GET['a'];
+	$args = $_GET['args'];
+	Melon::runApp( 'MyModule', $controler, $action, $args );
+</code>
+</pre>
+						这样就不必受到限制，随意定义自己的路由方式。
+					</div>
+				</div>
+				
+				
 				
 				<div class="melon-item">
 					<a name="mark_app_lang" class="melon-mark"></a>
@@ -1375,24 +1528,6 @@ class Index extends \Melon\App\Lib\Controller {
 					<h2 class="melon-h">感谢</h2>
 					<div>首先非常感谢你的关注！我一直想写一个自己的框架，有人对我说过，自己写的框架能比得上zend、yii它们吗？其实对于程序员这个非常有创造性的职业来说，相信每个人都有过满脑子的想法，却总是懒散，或者犹豫不决，生怕自己浪费时间和精力。<br /><br />这其实是非常扼杀自己创造力的想法，我在写它之前，也不相信自己能做出什么，但上手之后，我的灵感满脑子的跑，茶饭不思，从来没有过这样感觉，从中也学习和巩固了各方面的知识。于是MelonFramework诞生了，虽然它有很多不足，但我会继续完善它。<br /><br />如果你有一些灵感，请马上打开你的编辑器，写下来吧！</div>
 				</div>
-<!--				
-				<div class="melon-item">
-					<a name="mark_app_lang" class="melon-mark"></a>
-					<h2 class="melon-h">语言包（国际化）</h2>
-					<div></div>
-				</div>
-				-->
-<!--
-					<li><a href="#mark_app">APP/MVC</a>
-						<ul class="menu-sub">
-							<li><a href="#mark_app_initialization">初始化</a></li>
-							<li><a href="#mark_app_controller">控制器</a></li>
-							<li><a href="#mark_app_model">模型</a></li>
-							<li><a href="#mark_app_view">视图</a></li>
-							<li><a href="#mark_app_lang">语言包（国际化）</a></li>
-						</ul>
-					</li>
--->
 			</div>
 		</div>
 	</div>
