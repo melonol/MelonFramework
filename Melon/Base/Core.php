@@ -5,7 +5,7 @@
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link http://framework.melonol.com
  * @author Melon <admin@melonol.com>
- * @version 0.2.0
+ * @version 0.2.1
  */
 
 namespace Melon\Base;
@@ -49,7 +49,7 @@ class Core {
 	 * @var array 
 	 */
 	public $env = array(
-		'version' => '0.2.0'
+		'version' => '0.2.1'
 	);
 	
 	/**
@@ -150,8 +150,8 @@ class Core {
 		}
 		$runType = ( isset( $config['type'] ) && in_array( $config['type'], array( 'normal', 'app' ) ) ?
 				$config['type'] : 'normal' );
-		$rootPath = ( isset( $config['root'] ) ? $config['root'] : null );
-		if( $rootPath && ! is_dir( $rootPath ) ) {
+		$rootPath = ( isset( $config['root'] ) ? realpath( $config['root'] ) : null );
+		if( isset( $config['root'] ) && ! $rootPath ) {
 			exit( '应用目录无效' );
 		}
 		

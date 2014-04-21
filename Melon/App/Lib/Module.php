@@ -5,7 +5,7 @@
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link http://framework.melonol.com
  * @author Melon <admin@melonol.com>
- * @version 0.2.0
+ * @version 0.2.1
  */
 
 namespace Melon\App\Lib;
@@ -36,11 +36,11 @@ abstract class Module {
 		$controllerObj = $this->getController( $controller );
 		
 		if( ! is_object( $controllerObj ) ) {
-			trigger_error( '控制器不存在', E_USER_ERROR );
+			trigger_error( "控制器{$controller}不存在", E_USER_ERROR );
 			$this->page404();
 		}
 		if( ! is_callable( array( $controllerObj, $action ) ) ) {
-			trigger_error( '控制器方法不存在', E_USER_ERROR );
+			trigger_error( "控制器方法{$action}不存在", E_USER_ERROR );
 			$this->page404();
 		}
 		
@@ -48,7 +48,7 @@ abstract class Module {
 		$controllerObj->request = \Melon::httpRequest();
 		$controllerObj->response = \Melon::httpResponse();
 		$controllerObj->lang = new Lang( $this->getCommentLang() );
-		$controllerObj->view = new View( $controllerObj );
+		$controllerObj->view = $this->_getView( $controllerObj );
 		
 		$before = $after = array();
 		$ucfirstOfAction = ucfirst( $action );
@@ -60,6 +60,28 @@ abstract class Module {
 		}
 		$controlTrigger = \Melon::trigger( $controllerObj, $before, $after );
 		call_user_func_array( array( $controlTrigger, $action ), $args );
+	}
+	
+	/**
+	 * 获取视图实例
+	 * 
+	 * @param Object $controllerObj 控制器对象
+	 * @return \Melon\App\Lib\View
+	 */
+	private function _getView( $controllerObj ) {
+		\Melon::load( __DIR__ . DIRECTORY_SEPARATOR . 'Func.php' );
+		
+		$view = new View( $controllerObj );
+		
+		// 注入alink标签
+		$view->assignTag( 'alink', array(
+			'callable' => '\Melon\App\Lib\Func\alink',
+			'args' => array(
+				'ln' => '',
+				'comp' => true,
+			)
+		) );
+		return $view;
 	}
 	
 	/**

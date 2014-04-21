@@ -4,7 +4,7 @@ return array(
 	
 	'charset' => 'utf-8',							// 脚本编码
 	'timezone' => null,								// 时区
-	'privatePre' => '_',								// 私有前缀
+	
 	'includePath' => array(),						// 包含路径
 	
 	'logDir' => 'Log',					// 系统日志目录，相对于Melon环境变量的root目录
@@ -18,7 +18,7 @@ return array(
 	
 	'templateTags' => array( '{', '}' ),			//默认模板标签
 	
-	'database' => array(						// PDO数据库接口配置
+	'database' => array(						// 数据库接口配置
 		'tablePrefix' => '',					// 表前缀
 //		'driver' => array(
 //			'dsn' => '',						// PDO DSN，例：mysql:host=localhost;dbname=test;

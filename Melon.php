@@ -5,7 +5,7 @@
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link http://framework.melonol.com
  * @author Melon <admin@melonol.com>
- * @version 0.2.0
+ * @version 0.2.1
  */
 
 define( 'IN_MELON', true );
@@ -86,8 +86,8 @@ class Melon {
 	 * 
 	 * @param string $module [可选] module名称，如果你在初始化的时候设置了，这时候就不需要指定此参数
 	 * @param string $controller [可选] 控制器，如果不提供此参数，程序则调用Route类尝试解释路径
-	 * @param string $action [可选] 方法
-	 * @param string $args [可选] 参数
+	 * @param string $action [可选] 方法，必需先提供控制器，否则该选项无效
+	 * @param string $args [可选] 参数，必需先提供控制器，否则该选项无效
 	 * @return void
 	 */
 	static public function runApp( $module = null, $controller = null, $action = null, array $args = array() ) {
@@ -365,11 +365,18 @@ class Melon {
 	/**
 	 * 获得一个路由实例
 	 * 
-	 * @param array $config 路由配置
+	 * 
+	 * @param array $config 全局路由配置，详情请看self::setConfig方法
+	 * @param enum $type 路由类型
+	 * Route::TYPE_AUTO				[默认] 自动识别
+	 * Route::TYPE_INCOMPLETE		不完全的（带.php）
+	 * Route::TYPE_COMPLETE			完全的（带.php）
+	 * Route::TYPE_REQUEST_KEY		通过请求参数指定路由
+	 * @param string $request 请求参数的名字，当路由类型为Route::TYPE_REQUEST_KEY时，有效
 	 * @return \Melon\Http\Route
 	 */
-	final static public function httpRoute( $config = array() ) {
-		return new Http\Route( $config );
+	final static public function httpRoute( $config = array(), $type = Http\Route::TYPE_AUTO, $requestKey = '' ) {
+		return new Http\Route( $config, $type, $requestKey );
 	}
 	
 	/**
