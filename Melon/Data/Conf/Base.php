@@ -4,7 +4,7 @@ return array(
 	
 	'charset' => 'utf-8',							// 脚本编码
 	'timezone' => null,								// 时区
-	'privatePre' => '_',								// 私有前缀
+	'privatePre' => '_',								// 私有前缀，安装APP之前可更改，安装之后是不可更改的
 	'includePath' => array(),						// 包含路径
 	
 	'logDir' => 'Data/Log',					// 系统日志目录，相对于Melon环境变量的root目录

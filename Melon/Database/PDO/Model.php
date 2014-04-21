@@ -5,7 +5,7 @@
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link http://framework.melonol.com
  * @author Melon <admin@melonol.com>
- * @version 0.2.0
+ * @version 0.2.1
  */
 
 namespace Melon\Database\PDO;
@@ -76,6 +76,15 @@ class Model {
 		$this->_setTable( $table );
 		$this->_pdo = $pdo;
 		$this->_debug = false;
+	}
+	
+	/**
+	 * 返回当前模型的PDO对象
+	 * 
+	 * @return \PDO $pdo PDO实例对象
+	 */
+	public function pdo() {
+		return $this->_pdo;
 	}
 	
 	/**
