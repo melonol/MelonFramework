@@ -6,5 +6,5 @@
  * 大胆写吧！
  */
 class __APPNAME__ extends Melon {
-	
+    
 }

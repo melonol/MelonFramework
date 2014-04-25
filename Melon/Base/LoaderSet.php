@@ -12,14 +12,14 @@ defined( 'IN_MELON' ) or die( 'Permission denied' );
  * @author Melon
  */
 class LoaderSet extends \Melon\Util\Set {
-	
-	/**
-	 * 使用md5格式化键名
-	 * 
-	 * @param mixed $key
-	 * @return string 
-	 */
-	protected function _normalizeKey( $key ) {
-		return md5( $key );
-	}
+    
+    /**
+     * 使用md5格式化键名
+     * 
+     * @param mixed $key
+     * @return string 
+     */
+    protected function _normalizeKey( $key ) {
+        return md5( $key );
+    }
 }

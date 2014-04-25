@@ -1,193 +1,239 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Melon Framework - 中文 PHP 框架</title>
-	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-	<meta name="description" content="Melon Framework是一个用于php5.3或以上开源的轻量级php框架，基于Apache Licence 2.0开源协议发布。支持mvc与restful程序的构建，并有可动态扩展的模块引擎、独创的包体系、触发器（类aop）等功能。" />
-	<meta name="keywords" content="Melon Framework官网,Melon Framework,framework,PHP,PHP框架,MVC框架,REST,开源,mvc,web应用" />
-	<style>
-		/*整体*/
-		body * { margin: 0; padding: 0; color: #555; font-size: 1em; font-weight: normal; font-family: "microsoft yahei", 微软雅黑, Verdana, sans-serif, 宋体; }
-		li { list-style-type:none; }
-		b { font-weight: 700; }
-		#main { margin-left: 250px; }
-		
-		 @media screen and (max-width: 768px) {
-			 #main { margin-left: 0px;  }
-			 #menu { display: none; }
-		 }
-		
-		/*菜单栏*/
-		#menu { width: 250px; height: 100%; position: fixed; top: 0; left: 0; overflow-y: auto; background-color: #F37B1D; color: #FFFFFF; }
-		.melon-menu { padding: 1em; }
-		.melon-contact { padding: 1em; color: #FFFFFF; }
-		.melon-contact a { color: #FFFFFF; }
-		.melon-menu * { color: #EEE; }
-		.melon-menu a { width: 100%; display: inline-block; zoom: 1; margin: 0.2em 0; padding: 0.4em 0; text-decoration:none; }
-		.melon-menu ul li a { text-indent: 0.5em; }
-		.melon-menu ul li a:hover, .melon-menu .menu-hover { color: #FFF; background-color: #C46216; text-decoration:none; }
-		.melon-menu .menu-head { display: inline-block; zoom: 1; color: #FFF; font-size: 1.5em; padding: 0.6em 0; }
-		.melon-menu .menu-sub { padding-left: 1em; }
-		
-		/*内容栏*/
-		#content { padding: 3em; max-width: 768px; margin: 0 auto; font-size: 0.9em; }
-		#content p { line-height: 1.5em; text-indent: 2em; }
-		
-		/*头部简介*/
-		.melon-introduction { height: 800px; text-align: center; }
-		.melon-introduction .introduction-tl { color: #F37B1D; font-size: 4em; }
-		.melon-introduction .introduction-content { margin-top: 4em; }
-		.melon-introduction .introduction-source-links { margin-top: 8em; }
-		.melon-introduction .introduction-source-links .melon-btn { margin: 0 10px; }
-		.melon-introduction .introduction-source-links .introduction-source-version { display: block; font-size: 2em; margin-bottom: 1em; }
-		
-		/*按钮*/
-		a.melon-btn { display: inline-block; zoom: 1; padding: 0.5em 1em; font-size: 1em; color: #444; background-color: #E6E6E6; text-decoration:none; }
-		a.melon-btn:hover { background-color: #D6D6D6; text-decoration:none; }
+    <title>Melon Framework - 中文 PHP 框架</title>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <meta name="description" content="Melon Framework是一个用于php5.3或以上开源的轻量级php框架，基于Apache Licence 2.0开源协议发布。支持mvc与restful程序的构建，并有可动态扩展的模块引擎、独创的包体系、触发器（类aop）等功能。" />
+    <meta name="keywords" content="Melon Framework官网,Melon Framework,framework,PHP,PHP框架,MVC框架,REST,开源,mvc,web应用" />
+    <style>
+        /*整体*/
+        body * { margin: 0; padding: 0; color: #555; font-size: 1em; font-weight: normal; font-family: "microsoft yahei", 微软雅黑, Verdana, sans-serif, 宋体; }
+        li { list-style-type:none; }
+        b { font-weight: 700; }
+        #main { margin-left: 250px; }
+        
+         @media screen and (max-width: 768px) {
+             #main { margin-left: 0px;  }
+             #menu { display: none; }
+         }
+        
+        /*菜单栏*/
+        #menu { width: 250px; height: 100%; position: fixed; top: 0; left: 0; overflow-y: auto; background-color: #F37B1D; color: #FFFFFF; }
+        .melon-menu { padding: 1em; }
+        .melon-contact { padding: 1em; color: #FFFFFF; }
+        .melon-contact a { color: #FFFFFF; }
+        .melon-menu * { color: #EEE; }
+        .melon-menu a { width: 100%; display: inline-block; zoom: 1; margin: 0.2em 0; padding: 0.4em 0; text-decoration:none; }
+        .melon-menu ul li a { text-indent: 0.5em; }
+        .melon-menu ul li a:hover, .melon-menu .menu-hover { color: #FFF; background-color: #C46216; text-decoration:none; }
+        .melon-menu .menu-head { display: inline-block; zoom: 1; color: #FFF; font-size: 1.5em; padding: 0.6em 0; }
+        .melon-menu .menu-sub { padding-left: 1em; }
+        
+        /*内容栏*/
+        #content { padding: 3em; max-width: 768px; margin: 0 auto; font-size: 0.9em; }
+        #content p { line-height: 1.5em; text-indent: 2em; }
+        
+        /*头部简介*/
+        .melon-introduction { height: 800px; text-align: center; }
+        .melon-introduction .introduction-tl { color: #F37B1D; font-size: 4em; }
+        .melon-introduction .introduction-content { margin-top: 4em; }
+        .melon-introduction .introduction-source-links { margin-top: 8em; }
+        .melon-introduction .introduction-source-links .melon-btn { margin: 0 10px; }
+        .melon-introduction .introduction-source-links .introduction-source-version { display: block; font-size: 2em; margin-bottom: 1em; }
+        
+        /*按钮*/
+        a.melon-btn { display: inline-block; zoom: 1; padding: 0.5em 1em; font-size: 1em; color: #444; background-color: #E6E6E6; text-decoration:none; }
+        a.melon-btn:hover { background-color: #D6D6D6; text-decoration:none; }
 
-		/*标题*/
-		.melon-h { margin: 2em 0 0.5em 0; border-bottom: 1px solid #F37B1D; }
-		h2.melon-h { font-size: 1.5em; border-bottom-width: 5px; }
-		h3.melon-h { font-size: 1.4em; border-bottom-width: 3px; }
-		h4.melon-h { font-size: 1.2em; border-bottom-width: 1px; }
+        /*标题*/
+        .melon-h { margin: 2em 0 0.5em 0; border-bottom: 1px solid #F37B1D; }
+        h2.melon-h { font-size: 1.5em; border-bottom-width: 5px; }
+        h3.melon-h { font-size: 1.4em; border-bottom-width: 3px; }
+        h4.melon-h { font-size: 1.2em; border-bottom-width: 1px; }
 
-		/*列表*/
-		.melon-item { margin-top: 10em; }
-		.melon-list, .melon-dlist { margin: 1em 0; }
-		.melon-list li, .melon-dlist dt { font-weight: bold; }
-		.melon-dlist dd { margin-bottom: 0.5em; }
-		.melon-tips { padding: 0.5em; margin: 1em 0; background-color: #D6D6D6; font-size: 0.8em; font-style: italic; }
-		.melon-item .clean-mg { margin: 0; }
-		.melon-item .clean-mg-top { margin-top: 0; }
-		
-		/*代码*/
-		pre code { overflow-y: auto; border: 0px; background-color: #FFFFFF; font-family: Monospaced, Proggy, Profont, Courier !important; -webkit-font-smoothing:antialiased; font-smoothing:antialiased  }
-		code { border: 1px solid #EEE; background-color: #D6D6D6; }
-		code * { font-family: Monospaced, Proggy, Profont, Courier !important; -webkit-font-smoothing:antialiased; font-smoothing:antialiased }
-	</style>
-	
+        /*列表*/
+        .melon-item { margin-top: 10em; }
+        .melon-list, .melon-dlist { margin: 1em 0; }
+        .melon-list li, .melon-dlist dt { font-weight: bold; }
+        .melon-dlist dd { margin-bottom: 0.5em; }
+        .melon-tips { padding: 0.5em; margin: 1em 0; background-color: #D6D6D6; font-size: 0.8em; font-style: italic; }
+        .melon-item .clean-mg { margin: 0; }
+        .melon-item .clean-mg-top { margin-top: 0; }
+        
+        /*代码*/
+        pre code { overflow-y: auto; border: 0px; background-color: #FFFFFF; font-family: Monospaced, Proggy, Profont, Courier !important; -webkit-font-smoothing:antialiased; font-smoothing:antialiased  }
+        code { border: 1px solid #EEE; background-color: #D6D6D6; }
+        code * { font-family: Monospaced, Proggy, Profont, Courier !important; -webkit-font-smoothing:antialiased; font-smoothing:antialiased }
+    </style>
+    
 </head>
 <body>
-	<div id="main">
-		<div id="menu">
-			<div class="melon-menu">
-				<a href="#" class="menu-head">Melon Framework</a>
-				<ul>
-					<li><a href="#mark_quick_start">开始了解</a></li>
-					<li><a href="#mark_tree">目录结构</a></li>
-					<li><a href="#mark_norms">开发规范</a></li>
-					<li><a href="#mark_initialization">初始化与配置</a></li>
-					<li><a href="#mark_loader">加载</a></li>
-					<li><a href="#mark_package">权限与包</a></li>
-					<li><a href="#mark_error_handler">错误与调试</a></li>
-					<li><a href="#mark_logger">日志</a></li>
-					<li><a href="#mark_database_pdo">数据库接口</a></li>
-					<li><a href="#mark_route">路由</a></li>
-					<li><a href="#mark_http_rest">HTTP/REST</a></li>
-					<li><a href="#mark_template">模板</a></li>
-					<li><a href="#mark_trigger">触发器</a></li>
-					<li><a href="#mark_function">函数</a></li>
-					<li><a href="#mark_app">APP/MVC</a>
-						<ul class="menu-sub">
-							<li><a href="#mark_app_initialization">初始化与配置</a></li>
-							<li><a href="#mark_app_tree">目录结构</a></li>
-							<li><a href="#mark_app_controller">控制器</a></li>
-							<li><a href="#mark_app_view">视图</a></li>
-							<li><a href="#mark_app_model">模型</a></li>
-							<li><a href="#mark_app_route">路由与URL</a></li>
-							<li><a href="#mark_app_lang">语言包（国际化）</a></li>
-						</ul>
-					</li>
-				</ul>
-			</div>
-			<p class="melon-contact">你好，我是Melon，也可以叫我豆浆油条<br />如果有什么疑问，欢迎你反馈信息到以下邮箱，谢谢<br /><a href="mailto:admin@melonol.com">admin@melonol.com</a></p>
-		</div>
-		<div id="content">
-			<div class="melon-introduction">
-				<h1 class="introduction-tl">Melon Framework</h1>
-				<div class="introduction-content">
-					<p>是一个用于php5.3或以上开源的轻量级php框架，基于<a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache Licence 2.0</a>开源协议发布。支持mvc与restful程序的构建，并有可动态扩展的模块引擎、独创的包体系、触发器（类aop）等功能。</p>
-					<p>框架提供了常见的基本操作，非常低的偶合度可以帮助你灵活构建适合自己的开发环境。</p>
-				</div>
-				<div class="introduction-source-links">
-					<span class="introduction-source-version">当前文档版本 - 0.2.1，获取最新版本</span>
-					<a href="http://git.oschina.net/397574898/MelonFramework" target="_blank" class="melon-btn">开源中国Git</a>
-					<a href="https://github.com/melonol/MelonFramework" target="_blank" class="melon-btn">Github</a>
-				</div>
-			</div>
-			
-			<div class="melon-doc">
-				<div class="melon-item clean-mg">
-					<a name="mark_quick_start" class="melon-mark"></a>
-					<h2 class="melon-h clean-mg-top">开始了解</h2>
-					<div>
-						下载源码解压到指定目录，只要引入Melon.php，执行初始化即可使用。<br />
-						Melon.php中声明了一个叫<b>Melon</b>的类，我习惯把它称为<b>主体类</b><br />
-						<div class="melon-tips">
-							<b>Melon主体类</b>是一个纯静态类，提供了框架几乎所有操作的入口，你只需要参阅Melon下的<b>方法</b>就能了解整个框架的所有功能
-						</div>
-						框架使用了5.3新增的命名空间以及闭包。而运行的模式有两种，一种是为喜欢定制自己环境的人创建的，另一种是为快速开发的人而创建的
-					</div>
-					<h3 class="melon-h">普通模式</h3>
-					<div>
-					普通模式仅初始化框架基本环境，提供基本工具
+    <div id="main">
+        <div id="menu">
+            <div class="melon-menu">
+                <a href="#" class="menu-head">Melon Framework</a>
+                <ul>
+                    <li><a href="#mark_quick_start">开始了解</a></li>
+                    <li><a href="#mark_tree">目录结构</a></li>
+                    <li><a href="#mark_norms">开发规范</a></li>
+                    <li><a href="#mark_initialization">初始化与配置</a></li>
+                    <li><a href="#mark_loader">加载</a></li>
+                    <li><a href="#mark_package">权限与包</a></li>
+                    <li><a href="#mark_error_handler">错误与调试</a></li>
+                    <li><a href="#mark_logger">日志</a></li>
+                    <li><a href="#mark_database_pdo">数据库接口</a></li>
+                    <li><a href="#mark_route">路由</a></li>
+                    <li><a href="#mark_http_rest">HTTP/REST</a></li>
+                    <li><a href="#mark_template">模板</a></li>
+                    <li><a href="#mark_trigger">触发器</a></li>
+                    <li><a href="#mark_function">函数</a></li>
+                    <li><a href="#mark_app">APP/MVC</a>
+                        <ul class="menu-sub">
+                            <li><a href="#mark_app_initialization">初始化与配置</a></li>
+                            <li><a href="#mark_app_tree">目录结构</a></li>
+                            <li><a href="#mark_app_controller">控制器</a></li>
+                            <li><a href="#mark_app_view">视图</a></li>
+                            <li><a href="#mark_app_model">模型</a></li>
+                            <li><a href="#mark_app_route">路由与URL</a></li>
+                            <li><a href="#mark_app_lang">语言包（国际化）</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <p class="melon-contact">你好，我是Melon，也可以叫我豆浆油条<br />如果有什么疑问，欢迎你反馈信息到以下邮箱，谢谢<br /><a href="mailto:admin@melonol.com">admin@melonol.com</a></p>
+        </div>
+        <div id="content">
+            <div class="melon-introduction">
+                <h1 class="introduction-tl">Melon Framework</h1>
+                <div class="introduction-content">
+                    <p>是一个用于php5.3或以上开源的轻量级php框架，基于<a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache Licence 2.0</a>开源协议发布。支持mvc与restful程序的构建，并有可动态扩展的模块引擎、独创的包体系、触发器（类aop）等功能。</p>
+                    <p>框架提供了常见的基本操作，非常低的偶合度可以帮助你灵活构建适合自己的开发环境。</p>
+                </div>
+                <div class="introduction-source-links">
+                    <span class="introduction-source-version">当前文档版本 - 0.2.2，获取最新版本</span>
+                    <a href="http://git.oschina.net/397574898/MelonFramework" target="_blank" class="melon-btn">开源中国Git</a>
+                    <a href="https://github.com/melonol/MelonFramework" target="_blank" class="melon-btn">Github</a>
+                </div>
+            </div>
+            
+            <div class="melon-doc">
+                <div class="melon-item clean-mg">
+                    <a name="mark_quick_start" class="melon-mark"></a>
+                    <h2 class="melon-h clean-mg-top">开始了解</h2>
+                    <div>
+                        下载源码解压到指定目录，只要引入Melon.php，执行初始化即可使用。<br />
+                        Melon.php中声明了一个叫<b>Melon</b>的类，我习惯把它称为<b>主体类</b><br />
+                        <div class="melon-tips">
+                            <b>Melon主体类</b>是一个纯静态类，提供了框架几乎所有操作的入口，你只需要参阅Melon下的<b>方法</b>就能了解整个框架的所有功能
+                        </div>
+                        框架使用了5.3新增的命名空间以及闭包。而运行的模式有两种，一种是为喜欢定制自己环境的人创建的，另一种是为快速开发的人而创建的
+                    </div>
+                    <h3 class="melon-h">普通模式</h3>
+                    <div>
+                    普通模式仅初始化框架基本环境，提供基本工具
 <pre>
 <code class="language-php">
-	require './MelonFramework/Melon.php';
-	Melon::init();
+    require './MelonFramework/Melon.php';
+    Melon::init();
 </code>
 </pre>
-					主体类带有一个<b>快捷方式M</b>（其实是Melon的子类），你可以<code>Melon::env</code>这样调用一个方法，或者<code>M::env</code><br />
-						干脆你不想用它们，也可以自己换一个'马甲'，像M一样继承Melon：<br />
+                    主体类带有一个<b>快捷方式M</b>（其实是Melon的子类），你可以<code>Melon::env</code>这样调用一个方法，或者<code>M::env</code><br />
+                        干脆你不想用它们，也可以自己换一个'马甲'，像M一样继承Melon：<br />
 <pre>
 <code class="language-php">
-	require './MelonFramework/Melon.php';
-	class Name extends Melon {}
-	Name::init();
+    require './MelonFramework/Melon.php';
+    class Name extends Melon {}
+    Name::init();
 </code>
 </pre>
 使用两个基本方法载入脚本，load方法已经对脚本做了防重处理，重复载入不会发生错误。当然也支持autoload，但你要先配置includePath和使用命名空间
 <pre>
 <code class="language-php">
-	// 载入程序脚本
-	Melon::load( 'dir/script.php' );
-	// 载入有返回值的脚本，一般是配置之类的
-	$config = Melon::acquire( 'dir/config.php' );
+    // 载入程序脚本
+    Melon::load( 'dir/script.php' );
+    // 载入有返回值的脚本，一般是配置之类的
+    $config = Melon::acquire( 'dir/config.php' );
 </code>
 </pre>
-						然后使用主体类提供的工具搭建环境吧！
-					</div>
-					
-					<h3 class="melon-h">APP模式</h3>
-					<div>
-						如果你想更快的开发出应用，可以选择APP模式，APP模式基于模块、和MVC运行，并拥有普通模式的所有功能。要使用它也很容易，但首先你要安装：
+                    来看另一个简单的应用实例
 <pre>
 <code class="language-php">
-	require './MelonFramework/Melon.php';
-	Melon::init( array(
-		'type' => 'app', // app模式
-		'root' => __DIR__, // APP所处目录
-		'appName' => 'MyApp', // app名字，首字母大写
-		'install' => 'app', // 这个参数表示安装MyApp
-	) );
-	Melon::runApp( 'MyModule' ); //必需调用runApp才能运行
+   require './MelonFramework/Melon.php';
+   Melon::init();
+
+   // 得到请求实际，它包含http请求头的信息，包括参数
+   $request = Melon::httpRequest();
+   // 得到处理回应结果的实例，它用于返回http信息
+   $response = Melon::httpResponse();
+
+   // 如果用户没提供用户名的参数，返回一个401错误
+   $username = $request->input( 'username' );
+   if( ! $request->input( 'username' ) ) {
+       $response->send( '请输入用户名', 401, 'text/html' );
+       Melon::halt();
+   }
+
+   // 得到用户名后，我们使用模板类来显示一个欢迎页
+   // 首先取得模板类实例，并设置模板和编译目录
+   $template = Melon::template()
+       ->setCompileDir( __DIR__ . DIRECTORY_SEPARATOR . 'Cache' )
+       ->setTemplateDir( __DIR__ . DIRECTORY_SEPARATOR . 'Template' );
+
+   // 假设Template目录下存在hello.html模板，内容如下
+   /*
+   &lt;html&gt;
+       &lt;head&gt;
+           &lt;title&gt;首页&lt;/title&gt;
+           &lt;meta charset=&quot;UTF-8&quot;&gt;
+       &lt;/head&gt;
+       &lt;body&gt;
+           欢迎你！{$username}
+       &lt;/body&gt;
+   &lt;/html&gt;
+    */
+   // 注入模板变量
+   $template->assign( 'username', $username );
+   // 接下来我们显示这个视图
+   $template->display( 'hello.html' );
+
+   // 浏览器访问当前脚本，并带入username参数，例如 http://domain.com/index.php?username=melon
+   // 即可得到如下信息：
+   // 欢迎你！melon
 </code>
 </pre>
-						如果页面出现‘欢迎’的字样，说明你已经安装成功了。下一步记得把<b>'install' => 'app'</b>这句注释或删掉，然后进入APP所处目录下的<b>MyApp/Module/_MyModule/</b>目录，熟悉的MVC就在这里了。
-					</div>
-					
-					<h4 class="melon-h">接下来干什么？</h4>
-					<div>
-						无论怎样，都应该大致了解Melon主体类的方法，这样基本你都整个框架就了解了50%以上。如果你还没有下载MelonFramework，可也可继续看下面的内容。<br />
-						在继续查看其它文档之前，建议先阅读<a href="#mark_tree" class="melon-mark-link">目录结构</a>和<a href="#mark_norms" class="melon-mark-link">开发规范</a>。<br /><br />
-						是不是觉得有点烦了？对此我很抱歉，但我尽量把文档口语化以及简单描述，相信不会花你很多时间的。
-					</div>
-				</div>
-				
-				<div class="melon-item">
-					<a name="mark_tree" class="melon-mark"></a>
-					<h2 class="melon-h melon-h2">目录结构</h2>
-					<div>
+                        通过普通模式，使用主体类提供的工具搭建环境吧！
+                    </div>
+                    
+                    <h3 class="melon-h">APP模式</h3>
+                    <div>
+                        如果你想更快的开发出应用，可以选择APP模式，APP模式基于模块、和MVC运行，并拥有普通模式的所有功能。要使用它也很容易，但首先你要安装：
+<pre>
+<code class="language-php">
+    require './MelonFramework/Melon.php';
+    Melon::init( array(
+        'type' => 'app',        // app模式
+        'root' => __DIR__,      // APP所处目录
+        'appName' => 'MyApp',   // app名字，首字母大写
+        'install' => 'app',     // 这个参数表示安装MyApp
+    ) );
+    Melon::runApp( 'MyModule' ); //必需调用runApp才能运行
+</code>
+</pre>
+                        如果页面出现‘欢迎’的字样，说明你已经安装成功了。下一步记得把<b>'install' => 'app'</b>这句注释或删掉，然后进入APP所处目录下的<b>MyApp/Module/_MyModule/</b>目录，熟悉的MVC就在这里了。
+                    </div>
+                    
+                    <h4 class="melon-h">接下来干什么？</h4>
+                    <div>
+                        无论怎样，都应该大致了解Melon主体类的方法，这样基本你都整个框架就了解了50%以上。如果你还没有下载MelonFramework，可也可继续看下面的内容。<br />
+                        在继续查看其它文档之前，建议先阅读<a href="#mark_tree" class="melon-mark-link">目录结构</a>和<a href="#mark_norms" class="melon-mark-link">开发规范</a>。<br /><br />
+                        是不是觉得有点烦了？对此我很抱歉，但我尽量把文档口语化以及简单描述，相信不会花你很多时间的。
+                    </div>
+                </div>
+                
+                <div class="melon-item">
+                    <a name="mark_tree" class="melon-mark"></a>
+                    <h2 class="melon-h melon-h2">目录结构</h2>
+                    <div>
 <pre>
 <code>
 Melon    -----------------------------------    <b>框架类库</b>
@@ -199,9 +245,9 @@ Melon    -----------------------------------    <b>框架类库</b>
             Module.php    ------------------    模块接口
             PDOModel.php    ----------------    PDO模型
             View.php    --------------------    视图类
-		
+        
         Template    ------------------------    <b>APP程序模板目录</b>
-		
+        
     Base    --------------------------------    <b>核心类库</b>
         App.php    -------------------------    APP模式核心运行
         Core.php    ------------------------    框架核心运行
@@ -211,425 +257,425 @@ Melon    -----------------------------------    <b>框架类库</b>
         LoaderSet.php    -------------------    文件信息容器
         Logger.php    ----------------------    日志处理
         PathTrace.php    -------------------    路径跟踪
-		
+        
     Data    --------------------------------    <b>数据存放</b>
-		
+        
         Conf    ----------------------------    <b>配置</b>
             Base.php    --------------------    基础配置
         errorPage.html    ------------------    错误提示页面
-		
+        
         Log    -----------------------------    <b>普通模式运行后生成的系统日志目录</b>
-		
+        
     Database    ----------------------------    <b>数据库接口</b>
-		
+        
         PDO    -----------------------------    <b>PDO接口</b>
             Model.php    -------------------    PDO模型
             PDO.php    ---------------------    PDO主类
             Statement.php    ---------------    PDO Statement类
-		
+        
     Exception    ---------------------------    <b>异常</b>
         RuntimeException.php    ------------    异常处理
-		
+        
     Http    --------------------------------    <b>HTTP</b>
         Request.php    ---------------------    请求处理
         Response.php    --------------------    回应处理
         Route.php    -----------------------    路由处理
         SimpleRest.php    ------------------    小巧的REST处理类
-		
+        
     Util    --------------------------------    <b>工具</b>
         Set.php    -------------------------    Set集合
         Template.php    --------------------    模板处理
         Trigger.php    ---------------------    触发器
-		
+        
 Melon.php    -------------------------------    主体类
 </code>
 </pre>
-					</div>
-				</div>
-				
-				<div class="melon-item">
-					<a name="mark_norms" class="melon-mark"></a>
-					<h2 class="melon-h">开发规范</h2>
-					每个好项目必定有好的开发规范。也可以这样说，有好的开发规范能帮助程序员开发出好的项目。所以，这是必需落实和坚持的。如果你有兴趣，可以看这篇文章了解我现在是如何编程的，<a href="http://my.oschina.net/u/867608/blog/138002" target="_blank">点这里</a>
-					<h3 class="melon-h">命名</h3>
-					<div>
-						命名讲究简单易懂、见名思义，但有时想个好的名字实在头疼了。所以如果你没有好的主意时，干脆把关键单词组合起来，长一点也没关系，尽量不要缩写
-						<div class="melon-tips">
-							骆驼命名法：由一个或多个单字连结在一起，第一个单词以小写字母开始；第二个单词的首字母大写或每一个单词的首字母都采用大写字母，例如：myFirstName、myLastName<br /><br />
-							帕斯卡命名法：跟骆驼命名法类似，但连首字母都大写，例如MyFirstName、MyLastName<br /><br />
-							下划线命名法：由一个或多个单字连结在一起，每个单词用下划线连结在一起，例如MY_FIRST_NAME、MY_LAST_NAME
-						</div>
-						<dl class="melon-dlist">
-							<dt>文件和目录</dt>
-							<dd>为了更容易使用命名空间，脚本文件和目录都用帕斯卡命名法。除了脚本文件，其它文件也应该这样做，使一致性更好</dd>
-							<dt>类</dt>
-							<dd>使用帕斯卡命名法，并且一个文件应该只有一个类，每个类都应该处于命名空间下</dd>
-							<dt>命名空间</dt>
-							<dd>使用帕斯卡命名法，从程序根目录开始按照目录路径依次命名。例如<code>Melon/Base/App.php</code>脚本的命名空间应该是<code>Melon\Base\App</code></dd>
-							<dt>变量、函数和方法</dt>
-							<dd>使用骆驼命名法</dd>
-							<dt>键名和属性</dt>
-							<dd>同样使用骆驼命名法</dd>
-							<dt>常量</dt>
-							<dd>使用下划线命名法，并且所有单词大写</dd>
-						</dl>
-					</div>
-					<h3 class="melon-h">控制结构</h3>
-					<div>
-						每个人的代码风格都不同，这无法避免。但如果要有好的一致性，除了命名外，控制结构也是需要注意的。其实也没很多要求，相信你也从平常开发中知道很多，我想说的有以下几点：<br /><br />
-						if条件语句尽量以肯定条件判断
+                    </div>
+                </div>
+                
+                <div class="melon-item">
+                    <a name="mark_norms" class="melon-mark"></a>
+                    <h2 class="melon-h">开发规范</h2>
+                    每个好项目必定有好的开发规范。也可以这样说，有好的开发规范能帮助程序员开发出好的项目。所以，这是必需落实和坚持的。如果你有兴趣，可以看这篇文章了解我现在是如何编程的，<a href="http://my.oschina.net/u/867608/blog/138002" target="_blank">点这里</a>
+                    <h3 class="melon-h">命名</h3>
+                    <div>
+                        命名讲究简单易懂、见名思义，但有时想个好的名字实在头疼了。所以如果你没有好的主意时，干脆把关键单词组合起来，长一点也没关系，尽量不要缩写
+                        <div class="melon-tips">
+                            骆驼命名法：由一个或多个单字连结在一起，第一个单词以小写字母开始；第二个单词的首字母大写或每一个单词的首字母都采用大写字母，例如：myFirstName、myLastName<br /><br />
+                            帕斯卡命名法：跟骆驼命名法类似，但连首字母都大写，例如MyFirstName、MyLastName<br /><br />
+                            下划线命名法：由一个或多个单字连结在一起，每个单词用下划线连结在一起，例如MY_FIRST_NAME、MY_LAST_NAME
+                        </div>
+                        <dl class="melon-dlist">
+                            <dt>文件和目录</dt>
+                            <dd>为了更容易使用命名空间，脚本文件和目录都用帕斯卡命名法。除了脚本文件，其它文件也应该这样做，使一致性更好</dd>
+                            <dt>类</dt>
+                            <dd>使用帕斯卡命名法，并且一个文件应该只有一个类，每个类都应该处于命名空间下</dd>
+                            <dt>命名空间</dt>
+                            <dd>使用帕斯卡命名法，从程序根目录开始按照目录路径依次命名。例如<code>Melon/Base/App.php</code>脚本的命名空间应该是<code>Melon\Base\App</code></dd>
+                            <dt>变量、函数和方法</dt>
+                            <dd>使用骆驼命名法</dd>
+                            <dt>键名和属性</dt>
+                            <dd>同样使用骆驼命名法</dd>
+                            <dt>常量</dt>
+                            <dd>使用下划线命名法，并且所有单词大写</dd>
+                        </dl>
+                    </div>
+                    <h3 class="melon-h">控制结构</h3>
+                    <div>
+                        每个人的代码风格都不同，这无法避免。但如果要有好的一致性，除了命名外，控制结构也是需要注意的。其实也没很多要求，相信你也从平常开发中知道很多，我想说的有以下几点：<br /><br />
+                        if条件语句尽量以肯定条件判断
 <pre>
 <code class="language-php">
-	if( ! $isEmpty ) {
-		//do something...
-	} else {
-		echo "Error: it's empty";
-	}
+    if( ! $isEmpty ) {
+        //do something...
+    } else {
+        echo "Error: it's empty";
+    }
 </code>
 </pre>
-						应该改为下面这样，减少头脑的二次转换
+                        应该改为下面这样，减少头脑的二次转换
 <pre>
 <code class="language-php">
-	if( $isEmpty ) {
-		echo "Error: it's empty";
-	} else {
-		//do something...
-	}
+    if( $isEmpty ) {
+        echo "Error: it's empty";
+    } else {
+        //do something...
+    }
 </code>
 </pre>
-						if尽量不要超过4层嵌套<br />
-						如果你常常为避免多层嵌套而烦脑，这里有两个建议，一是把里层的逻辑另外封装成一个函数；如果条件允许，可以优先退出
+                        if尽量不要超过4层嵌套<br />
+                        如果你常常为避免多层嵌套而烦脑，这里有两个建议，一是把里层的逻辑另外封装成一个函数；如果条件允许，可以优先退出
 <pre>
 <code class="language-php">
-	public function addUser( $source, $target) {
-		if( ! $this->_inRange( $target ) ) {
-			$noPrivate = ( strpos( $target, DIRECTORY_SEPARATOR . $this->_privatePre ) === false );
-			if( ! $noPrivate ) {
-				$sourceDir = dirname( $source ) . DIRECTORY_SEPARATOR;
-				$targetDir = dirname( $target ) . DIRECTORY_SEPARATOR;
-				if( $sourceDir === $targetDir ) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
+    public function addUser( $source, $target) {
+        if( ! $this->_inRange( $target ) ) {
+            $noPrivate = ( strpos( $target, DIRECTORY_SEPARATOR . $this->_privatePre ) === false );
+            if( ! $noPrivate ) {
+                $sourceDir = dirname( $source ) . DIRECTORY_SEPARATOR;
+                $targetDir = dirname( $target ) . DIRECTORY_SEPARATOR;
+                if( $sourceDir === $targetDir ) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 </code>
 </pre>
-						像下面这样，不符合条件的优先退出，这样避免多层嵌套。不过不是嵌套太多的话，我是优先使用上面的方式，这样符合结构化编程的思想。
+                        像下面这样，不符合条件的优先退出，这样避免多层嵌套。不过不是嵌套太多的话，我是优先使用上面的方式，这样符合结构化编程的思想。
 <pre>
 <code class="language-php">
-	public function addUser( $source, $target) {
-		if( $this->_inRange( $target ) ) {
-			return false;
-		}
-		$noPrivate = ( strpos( $target, DIRECTORY_SEPARATOR . $this->_privatePre ) === false );
-		if( $noPrivate ) {
-			return false;
-		}
-		$sourceDir = dirname( $source ) . DIRECTORY_SEPARATOR;
-		$targetDir = dirname( $target ) . DIRECTORY_SEPARATOR;
-		if( $sourceDir === $targetDir ) {
-			return true;
-		}
-		return false;
-	}
+    public function addUser( $source, $target) {
+        if( $this->_inRange( $target ) ) {
+            return false;
+        }
+        $noPrivate = ( strpos( $target, DIRECTORY_SEPARATOR . $this->_privatePre ) === false );
+        if( $noPrivate ) {
+            return false;
+        }
+        $sourceDir = dirname( $source ) . DIRECTORY_SEPARATOR;
+        $targetDir = dirname( $target ) . DIRECTORY_SEPARATOR;
+        if( $sourceDir === $targetDir ) {
+            return true;
+        }
+        return false;
+    }
 </code>
 </pre>
-						比较条件按从小到大放置，下面这个，给人感觉混乱
+                        比较条件按从小到大放置，下面这个，给人感觉混乱
 <pre>
 <code class="language-php">
-	if( $input > 3 && $input <=10 )
+    if( $input > 3 && $input <=10 )
 </code>
 </pre>
-						这个则很自然，像看标尺一样
+                        这个则很自然，像看标尺一样
 <pre>
 <code class="language-php">
-	if( 3 < $input && $input <=10 )
+    if( 3 < $input && $input <=10 )
 </code>
 </pre>
-					</div>
-					<h3 class="melon-h">排版</h3>
-					<div>
-						排版方面，缩进使用tab而非空格、一行尽量代码保持80字符以内<br />
-						左边花括号不进行换行
+                    </div>
+                    <h3 class="melon-h">排版</h3>
+                    <div>
+                        排版方面，缩进使用四个空格而非tab（自0.2.2版本起）、一行尽量代码保持80字符以内<br />
+                        左边花括号不进行换行
 <pre>
 <code class="language-php">
-	function fuckName() {
-	}
-	if() {
-	}
+    function fuckName() {
+    }
+    if() {
+    }
 </code>
 </pre>
-						关键字与括号之间不带空格，关键字与花括号之间带一个空格；方法和实例对象一样，不带空格
+                        关键字与括号之间不带空格，关键字与花括号之间带一个空格；方法和实例对象一样，不带空格
 <pre>
 <code class="language-php">
-	if() {
-	} else {
-	}
-	foreach() {
-	}
-	
-	func();
-	new stdClass();
+    if() {
+    } else {
+    }
+    foreach() {
+    }
+    
+    func();
+    new stdClass();
 </code>
 </pre>
-						除了上面这种情况，所有可分隔的词和符号，都应该使用一个空格分隔，这样代码看起来比较宽松
+                        除了上面这种情况，所有可分隔的词和符号，都应该使用一个空格分隔，这样代码看起来比较宽松
 <pre>
 <code class="language-php">
-	$key = 'user';
-	$username = isset( $_POST[ $key ] ); // 字符串键名可以不分隔，例如$_POST['user']
-	if( $isEmpty && $isTrue ) {
-		add( 'vip_' . $username );
-	}
+    $key = 'user';
+    $username = isset( $_POST[ $key ] ); // 字符串键名可以不分隔，例如$_POST['user']
+    if( $isEmpty && $isTrue ) {
+        add( 'vip_' . $username );
+    }
 </code>
 </pre>
-						三元操作符使用括号括起来
+                        三元操作符使用括号括起来
 <pre>
 <code class="language-php">
-	$isEmpty = ( $_POST[ 'user' ] === '' ? true : false );
+    $isEmpty = ( $_POST[ 'user' ] === '' ? true : false );
 </code>
 </pre>
-					</div>
-					<h3 class="melon-h">注释</h3>
-					<div>
-						注释按照<a href="http://www.phpdoc.org/docs/latest/index.html" target="_blank">phpdocmentor的注释规范</a>，如果连接被墙了，可以<a href="http://www.google.com.hk/#newwindow=1&q=phpdocumentor+%E6%B3%A8%E9%87%8A%E8%A7%84%E8%8C%83&safe=strict" target="_blank">点这里</a>，而表达方面，注释应该告诉别人代码的意图：为什么要这样做，而不是单纯的说这是什么。这里有一个函数的例子
+                    </div>
+                    <h3 class="melon-h">注释</h3>
+                    <div>
+                        注释按照<a href="http://www.phpdoc.org/docs/latest/index.html" target="_blank">phpdocmentor的注释规范</a>，如果连接被墙了，可以<a href="http://www.google.com.hk/#newwindow=1&q=phpdocumentor+%E6%B3%A8%E9%87%8A%E8%A7%84%E8%8C%83&safe=strict" target="_blank">点这里</a>，而表达方面，注释应该告诉别人代码的意图：为什么要这样做，而不是单纯的说这是什么。这里有一个函数的例子
 <pre>
 <code class="language-php">
-	/**
-	 * 替换字符串里指定格式的变量
-	 * 
-	 * 字符串的变量指定为 ${变量名} 这样的格式。一个简单的使用例子：
-	 * echo varReplace( 'name', 'Melon', '我的名字是${name}' );
-	 * // 输出：我的名字是Melon
-	 * 
-	 * @param string|array $search 要搜索的变量，如果要搜索多个变量，则参数为数组
-	 * @param string|array $replace 替换值，如果要替换为多个值，则参数为数组
-	 * @param string $input 输入字符串
-	 * @return string 替换后的字符串
-	 */
-	function varReplace( $search, $replace, $input ) {
-		// 我打算使用str_replace进行替换，所以要准备搜索和替换的两个数组
-		$searchs = ( is_array( $search ) ? $search : array( $search ) );
-		$replaces = ( is_array( $replace ) ? $replace : array( $replace ) );
-		foreach( $searchs as &$value ) {
-			$value = '${' . $value . '}';
-		}
-		return str_replace( $searchs, $replaces, $input );
-	}								
+    /**
+     * 替换字符串里指定格式的变量
+     * 
+     * 字符串的变量指定为 ${变量名} 这样的格式。一个简单的使用例子：
+     * echo varReplace( 'name', 'Melon', '我的名字是${name}' );
+     * // 输出：我的名字是Melon
+     * 
+     * @param string|array $search 要搜索的变量，如果要搜索多个变量，则参数为数组
+     * @param string|array $replace 替换值，如果要替换为多个值，则参数为数组
+     * @param string $input 输入字符串
+     * @return string 替换后的字符串
+     */
+    function varReplace( $search, $replace, $input ) {
+        // 我打算使用str_replace进行替换，所以要准备搜索和替换的两个数组
+        $searchs = ( is_array( $search ) ? $search : array( $search ) );
+        $replaces = ( is_array( $replace ) ? $replace : array( $replace ) );
+        foreach( $searchs as &$value ) {
+            $value = '${' . $value . '}';
+        }
+        return str_replace( $searchs, $replaces, $input );
+    }                                
 </code>
 </pre>
-					</div>
-					<h3 class="melon-h">耦合</h3>
-					<div>耦合这个问题很广，我向你推荐一下我常用并觉得很好的
-						<ul class="melon-list">
-							<li>1. 习惯将重复的代码封装起来</li>
-							<li>2. 一个函数或方法只做一件事</li>
-							<li>3. 一个类表达一个事物</li>
-							<li>4. 类或方法尽量不要直接调用系统参数、配置，应该通过参数传入</li>
-						</ul>
-						更多的以后补充，或者欢迎你在邮件中和我交流</div>
-				</div>
-				
-				<div class="melon-item">
-					<a name="mark_initialization" class="melon-mark"></a>
-					<h2 class="melon-h">初始化与配置</h2>
-					<div>
-						你已经知道，初始化有两种模式 - 普通和APP。在初始化时候根据<b>type</b>关键字判别，type默认为<b>normal</b>，也就是普通模式。如果是<b>app</b>，请查看<a href="#mark_app_initialization" class="melon-mark-link">APP/MVC的初始化</a>
+                    </div>
+                    <h3 class="melon-h">耦合</h3>
+                    <div>耦合这个问题很广，我向你推荐一下我常用并觉得很好的
+                        <ul class="melon-list">
+                            <li>1. 习惯将重复的代码封装起来</li>
+                            <li>2. 一个函数或方法只做一件事</li>
+                            <li>3. 一个类表达一个事物</li>
+                            <li>4. 类或方法尽量不要直接调用系统参数、配置，应该通过参数传入</li>
+                        </ul>
+                        更多的以后补充，或者欢迎你在邮件中和我交流</div>
+                </div>
+                
+                <div class="melon-item">
+                    <a name="mark_initialization" class="melon-mark"></a>
+                    <h2 class="melon-h">初始化与配置</h2>
+                    <div>
+                        你已经知道，初始化有两种模式 - 普通和APP。在初始化时候根据<b>type</b>关键字判别，type默认为<b>normal</b>，也就是普通模式。如果是<b>app</b>，请查看<a href="#mark_app_initialization" class="melon-mark-link">APP/MVC的初始化</a>
 <pre>
 <code class="language-php">
-	Melon::init( array(
-		'type' => 'normal', // 不写这参数也可以，缺省就是normal
-		'root' => __DIR__,
-	) );
+    Melon::init( array(
+        'type' => 'normal', // 不写这参数也可以，缺省就是normal
+        'root' => __DIR__,
+    ) );
 </code>
-</pre>					那这个root是什么呢？root表示当前应用的根目录，它会被作为APP的安装目录和autoload的作用目录，关于autoload请看<a href="#mark_loader" class="melon-mark-link">加载</a>项。<br />
-					
-					<h3 class="melon-h">配置</h3>
-					<div>
-						在<b>MelonFramework/Melon/Data/Conf/Base.php</b>（A）中存在缺省配置，你也可以在初始化中传入（C）
+</pre>                    那这个root是什么呢？root表示当前应用的根目录，它会被作为APP的安装目录和autoload的作用目录，关于autoload请看<a href="#mark_loader" class="melon-mark-link">加载</a>项。<br />
+                    
+                    <h3 class="melon-h">配置</h3>
+                    <div>
+                        在<b>MelonFramework/Melon/Data/Conf/Base.php</b>（A）中存在缺省配置，你也可以在初始化中传入（C）
 <pre>
 <code class="language-php">
-	Melon::init( array(
-		'type' => 'normal',
-		'config' => array(
-			// 配置项
-		)
-	) );
+    Melon::init( array(
+        'type' => 'normal',
+        'config' => array(
+            // 配置项
+        )
+    ) );
 </code>
 </pre>
-						如果你是使用APP模式，在<b>MyApp/Conf/Base.php</b>（B）下同样存在缺省配置<br />
-						这三处配置的优先级是 C < B < A，总而言之，初始化时传入的配置优先级总是最高的<br />
-						下面给出了缺省配置参考
+                        如果你是使用APP模式，在<b>MyApp/Conf/Base.php</b>（B）下同样存在缺省配置<br />
+                        这三处配置的优先级是 C < B < A，总而言之，初始化时传入的配置优先级总是最高的<br />
+                        下面给出了缺省配置参考
 <pre>
 <code class="language-php">
-	'charset' => 'utf-8',			// 脚本编码
-	'timezone' => null,			// 时区
-	'privatePre' => '_',			// 私有前缀
-	'includePath' => array(),		// 包含路径
-	
-	'logDir' => 'Data/Log',			// 系统日志目录，相对于Melon环境变量的root目录
-	'logDisplayLevel' => 3,			// 显示系统日志等级，0不显示；1只显示异常和致命错误；2显示所有错误；3显示所有类型
-	'logLevel' => 3,			// 记录系统日志等级，0不记录；1只记录异常和致命错误；2记录所有错误；3记录所有类型
-	'logSplitSize' => 10,			// 系统日志分割大小，单位M
-	'htmlShowCodeSnippet' => true,		// 是否在页面中显示代码片段
-	
-	'errorPage' => 'Data/errorPage.html',	// 浏览器访问发生错误时显示的页面，相对于Melon环境变量的root目录
-	'errorMessage' => 'Server error.',	// 非浏览器访问（ajax、cgi等）或者errotPage不存在时输出的错误消息
+    'charset' => 'utf-8',                // 脚本编码
+    'timezone' => null,                  // 时区
+    'privatePre' => '_',                 // 私有前缀
+    'includePath' => array(),            // 包含路径
+    
+    'logDir' => 'Data/Log',              // 系统日志目录，相对于Melon环境变量的root目录
+    'logDisplayLevel' => 3,              // 显示系统日志等级，0不显示；1只显示异常和致命错误；2显示所有错误；3显示所有类型
+    'logLevel' => 3,                     // 记录系统日志等级，0不记录；1只记录异常和致命错误；2记录所有错误；3记录所有类型
+    'logSplitSize' => 10,                // 系统日志分割大小，单位M
+    'htmlShowCodeSnippet' => true,       // 是否在页面中显示代码片段
+    
+    'errorPage' => 'Data/errorPage.html',// 浏览器访问发生错误时显示的页面，相对于Melon环境变量的root目录
+    'errorMessage' => 'Server error.',   // 非浏览器访问（ajax、cgi等）或者errotPage不存在时输出的错误消息
 
-	'templateTags' => array( '{', '}' ),	//默认模板标签
+    'templateTags' => array( '{', '}' ), //默认模板标签
 
-	'database' => array(			// PDO数据库接口配置
-		'tablePrefix' => '',		// 表前缀
-		'driver' => array(
-			'dsn' => '',		// PDO DSN，例：mysql:host=localhost;dbname=test;
-			'username' => '',	// 数据库帐号
-			'password' => '',	// 数据库密码
-			'options' => array(),	// PDO属性
-		)
-	)
+    'database' => array(                 // PDO数据库接口配置
+        'tablePrefix' => '',             // 表前缀
+        'driver' => array(
+            'dsn' => '',                 // PDO DSN，例：mysql:host=localhost;dbname=test;
+            'username' => '',            // 数据库帐号
+            'password' => '',            // 数据库密码
+            'options' => array(),        // PDO属性
+        )
+    )
 </code>
 </pre>
-						</div>
-						<h3 class="melon-h">环境变量env</h3>
-						<div>
-							初始化完成后，MelonFramework不像平时框架那样创建很多常量，而是把它们放到一个环境变量中，可以使用<code>Melon::env</code>方法获取
+                        </div>
+                        <h3 class="melon-h">环境变量env</h3>
+                        <div>
+                            初始化完成后，MelonFramework不像平时框架那样创建很多常量，而是把它们放到一个环境变量中，可以使用<code>Melon::env</code>方法获取
 <pre>
 <code class="language-php">
-	// 获取所有环境变量
-	print_r( Melon::env() );
-	// 结果大概是这样
-	array (
-		 'version' => '0.2.1',		// melon版本
-		 'runType' => 'normal',		// 运行模式：narmal、app
-		 'root' => '',			// 应用根目录
-		 'melonRoot' => '',		// melon根目录
-		 'melonLibrary' => '',		// melon类库目录
-		 'clientType' => 'browser',	// 连接类型： browser、ajax、cgi
-		 'install' => false,		// 安装状态
-		 'config' => array( ... )	// 配置参数
-	 );
-	 
-	 // 获取指定环境变量
-	 echo Melon::env( 'version' );
-	 // 使用.号获取键值
-	 // 下面这句即得到env['config']['charset']的值
-	 echo Melon::env( 'config.charset' );
+    // 获取所有环境变量
+    print_r( Melon::env() );
+    // 结果大概是这样
+    array (
+         'version' => '0.2.2',         // melon版本
+         'runType' => 'normal',        // 运行模式：narmal、app
+         'root' => '',                 // 应用根目录
+         'melonRoot' => '',            // melon根目录
+         'melonLibrary' => '',         // melon类库目录
+         'clientType' => 'browser',    // 连接类型： browser、ajax、cgi
+         'install' => false,           // 安装状态
+         'config' => array( ... )      // 配置参数
+     );
+     
+     // 获取指定环境变量
+     echo Melon::env( 'version' );
+     // 使用.号获取键值
+     // 下面这句即得到env['config']['charset']的值
+     echo Melon::env( 'config.charset' );
 </code>
 </pre>
-						</div>
-					</div>
-				</div>
-				
-				<div class="melon-item">
-					<a name="mark_loader" class="melon-mark"></a>
-					<h2 class="melon-h">加载</h2>
-					<div>
-						加载主要是通过<code>Melon::load</code>和<code>Melon::acquire</code>两个方法进行，而load方法做了防重处理，你不必考虑重复载入的问题
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="melon-item">
+                    <a name="mark_loader" class="melon-mark"></a>
+                    <h2 class="melon-h">加载</h2>
+                    <div>
+                        加载主要是通过<code>Melon::load</code>和<code>Melon::acquire</code>两个方法进行，而load方法做了防重处理，你不必考虑重复载入的问题
 <pre>
 <code class="language-php">
-	// 载入程序脚本
-	Melon::load( 'dir/script.php' );
-	// 载入有返回值的脚本，一般是配置之类的
-	$config = Melon::acquire( 'dir/config.php' );
+    // 载入程序脚本
+    Melon::load( 'dir/script.php' );
+    // 载入有返回值的脚本，一般是配置之类的
+    $config = Melon::acquire( 'dir/config.php' );
 </code>
 </pre>
-						<h3 class="melon-h">includePath与autoload</h3>
-						<div>
-							includePath指<b>包含路径</b>，包含路径是autoload(<a href="http://www.php.net/manual/zh/function.spl-autoload.php" target="_blank">php spl autoload</a>)的作用范围，并且是起点，autoload以这个起点和命名空间作为目录路径搜寻脚本。
+                        <h3 class="melon-h">includePath与autoload</h3>
+                        <div>
+                            includePath指<b>包含路径</b>，包含路径是autoload(<a href="http://www.php.net/manual/zh/function.spl-autoload.php" target="_blank">php spl autoload</a>)的作用范围，并且是起点，autoload以这个起点和命名空间作为目录路径搜寻脚本。
 <pre>
 <code class="language-php">
-	// 不存在fooClass(没有载入)，它将触发autoload
-	// autoload将查找 includePath . '/MyApp/Module/fooClass.php';
-	$class = new MyApp\Module\fooClass();
+    // 不存在fooClass(没有载入)，它将触发autoload
+    // autoload将查找 includePath . '/MyApp/Module/fooClass.php';
+    $class = new MyApp\Module\fooClass();
 </code>
 </pre>
-							而程序默认将<b>MelonFramework</b>（框架本身的目录）以及<b>root</b>添加到includePath中，按先后顺序查找，查找到符合条件的脚本将马上返回，所以这里有一个顺序和性能的问题要注意。你可以在配置文件中的<b>includePath</b>数组中添加更多includePath。
-						</div>
-					</div>
-				</div>
-				
-				<div class="melon-item">
-					<a name="mark_package" class="melon-mark"></a>
-					<h2 class="melon-h">权限与包</h2>
-					权限与包是MelonFramework自创的特色功能，使用它们增强文件和目录的管理。
-					<div>
-						<div class="melon-tips">私有前缀：配置文件中的<b>privatePre</b>参数，默认是 _ 一个下划线</div>
-						在includePath中，当一个文件或目录名字被加上私有前缀的时候，它就添加了<code>Melon::load</code>、<code>Melon::acquire</code>和<b>autoload</b>的读取限制，可以理解成设定为私有文件或目录，就像类的<b>private</b>关键字一样<br /><br />
-						没有权限的脚本要使用<code>Melon::load</code>等加载方法载入私有文件，会被抛出异常。要判断一个脚本文件是否有载入私有文件<br />
-						我把它们分别叫做'载入源路径'和'目标路径'，当载入源路径满足以下条件时，才有权限载入目标路径
-						<ul class="melon-list">
-							<li>1. 目标路径不在检查范围内，即不在includePath包含路径中</li>
-							<li>2. 目标路径文件和父目录都不属于私有的</li>
-							<li>3. 某个父目录属于私有，但是载入源路径和目标路径也同时存在这个私有目录或者其子目录（不包含私有目录）下</li>
-							<li>4. 载入源文件名与目标路径的当前父目录同级，或载入源文件名（不含.php）加上私有前缀与当前父目录相等，比如 /File.php文件可以载入/_File目录下的脚本</li>
-							
-						</ul>
-						原理是我之前通过研究debug_backtrace得到上级调用路径的一些案例，有兴趣的话可以查看这篇文章<a href="http://my.oschina.net/u/867608/blog/129125" target="_blank">《PHP debug_backtrace的胡思乱想》</a>了解。通过debug_backtrace得到调用路径后，可以做一些关于权限的处理
-					</div>
-					
-					<h3 class="melon-h">包</h3>
-					<div>
-						一个目录被设定为私有时，那么同时它也成为了一个包(Package)，私有目录必需有一个同名文件作为入口才可以读取里面的文件，这样加强了模块化的作用<br /><br />
-						在包里任何脚本都可以使用<code>Melon::packageDir</code>得到当前包的目录，同时也可以使用<code>Melon::packageAcquire</code>和<code>Melon::packageLoad</code>方法
+                            而程序默认将<b>MelonFramework</b>（框架本身的目录）以及<b>root</b>添加到includePath中，按先后顺序查找，查找到符合条件的脚本将马上返回，所以这里有一个顺序和性能的问题要注意。你可以在配置文件中的<b>includePath</b>数组中添加更多includePath。
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="melon-item">
+                    <a name="mark_package" class="melon-mark"></a>
+                    <h2 class="melon-h">权限与包</h2>
+                    权限与包是MelonFramework自创的特色功能，使用它们增强文件和目录的管理。
+                    <div>
+                        <div class="melon-tips">私有前缀：配置文件中的<b>privatePre</b>参数，默认是 _ 一个下划线</div>
+                        在includePath中，当一个文件或目录名字被加上私有前缀的时候，它就添加了<code>Melon::load</code>、<code>Melon::acquire</code>和<b>autoload</b>的读取限制，可以理解成设定为私有文件或目录，就像类的<b>private</b>关键字一样<br /><br />
+                        没有权限的脚本要使用<code>Melon::load</code>等加载方法载入私有文件，会被抛出异常。要判断一个脚本文件是否有载入私有文件<br />
+                        我把它们分别叫做'载入源路径'和'目标路径'，当载入源路径满足以下条件时，才有权限载入目标路径
+                        <ul class="melon-list">
+                            <li>1. 目标路径不在检查范围内，即不在includePath包含路径中</li>
+                            <li>2. 目标路径文件和父目录都不属于私有的</li>
+                            <li>3. 某个父目录属于私有，但是载入源路径和目标路径也同时存在这个私有目录或者其子目录（不包含私有目录）下</li>
+                            <li>4. 载入源文件名与目标路径的当前父目录同级，或载入源文件名（不含.php）加上私有前缀与当前父目录相等，比如 /File.php文件可以载入/_File目录下的脚本</li>
+                            
+                        </ul>
+                        原理是我之前通过研究debug_backtrace得到上级调用路径的一些案例，有兴趣的话可以查看这篇文章<a href="http://my.oschina.net/u/867608/blog/129125" target="_blank">《PHP debug_backtrace的胡思乱想》</a>了解。通过debug_backtrace得到调用路径后，可以做一些关于权限的处理
+                    </div>
+                    
+                    <h3 class="melon-h">包</h3>
+                    <div>
+                        一个目录被设定为私有时，那么同时它也成为了一个包(Package)，私有目录必需有一个同名文件作为入口才可以读取里面的文件，这样加强了模块化的作用<br /><br />
+                        在包里任何脚本都可以使用<code>Melon::packageDir</code>得到当前包的目录，同时也可以使用<code>Melon::packageAcquire</code>和<code>Melon::packageLoad</code>方法
 <pre>
 <code class="language-php">
-	// 假设有这样一个目录：/www/App/Module/_Pak/Lib/class.php
-	// 那个class.php处于_Pak包中，class文件执行以行代码：
-	
-	// 得到包路径 /www/App/Module/_Pak/
-	Melon::packageDir();
-	// 载入 /www/App/Module/_Pak/Model/script.php
-	Melon::packageLoad( 'Model/script.php' );
-	// 载入 /www/App/Module/_Pak/Conf/Base.php配置
-	$config = Melon::packageAcquire( 'Conf/Base.php' );
+    // 假设有这样一个目录：/www/App/Module/_Pak/Lib/class.php
+    // 那个class.php处于_Pak包中，class文件执行以行代码：
+    
+    // 得到包路径 /www/App/Module/_Pak/
+    Melon::packageDir();
+    // 载入 /www/App/Module/_Pak/Model/script.php
+    Melon::packageLoad( 'Model/script.php' );
+    // 载入 /www/App/Module/_Pak/Conf/Base.php配置
+    $config = Melon::packageAcquire( 'Conf/Base.php' );
 </code>
 </pre>
-					</div>
-				</div>
-				<div class="melon-item">
-					<a name="mark_error_handler" class="melon-mark"></a>
-					<h2 class="melon-h">错误与调试</h2>
-					<div>
-						配置文件中有五个针对错误处理的参数，分别是<b>logDir</b>系统日志目录、<b>logDisplayLevel</b>显示系统日志等级、<b>logLevel</b>记录系统日志等级、<b>logSplitSize</b>日志文件分割大小。还有一个比较特殊的<b>htmlShowCodeSnippet</b>，它表示显示代码片段开关。<br /><br />当logDisplayLevel开启后，并以浏览器访问发生错误时，页面将显示错误的信息、方法栈以及代码片段，如果你不想显示代码片段，可以把它关闭。<br />这里有一个代码片段的例子，点击左边的 + 号可以看到方法栈的代码
+                    </div>
+                </div>
+                <div class="melon-item">
+                    <a name="mark_error_handler" class="melon-mark"></a>
+                    <h2 class="melon-h">错误与调试</h2>
+                    <div>
+                        配置文件中有五个针对错误处理的参数，分别是<b>logDir</b>系统日志目录、<b>logDisplayLevel</b>显示系统日志等级、<b>logLevel</b>记录系统日志等级、<b>logSplitSize</b>日志文件分割大小。还有一个比较特殊的<b>htmlShowCodeSnippet</b>，它表示显示代码片段开关。<br /><br />当logDisplayLevel开启后，并以浏览器访问发生错误时，页面将显示错误的信息、方法栈以及代码片段，如果你不想显示代码片段，可以把它关闭。<br />这里有一个代码片段的例子，点击左边的 + 号可以看到方法栈的代码
 <div>
-	<table style="margin: 10px; padding: 5px; border-collapse: collapse; background-color: #eeefff; color: #000;"><tbody><tr><th style="border: 1px solid #000; padding: 5px; text-align: left; font-weight: normal;"><a href="javascript:void(0);" style="color: #000; text-decoration: none;" onclick="
-						var codeMain = this.parentNode.getElementsByTagName( 'div' )[0],
-							codeStatus = this.getElementsByTagName( 'span' )[0];
-						if( codeMain.style.display == 'block' ) {
-							codeMain.style.display = 'none';
-							codeStatus.innerHTML = '[+]'
-						} else {
-							codeMain.style.display = 'block';
-							codeStatus.innerHTML = '[-]';
-						}
-						window.onresize();
-					"><span>[+]</span> Notice: Undefined variable: b in F:\www\MelonFrameworks\0.2\test\App1\Module\_Mod1\Controller\Index.php(17)</a>
-					<div style="width: 600px; margin-left: 20px; overflow: hidden; display: none;">
-									<div style="position: relative; font-size: 13px;">
-				<span style="display: block; position: absolute; z-index: 1; top: 140px; height: 20px; width: 100%; _width: 95%; background-color: yellow; opacity: 0.4; filter:alpha(opacity=40); "></span>
-				<div style="float: left; margin-right: 10px; position: relative; z-index: 2; line-height: 20px; color: #aaa;">10<br>11<br>12<br>13<br>14<br>15<br>16<br>17<br>18<br>19<br>20<br>21<br></div>
-				<div style="_width: 95%; line-height: 20px; position: relative; z-index: 2; overflow: hidden; white-space:nowrap; text-overflow:ellipsis;"><span style="color: #FF8000"></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">Index&nbsp;</span><span style="color: #007700">extends&nbsp;\</span><span style="color: #0000BB">Melon</span><span style="color: #007700">\</span><span style="color: #0000BB">App</span><span style="color: #007700">\</span><span style="color: #0000BB">Lib</span><span style="color: #007700">\</span><span style="color: #0000BB">Controller&nbsp;</span><span style="color: #007700">{<br>&nbsp;&nbsp;&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;function&nbsp;</span><span style="color: #0000BB">index</span><span style="color: #007700">()&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//&nbsp;实例一个模型<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;这只是个例子，你需要先配置数据库和创建member表才能运行下面这代码<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;$memberModel&nbsp;=&nbsp;new&nbsp;Model\Member(&nbsp;'member'&nbsp;);<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$a&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">$b</span><span style="color: #007700">;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//&nbsp;显示视图<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">view</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">display</span><span style="color: #007700">(&nbsp;</span><span style="color: #DD0000">'hello.html'&nbsp;</span><span style="color: #007700">);<br>&nbsp;&nbsp;&nbsp;&nbsp;}<br>}</span>
+    <table style="margin: 10px; padding: 5px; border-collapse: collapse; background-color: #eeefff; color: #000;"><tbody><tr><th style="border: 1px solid #000; padding: 5px; text-align: left; font-weight: normal;"><a href="javascript:void(0);" style="color: #000; text-decoration: none;" onclick="
+                        var codeMain = this.parentNode.getElementsByTagName( 'div' )[0],
+                            codeStatus = this.getElementsByTagName( 'span' )[0];
+                        if( codeMain.style.display == 'block' ) {
+                            codeMain.style.display = 'none';
+                            codeStatus.innerHTML = '[+]'
+                        } else {
+                            codeMain.style.display = 'block';
+                            codeStatus.innerHTML = '[-]';
+                        }
+                        window.onresize();
+                    "><span>[+]</span> Notice: Undefined variable: b in F:\www\MelonFrameworks\0.2\test\App1\Module\_Mod1\Controller\Index.php(17)</a>
+                    <div style="width: 600px; margin-left: 20px; overflow: hidden; display: none;">
+                                    <div style="position: relative; font-size: 13px;">
+                <span style="display: block; position: absolute; z-index: 1; top: 140px; height: 20px; width: 100%; _width: 95%; background-color: yellow; opacity: 0.4; filter:alpha(opacity=40); "></span>
+                <div style="float: left; margin-right: 10px; position: relative; z-index: 2; line-height: 20px; color: #aaa;">10<br>11<br>12<br>13<br>14<br>15<br>16<br>17<br>18<br>19<br>20<br>21<br></div>
+                <div style="_width: 95%; line-height: 20px; position: relative; z-index: 2; overflow: hidden; white-space:nowrap; text-overflow:ellipsis;"><span style="color: #FF8000"></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">Index&nbsp;</span><span style="color: #007700">extends&nbsp;\</span><span style="color: #0000BB">Melon</span><span style="color: #007700">\</span><span style="color: #0000BB">App</span><span style="color: #007700">\</span><span style="color: #0000BB">Lib</span><span style="color: #007700">\</span><span style="color: #0000BB">Controller&nbsp;</span><span style="color: #007700">{<br>&nbsp;&nbsp;&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;function&nbsp;</span><span style="color: #0000BB">index</span><span style="color: #007700">()&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//&nbsp;实例一个模型<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;这只是个例子，你需要先配置数据库和创建member表才能运行下面这代码<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;$memberModel&nbsp;=&nbsp;new&nbsp;Model\Member(&nbsp;'member'&nbsp;);<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$a&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">$b</span><span style="color: #007700">;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//&nbsp;显示视图<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">view</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">display</span><span style="color: #007700">(&nbsp;</span><span style="color: #DD0000">'hello.html'&nbsp;</span><span style="color: #007700">);<br>&nbsp;&nbsp;&nbsp;&nbsp;}<br>}</span>
 
 <br></div>
-			</div>
-					</div></th></tr><tr><td style="border: 1px solid #000; padding: 5px; text-align: left;"><a href="javascript:void(0);" style="color: #000; text-decoration: none;" onclick="
-						var codeMain = this.parentNode.getElementsByTagName( 'div' )[0],
-							codeStatus = this.getElementsByTagName( 'span' )[0];
-						if( codeMain.style.display == 'block' ) {
-							codeMain.style.display = 'none';
-							codeStatus.innerHTML = '[+]'
-						} else {
-							codeMain.style.display = 'block';
-							codeStatus.innerHTML = '[-]';
-						}
-						window.onresize();
-					"><span>[+]</span> F:\www\MelonFrameworks\0.2\MelonFramework\Melon\Base\App.php(147) --&gt; Melon\App\Lib\Module-&gt;execute</a>
-					<div style="width: 600px; margin-left: 20px; overflow: hidden; display: none;">
-									<div style="position: relative; font-size: 13px;">
-				<span style="display: block; position: absolute; z-index: 1; top: 140px; height: 20px; width: 100%; _width: 95%; background-color: yellow; opacity: 0.4; filter:alpha(opacity=40); "></span>
-				<div style="float: left; margin-right: 10px; position: relative; z-index: 2; line-height: 20px; color: #aaa;">140<br>141<br>142<br>143<br>144<br>145<br>146<br>147<br>148<br>149<br>150<br>151<br>152<br>153<br>154<br></div>
-				<div style="_width: 95%; line-height: 20px; position: relative; z-index: 2; overflow: hidden; white-space:nowrap; text-overflow:ellipsis;"><span style="color: #007700">
+            </div>
+                    </div></th></tr><tr><td style="border: 1px solid #000; padding: 5px; text-align: left;"><a href="javascript:void(0);" style="color: #000; text-decoration: none;" onclick="
+                        var codeMain = this.parentNode.getElementsByTagName( 'div' )[0],
+                            codeStatus = this.getElementsByTagName( 'span' )[0];
+                        if( codeMain.style.display == 'block' ) {
+                            codeMain.style.display = 'none';
+                            codeStatus.innerHTML = '[+]'
+                        } else {
+                            codeMain.style.display = 'block';
+                            codeStatus.innerHTML = '[-]';
+                        }
+                        window.onresize();
+                    "><span>[+]</span> F:\www\MelonFrameworks\0.2\MelonFramework\Melon\Base\App.php(147) --&gt; Melon\App\Lib\Module-&gt;execute</a>
+                    <div style="width: 600px; margin-left: 20px; overflow: hidden; display: none;">
+                                    <div style="position: relative; font-size: 13px;">
+                <span style="display: block; position: absolute; z-index: 1; top: 140px; height: 20px; width: 100%; _width: 95%; background-color: yellow; opacity: 0.4; filter:alpha(opacity=40); "></span>
+                <div style="float: left; margin-right: 10px; position: relative; z-index: 2; line-height: 20px; color: #aaa;">140<br>141<br>142<br>143<br>144<br>145<br>146<br>147<br>148<br>149<br>150<br>151<br>152<br>153<br>154<br></div>
+                <div style="_width: 95%; line-height: 20px; position: relative; z-index: 2; overflow: hidden; white-space:nowrap; text-overflow:ellipsis;"><span style="color: #007700">
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//&nbsp;现在把控制权交给当前请求的模块
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$moduleClass&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">_core</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">env</span><span style="color: #007700">[</span><span style="color: #DD0000">'className'</span><span style="color: #007700">]&nbsp;.&nbsp;</span><span style="color: #DD0000">'\Module\\'&nbsp;</span><span style="color: #007700">.&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">_core</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">env</span><span style="color: #007700">[</span><span style="color: #DD0000">'moduleName'</span><span style="color: #007700">];
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(&nbsp;!&nbsp;</span><span style="color: #0000BB">file_exists</span><span style="color: #007700">(&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">_core</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">env</span><span style="color: #007700">[</span><span style="color: #DD0000">'root'</span><span style="color: #007700">]&nbsp;.&nbsp;</span><span style="color: #0000BB">DIRECTORY_SEPARATOR&nbsp;</span><span style="color: #007700">.&nbsp;</span><span style="color: #0000BB">str_replace</span><span style="color: #007700">(&nbsp;</span><span style="color: #DD0000">'\\'</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">DIRECTORY_SEPARATOR</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">$moduleClass&nbsp;</span><span style="color: #007700">)&nbsp;.&nbsp;</span><span style="color: #DD0000">'.php'&nbsp;</span><span style="color: #007700">)&nbsp;)&nbsp;{
@@ -645,24 +691,24 @@ Melon.php    -------------------------------    主体类
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;@param&nbsp;string&nbsp;$name&nbsp;module名称
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*/
 <br></span></div>
-			</div>
-					</div></td></tr><tr><td style="border: 1px solid #000; padding: 5px; text-align: left;"><a href="javascript:void(0);" style="color: #000; text-decoration: none;" onclick="
-						var codeMain = this.parentNode.getElementsByTagName( 'div' )[0],
-							codeStatus = this.getElementsByTagName( 'span' )[0];
-						if( codeMain.style.display == 'block' ) {
-							codeMain.style.display = 'none';
-							codeStatus.innerHTML = '[+]'
-						} else {
-							codeMain.style.display = 'block';
-							codeStatus.innerHTML = '[-]';
-						}
-						window.onresize();
-					"><span>[+]</span> F:\www\MelonFrameworks\0.2\MelonFramework\Melon.php(94) --&gt; Melon\Base\App-&gt;run</a>
-					<div style="width: 600px; margin-left: 20px; overflow: hidden; display: none;">
-									<div style="position: relative; font-size: 13px;">
-				<span style="display: block; position: absolute; z-index: 1; top: 140px; height: 20px; width: 100%; _width: 95%; background-color: yellow; opacity: 0.4; filter:alpha(opacity=40); "></span>
-				<div style="float: left; margin-right: 10px; position: relative; z-index: 2; line-height: 20px; color: #aaa;">087<br>088<br>089<br>090<br>091<br>092<br>093<br>094<br>095<br>096<br>097<br>098<br>099<br>100<br>101<br></div>
-				<div style="_width: 95%; line-height: 20px; position: relative; z-index: 2; overflow: hidden; white-space:nowrap; text-overflow:ellipsis;"><span style="color: #FF8000">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;@param&nbsp;string&nbsp;$module&nbsp;[可选]&nbsp;module名称，如果你在初始化的时候设置了，这时候就不需要指定此参数
+            </div>
+                    </div></td></tr><tr><td style="border: 1px solid #000; padding: 5px; text-align: left;"><a href="javascript:void(0);" style="color: #000; text-decoration: none;" onclick="
+                        var codeMain = this.parentNode.getElementsByTagName( 'div' )[0],
+                            codeStatus = this.getElementsByTagName( 'span' )[0];
+                        if( codeMain.style.display == 'block' ) {
+                            codeMain.style.display = 'none';
+                            codeStatus.innerHTML = '[+]'
+                        } else {
+                            codeMain.style.display = 'block';
+                            codeStatus.innerHTML = '[-]';
+                        }
+                        window.onresize();
+                    "><span>[+]</span> F:\www\MelonFrameworks\0.2\MelonFramework\Melon.php(94) --&gt; Melon\Base\App-&gt;run</a>
+                    <div style="width: 600px; margin-left: 20px; overflow: hidden; display: none;">
+                                    <div style="position: relative; font-size: 13px;">
+                <span style="display: block; position: absolute; z-index: 1; top: 140px; height: 20px; width: 100%; _width: 95%; background-color: yellow; opacity: 0.4; filter:alpha(opacity=40); "></span>
+                <div style="float: left; margin-right: 10px; position: relative; z-index: 2; line-height: 20px; color: #aaa;">087<br>088<br>089<br>090<br>091<br>092<br>093<br>094<br>095<br>096<br>097<br>098<br>099<br>100<br>101<br></div>
+                <div style="_width: 95%; line-height: 20px; position: relative; z-index: 2; overflow: hidden; white-space:nowrap; text-overflow:ellipsis;"><span style="color: #FF8000">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;@param&nbsp;string&nbsp;$module&nbsp;[可选]&nbsp;module名称，如果你在初始化的时候设置了，这时候就不需要指定此参数
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;@param&nbsp;string&nbsp;$controller&nbsp;[可选]&nbsp;控制器，如果不提供此参数，程序则调用Route类尝试解释路径
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;@param&nbsp;string&nbsp;$action&nbsp;[可选]&nbsp;方法
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;@param&nbsp;string&nbsp;$args&nbsp;[可选]&nbsp;参数
@@ -678,137 +724,137 @@ Melon.php    -------------------------------    主体类
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;@param&nbsp;string&nbsp;[可选]&nbsp;$content&nbsp;内容
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*/
 <br></span></div>
-			</div>
-					</div></td></tr><tr><td style="border: 1px solid #000; padding: 5px; text-align: left;"><a href="javascript:void(0);" style="color: #000; text-decoration: none;" onclick="
-						var codeMain = this.parentNode.getElementsByTagName( 'div' )[0],
-							codeStatus = this.getElementsByTagName( 'span' )[0];
-						if( codeMain.style.display == 'block' ) {
-							codeMain.style.display = 'none';
-							codeStatus.innerHTML = '[+]'
-						} else {
-							codeMain.style.display = 'block';
-							codeStatus.innerHTML = '[-]';
-						}
-						window.onresize();
-					"><span>[+]</span> F:\www\MelonFrameworks\0.2\test\index.php(19) --&gt; Melon::runApp</a>
-					<div style="width: 600px; margin-left: 20px; overflow: hidden; display: none;">
-									<div style="position: relative; font-size: 13px;">
-				<span style="display: block; position: absolute; z-index: 1; top: 140px; height: 20px; width: 100%; _width: 95%; background-color: yellow; opacity: 0.4; filter:alpha(opacity=40); "></span>
-				<div style="float: left; margin-right: 10px; position: relative; z-index: 2; line-height: 20px; color: #aaa;">12<br>13<br>14<br>15<br>16<br>17<br>18<br>19<br>20<br>21<br>22<br>23<br></div>
-				<div style="_width: 95%; line-height: 20px; position: relative; z-index: 2; overflow: hidden; white-space:nowrap; text-overflow:ellipsis;"><span style="color: #FF8000">//&nbsp;&nbsp;&nbsp;&nbsp;'type'&nbsp;=&gt;&nbsp;'normal',<br>//&nbsp;&nbsp;&nbsp;&nbsp;'config'&nbsp;=&gt;&nbsp;array(<br>//&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;配置项<br>//&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'logDisplayLevel'&nbsp;=&gt;&nbsp;0<br>//&nbsp;&nbsp;&nbsp;&nbsp;)<br>//));<br><br></span><span style="color: #0000BB">Melon</span><span style="color: #007700">::</span><span style="color: #0000BB">runApp</span><span style="color: #007700">(&nbsp;</span><span style="color: #DD0000">'Mod1'&nbsp;</span><span style="color: #007700">);<br><br><br><br></span>
+            </div>
+                    </div></td></tr><tr><td style="border: 1px solid #000; padding: 5px; text-align: left;"><a href="javascript:void(0);" style="color: #000; text-decoration: none;" onclick="
+                        var codeMain = this.parentNode.getElementsByTagName( 'div' )[0],
+                            codeStatus = this.getElementsByTagName( 'span' )[0];
+                        if( codeMain.style.display == 'block' ) {
+                            codeMain.style.display = 'none';
+                            codeStatus.innerHTML = '[+]'
+                        } else {
+                            codeMain.style.display = 'block';
+                            codeStatus.innerHTML = '[-]';
+                        }
+                        window.onresize();
+                    "><span>[+]</span> F:\www\MelonFrameworks\0.2\test\index.php(19) --&gt; Melon::runApp</a>
+                    <div style="width: 600px; margin-left: 20px; overflow: hidden; display: none;">
+                                    <div style="position: relative; font-size: 13px;">
+                <span style="display: block; position: absolute; z-index: 1; top: 140px; height: 20px; width: 100%; _width: 95%; background-color: yellow; opacity: 0.4; filter:alpha(opacity=40); "></span>
+                <div style="float: left; margin-right: 10px; position: relative; z-index: 2; line-height: 20px; color: #aaa;">12<br>13<br>14<br>15<br>16<br>17<br>18<br>19<br>20<br>21<br>22<br>23<br></div>
+                <div style="_width: 95%; line-height: 20px; position: relative; z-index: 2; overflow: hidden; white-space:nowrap; text-overflow:ellipsis;"><span style="color: #FF8000">//&nbsp;&nbsp;&nbsp;&nbsp;'type'&nbsp;=&gt;&nbsp;'normal',<br>//&nbsp;&nbsp;&nbsp;&nbsp;'config'&nbsp;=&gt;&nbsp;array(<br>//&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;配置项<br>//&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'logDisplayLevel'&nbsp;=&gt;&nbsp;0<br>//&nbsp;&nbsp;&nbsp;&nbsp;)<br>//));<br><br></span><span style="color: #0000BB">Melon</span><span style="color: #007700">::</span><span style="color: #0000BB">runApp</span><span style="color: #007700">(&nbsp;</span><span style="color: #DD0000">'Mod1'&nbsp;</span><span style="color: #007700">);<br><br><br><br></span>
 
 <br></div>
-			</div>
-					</div></td></tr></tbody></table><br />
+            </div>
+                    </div></td></tr></tbody></table><br />
 </div>
-						是不是感觉很方便？主体类还提供了两个输出变量调试方法来代替print_r以及var_dump，会自动识别数组和对象
+                        是不是感觉很方便？主体类还提供了两个输出变量调试方法来代替print_r以及var_dump，会自动识别数组和对象
 <pre>
 <code class="language-php">
-	// 输出变量信息
-	Melon::debug( $arr );
-	// 多个参数
-	Melon::debug( $arr1, $arr2 ... );
-	// 输出变量信息并显示调用方法栈
-	Melon::debugWithTrace( $object );
-	// 多个参数
-	Melon::debugWithTrace( $object1, $object2 ... );
+    // 输出变量信息
+    Melon::debug( $arr );
+    // 多个参数
+    Melon::debug( $arr1, $arr2 ... );
+    // 输出变量信息并显示调用方法栈
+    Melon::debugWithTrace( $object );
+    // 多个参数
+    Melon::debugWithTrace( $object1, $object2 ... );
 </code>
 </pre>
-					</div>
-				</div>
-				
-				<div class="melon-item">
-					<a name="mark_logger" class="melon-mark"></a>
-					<h2 class="melon-h">日志</h2>
-					<div>
-						日志默认存放在配置文件<b>logDir</b>参数指定的路径中，普通模式默认是<b>MelonFramework/Melon/Data/Log</b>下，而APP模式默认是<b>YourApp/Log</b>下。错误将被写入到日志中，错误处理的参数已经在<a href="#mark_error_handler" class="melon-mark-link">错误与调试</a>中说清楚了。如果达到<b>logSplitSize</b>大小时，将自动按日期分割为多份文件<br /><br />
-						使用<code>Melon::logger</code>可创建指定的日志对象
+                    </div>
+                </div>
+                
+                <div class="melon-item">
+                    <a name="mark_logger" class="melon-mark"></a>
+                    <h2 class="melon-h">日志</h2>
+                    <div>
+                        日志默认存放在配置文件<b>logDir</b>参数指定的路径中，普通模式默认是<b>MelonFramework/Melon/Data/Log</b>下，而APP模式默认是<b>YourApp/Log</b>下。错误将被写入到日志中，错误处理的参数已经在<a href="#mark_error_handler" class="melon-mark-link">错误与调试</a>中说清楚了。如果达到<b>logSplitSize</b>大小时，将自动按日期分割为多份文件<br /><br />
+                        使用<code>Melon::logger</code>可创建指定的日志对象
 <pre>
 <code class="language-php">
-	$dir = 'F:\logs';		// 目录
-	$filePrefix = 'order';		// 日志前缀
-	$splitSize = 5;			// 分割大小
-	$logger = Melon::logger( $dir, $filePrefix, $splitSize );
-	$logger->write( 'some message' );
+    $dir = 'F:\logs';          // 目录
+    $filePrefix = 'order';     // 日志前缀
+    $splitSize = 5;            // 分割大小
+    $logger = Melon::logger( $dir, $filePrefix, $splitSize );
+    $logger->write( 'some message' );
 </code>
 </pre>
-					</div>
-				</div>
-				
-				<div class="melon-item">
-					<a name="mark_database_pdo" class="melon-mark"></a>
-					<h2 class="melon-h">数据库接口</h2>
-					数据库提供了PDO接口，可以直接在配置文件中的database参数中配置，DSN以及OPETIONS可以查看<a href="http://www.php.net/manual/zh/book.pdo.php" target="_blank">官方文档</a>
+                    </div>
+                </div>
+                
+                <div class="melon-item">
+                    <a name="mark_database_pdo" class="melon-mark"></a>
+                    <h2 class="melon-h">数据库接口</h2>
+                    数据库提供了PDO接口，可以直接在配置文件中的database参数中配置，DSN以及OPETIONS可以查看<a href="http://www.php.net/manual/zh/book.pdo.php" target="_blank">官方文档</a>
 <pre>
 <code class="language-php">
-	'database' => array(						// PDO数据库接口配置
-		'tablePrefix' => '',					// 表前缀
-		'driver' => array(
-			'dsn' => 'mysql:host=localhost;dbname=test;', // PDO DSN
-			'username' => 'root',				// 数据库帐号
-			'password' => '123456',				// 数据库密码
-			'options' => array(				// PDO属性
-				\PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
-				\PDO::ATTR_ERRMODE => \PDO::ERRMODE_WARNING,
-				\PDO::ATTR_STATEMENT_CLASS => array( '\Melon\Database\PDO\Statement' )
-			),
-		)
-	)
+    'database' => array(                        // PDO数据库接口配置
+        'tablePrefix' => '',                    // 表前缀
+        'driver' => array(
+            'dsn' => 'mysql:host=localhost;dbname=test;', // PDO DSN
+            'username' => 'root',               // 数据库帐号
+            'password' => '123456',             // 数据库密码
+            'options' => array(                 // PDO属性
+                \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
+                \PDO::ATTR_ERRMODE => \PDO::ERRMODE_WARNING,
+                \PDO::ATTR_STATEMENT_CLASS => array( '\Melon\Database\PDO\Statement' )
+            ),
+        )
+    )
 </code>
 </pre>
-					配置后，可以使用<code>Melon::db</code>得到这个PDO实例，直接使用。注意配置中的<b>tablePrefix</b>，配置后，可以使用<code>Melon::table( $tablename )</code>自动为数据表添加前缀。<br /><br />
-					<b>如果你不想使用PDO，实际上可以配置driver参数指向一个做任意对象</b>，同样使用<code>Melon::db</code>获取这个实例，db方法其实只是一个容器。
+                    配置后，可以使用<code>Melon::db</code>得到这个PDO实例，直接使用。注意配置中的<b>tablePrefix</b>，配置后，可以使用<code>Melon::table( $tablename )</code>自动为数据表添加前缀。<br /><br />
+                    <b>如果你不想使用PDO，实际上可以配置driver参数指向一个做任意对象</b>，同样使用<code>Melon::db</code>获取这个实例，db方法其实只是一个容器。
 <pre>
 <code class="language-php">
-	Melon::init( array(
-		'type' => 'normal',
-		'config' => array(
-			'database' => array(
-				// 使用mysqli作为数据库驱动
-				'driver' => new mysqli()
-			)
-		)
-	) );
+    Melon::init( array(
+        'type' => 'normal',
+        'config' => array(
+            'database' => array(
+                // 使用mysqli作为数据库驱动
+                'driver' => new mysqli()
+            )
+        )
+    ) );
 
-	$db = Melon::db();
-	$db->query();
+    $db = Melon::db();
+    $db->query();
 </code>
 </pre>
-					<h3 class="melon-h">增强型PDO</h3>
-					<div>
-						MelonFramework提供的是增强型的PDO接口，增强了错误和调试方面的功能，程序记录了executes、exec以及query的执行次数和相关信息。可以通过<code>errorsTotal</code>、<code>executesTotal</code>、<code>statementsTotal</code>、<code>lastStatement</code>获取这些信息。<code>setErrorHandler</code>可以设置一个查询错误时的处理方法。<code>restoreErrorHandler</code>还原上一个错误处理方法<br /><br />
-						除了配置中提供的PDO接口外，还可以使用<code>Melon::PDO</code>方法实例新的PDO对象
-					</div>
-					
-					<h3 class="melon-h">模型（Model）</h3>
-					<div>
-						使用模型的目的是为了更简单的操作数据库，使用<code>Melon::PDOModel</code>可以得到模型对象
+                    <h3 class="melon-h">增强型PDO</h3>
+                    <div>
+                        MelonFramework提供的是增强型的PDO接口，增强了错误和调试方面的功能，程序记录了executes、exec以及query的执行次数和相关信息。可以通过<code>errorsTotal</code>、<code>executesTotal</code>、<code>statementsTotal</code>、<code>lastStatement</code>获取这些信息。<code>setErrorHandler</code>可以设置一个查询错误时的处理方法。<code>restoreErrorHandler</code>还原上一个错误处理方法<br /><br />
+                        除了配置中提供的PDO接口外，还可以使用<code>Melon::PDO</code>方法实例新的PDO对象
+                    </div>
+                    
+                    <h3 class="melon-h">模型（Model）</h3>
+                    <div>
+                        使用模型的目的是为了更简单的操作数据库，使用<code>Melon::PDOModel</code>可以得到模型对象
 <pre>
 <code class="language-php">
-	$table = 'member';		// 数据表名
-	$autoPrefix = true;		// 开启此项，则自动为表名添加配置中的<b>tablePrefix</b>前缀，而默认就是开启的
-	$pdo = null;			// pdo对象，如果为空，则自动取初始化时提供的PDO接口
-	$model = Melon::PDOModel( $table, $autoPrefix, $pdo );
-	
-	$model->openDebug();	// 开启调试，将在页面显示查询信息
-	
-	// 你可以使用以下方法对一个表进行操作：
-	// fetch			查询一条结果
-	// fetchAll		查询所有结果集
-	// fetchPage		以分页的形式查询结果集
-	// count			统计结果集行数
-	// update		更新数据
-	// delete			删除数据
-	// insert			插入数据
-	
-	$model->openDebug();	// 关闭调试
+    $table = 'member';      // 数据表名
+    $autoPrefix = true;     // 开启此项，则自动为表名添加配置中的<b>tablePrefix</b>前缀，而默认就是开启的
+    $pdo = null;            // pdo对象，如果为空，则自动取初始化时提供的PDO接口
+    $model = Melon::PDOModel( $table, $autoPrefix, $pdo );
+    
+    $model->openDebug();    // 开启调试，将在页面显示查询信息
+    
+    // 你可以使用以下方法对一个表进行操作：
+    // fetch            查询一条结果
+    // fetchAll         查询所有结果集
+    // fetchPage        以分页的形式查询结果集
+    // count            统计结果集行数
+    // update           更新数据
+    // delete           删除数据
+    // insert           插入数据
+    
+    $model->openDebug();    // 关闭调试
 </code>
 </pre>
-					</div>
-				</div>
-				<h3 class="melon-h">防注入</h3>
-				<div>
-					PDO原生就提供了SQL预处理功能，有很好的防注入作用，而模型基于此封装了更方便的防注入操作。如果你不了解PDO预处理，要先看看<a href="http://www.php.net/manual/zh/pdo.prepare.php" target="_blank">PDO::prepare</a>
+                    </div>
+                </div>
+                <h3 class="melon-h">防注入</h3>
+                <div>
+                    PDO原生就提供了SQL预处理功能，有很好的防注入作用，而模型基于此封装了更方便的防注入操作。如果你不了解PDO预处理，要先看看<a href="http://www.php.net/manual/zh/pdo.prepare.php" target="_blank">PDO::prepare</a>
 <pre>
 <code class="language-php">
 // 使用匿名的占位符
@@ -823,120 +869,120 @@ $model->fetchAll( '*', '`id`=? AND `type`=?', array( '123', 'hot' ) );
 ...
 </code>
 </pre>
-				</div>
-				
-				<div class="melon-item">
-					<a name="mark_route" class="melon-mark"></a>
-					<h2 class="melon-h">路由</h2>
-					<div>
-						 使用路由需要在服务器中添加一条重写规则，把所有路径重写到当前域名根目录下的某个文件中，一般是index.php。你可以参考本框架目录下的.htaccess文件<br /><br />
+                </div>
+                
+                <div class="melon-item">
+                    <a name="mark_route" class="melon-mark"></a>
+                    <h2 class="melon-h">路由</h2>
+                    <div>
+                         使用路由需要在服务器中添加一条重写规则，把所有路径重写到当前域名根目录下的某个文件中，一般是index.php。你可以参考本框架目录下的.htaccess文件<br /><br />
 
-						路由的作用是根据配置规则，以/号作为路径目录分割符，匹配URL中的PATHINFO，并替换为对应的URL。如果没有PATHINFO，则使用REQUEST_URI来解释<br /><br />
-						使用<code>Melon::httpRoute</code>得到一个路由实例
+                        路由的作用是根据配置规则，以/号作为路径目录分割符，匹配URL中的PATHINFO，并替换为对应的URL。如果没有PATHINFO，则使用REQUEST_URI来解释<br /><br />
+                        使用<code>Melon::httpRoute</code>得到一个路由实例
 <pre>
 <code class="language-php">
-	$route = Melon::httpRoute( array(
-		// 匹配全局URL
-		'global' => array(
-			'/[type]/[id]' => '/category/[type]/[id]',
-			'/user/(\w+)' => '/user/id/$1'
-		),
-		// 匹配get方法请求URL
-		'get' => array(
-			'/comment/hot/[uid]' => '/bolg/comment/type/hot/user/[uid]'
-			...
-		),
-		// 匹配post请求URL
-		'post' => array( ... ),
-		...
-	) );
+    $route = Melon::httpRoute( array(
+        // 匹配全局URL
+        'global' => array(
+            '/[type]/[id]' => '/category/[type]/[id]',
+            '/user/(\w+)' => '/user/id/$1'
+        ),
+        // 匹配get方法请求URL
+        'get' => array(
+            '/comment/hot/[uid]' => '/bolg/comment/type/hot/user/[uid]'
+            ...
+        ),
+        // 匹配post请求URL
+        'post' => array( ... ),
+        ...
+    ) );
 
-	// 解释匹配后的路径
-	$matchPath = $route->parse();
-	// 得到正确匹配的路径后，可以分割它，比如第一参数作为控制器，第二个参数作为控制器方法，这些随你。
+    // 解释匹配后的路径
+    $matchPath = $route->parse();
+    // 得到正确匹配的路径后，可以分割它，比如第一参数作为控制器，第二个参数作为控制器方法，这些随你。
 </code>
 </pre>
 
-						规则有两种匹配模式，每条规则只能使用其中一种，不能混用。大部分情况下，建议尽量使用第1种<br /><br />
+                        规则有两种匹配模式，每条规则只能使用其中一种，不能混用。大部分情况下，建议尽量使用第1种<br /><br />
 
-						<b>1. 按命名组的方式匹配，例</b><br />
-						配置： /[type]/[id] => /category/[type]/[id]<br />
-						这种方式无需写正则表达式，直接定义参数名，好处是语义化强，可读性较好<br /><br />
-						也可以在:号后添加正则表达式的规则：<br />
-						/[type:\w+]/[id:\d+] => /category/[type]/[id]<br /><br />
-						某些情况，如果你需要在表达式中使用/号，请在前面加上\号进行转义，否则会被认为是路径目录分割符<br />
-						如果要使用*号（通配符），请加上?号进入懒惰匹配模式，否则可能会把余下分组的信息覆盖，因为*包含/分割符<br /><br />
+                        <b>1. 按命名组的方式匹配，例</b><br />
+                        配置： /[type]/[id] => /category/[type]/[id]<br />
+                        这种方式无需写正则表达式，直接定义参数名，好处是语义化强，可读性较好<br /><br />
+                        也可以在:号后添加正则表达式的规则：<br />
+                        /[type:\w+]/[id:\d+] => /category/[type]/[id]<br /><br />
+                        某些情况，如果你需要在表达式中使用/号，请在前面加上\号进行转义，否则会被认为是路径目录分割符<br />
+                        如果要使用*号（通配符），请加上?号进入懒惰匹配模式，否则可能会把余下分组的信息覆盖，因为*包含/分割符<br /><br />
 
-						<b>2.普通正则匹配，例</b><br />
-						配置： /(\w+)/(\d+) => /category/$1/$2<br />
-						这种方式虽然灵活，但可读性较差， 一般情况不建议使用<br />
-					</div>
-				</div>
-				
-				<div class="melon-item">
-					<a name="mark_http_rest" class="melon-mark"></a>
-					<h2 class="melon-h">HTTP/REST</h2>
-					<h3 class="melon-h">处理请求（Request）</h3>
-					<div>
-						处理请求可以使用<code>Melon::httpRequest</code>取得一个请求实例
+                        <b>2.普通正则匹配，例</b><br />
+                        配置： /(\w+)/(\d+) => /category/$1/$2<br />
+                        这种方式虽然灵活，但可读性较差， 一般情况不建议使用<br />
+                    </div>
+                </div>
+                
+                <div class="melon-item">
+                    <a name="mark_http_rest" class="melon-mark"></a>
+                    <h2 class="melon-h">HTTP/REST</h2>
+                    <h3 class="melon-h">处理请求（Request）</h3>
+                    <div>
+                        处理请求可以使用<code>Melon::httpRequest</code>取得一个请求实例
 <pre>
 <code class="language-php">
-	$request = Melon::httpRequest();
+    $request = Melon::httpRequest();
 
-	// 请求头
-	print_r( $request->headers() );	// 打印所有请求头，已针对不同服务器做了兼容处理
-	echo $request->header( 'REQUEST_METHOD' ); // 打印请求方法
-	echo $request->method(); // 跟上面效果一样
+    // 请求头
+    print_r( $request->headers() ); // 打印所有请求头，已针对不同服务器做了兼容处理
+    echo $request->header( 'REQUEST_METHOD' ); // 打印请求方法
+    echo $request->method(); // 跟上面效果一样
 
-	// 请求参数
-	print_r( $request->inputs() ); // 打印所有请求参数
-	echo $request->input( 'key' ); // 打印指定参数
+    // 请求参数
+    print_r( $request->inputs() ); // 打印所有请求参数
+    echo $request->input( 'key' ); // 打印指定参数
 
-	// inputFormat预设了很多格式化选项，你可以参考这个方法说明
-	echo $request->inputFormat( 'key', 0, 'int' ); // 打印指定参数，当不存在时返回默认值0，存在则强制转为数字后返回
+    // inputFormat预设了很多格式化选项，你可以参考这个方法说明
+    echo $request->inputFormat( 'key', 0, 'int' ); // 打印指定参数，当不存在时返回默认值0，存在则强制转为数字后返回
 
-	// 方法判定
-	if( $request->isGet() ) {
+    // 方法判定
+    if( $request->isGet() ) {
 
-	} elseif( $request->isPost() ) {
+    } elseif( $request->isPost() ) {
 
-	} elseif( $request->isPut() ) {
+    } elseif( $request->isPut() ) {
 
-	}
-	...
+    }
+    ...
 </code>
 </pre>
-					</div>
-					
-					<h3 class="melon-h">回应（Response）</h3>
+                    </div>
+                    
+                    <h3 class="melon-h">回应（Response）</h3>
 <pre>
 <code class="language-php">
-	$response = Melon::httpResponse();
+    $response = Melon::httpResponse();
 
-	// 设置头部
-	$response->setHeader( 'Content-Type', 'text/html;charset=utf-8' );
-	$response->setHeaderItem( array(
-		'Connection' => 'Keep-Alive',
-		'Keep-Alive' => 'timeout=5, max=100',
-		'Transfer-Encoding' => 'chunked'
-	) );
+    // 设置头部
+    $response->setHeader( 'Content-Type', 'text/html;charset=utf-8' );
+    $response->setHeaderItem( array(
+        'Connection' => 'Keep-Alive',
+        'Keep-Alive' => 'timeout=5, max=100',
+        'Transfer-Encoding' => 'chunked'
+    ) );
 
-	$body = 'Hello Melon.';				// 回应结果
-	$status = 200;					// 状态码
-	$contentType = 'text/html';			// 媒体格式
+    $body = 'Hello Melon.';            // 回应结果
+    $status = 200;                     // 状态码
+    $contentType = 'text/html';        // 媒体格式
 
-	// 一步快速回应
-	$response->send( $body, $status, $contentType );
+    // 一步快速回应
+    $response->send( $body, $status, $contentType );
 
-	// 分多步回应
-	$response->setCharset( 'utf-8' );
-	$response->setContentType( 'text/html' );
-	$response->setBody( $body );
-	$response->send();
+    // 分多步回应
+    $response->setCharset( 'utf-8' );
+    $response->setContentType( 'text/html' );
+    $response->setBody( $body );
+    $response->send();
 </code>
 </pre>
-					<h3 class="melon-h">REST（SimpleRest）</h3>
-					这是一个组合Route、Request、Response类的小巧REST工具，只适合在普通模式下使用
+                    <h3 class="melon-h">REST（SimpleRest）</h3>
+                    这是一个组合Route、Request、Response类的小巧REST工具，只适合在普通模式下使用
 <pre>
 <code class="language-php">
     // 获取一个REST实例
@@ -964,95 +1010,95 @@ $model->fetchAll( '*', '`id`=? AND `type`=?', array( '123', 'hot' ) );
     }
 </code>
 </pre>
-					如果使用APP模式，系统将提供Request、Response类的实例，你可以基于它们开发高级的REST程序
-				</div>
-				
-				
-				<div class="melon-item">
-					<a name="mark_template" class="melon-mark"></a>
-					<h2 class="melon-h">模板</h2>
-					<div>
-					模板是通过自定义一系列标签，使用正则表达式替换为标准的PHP语法的格式
+                    如果使用APP模式，系统将提供Request、Response类的实例，你可以基于它们开发高级的REST程序
+                </div>
+                
+                
+                <div class="melon-item">
+                    <a name="mark_template" class="melon-mark"></a>
+                    <h2 class="melon-h">模板</h2>
+                    <div>
+                    模板是通过自定义一系列标签，使用正则表达式替换为标准的PHP语法的格式
 
 <pre>
 <code class="language-php">
-	Melon::template()
-	// 设置模板目录
-	->setTemplateDir( './' )
-	// 设置编译缓存目录
-	->setCompileDir( './' )
-	// 注入变量
-	->assign( $key, $value )
-	// 显示模板
-	->display( 'index.html' );
+    Melon::template()
+    // 设置模板目录
+    ->setTemplateDir( './' )
+    // 设置编译缓存目录
+    ->setCompileDir( './' )
+    // 注入变量
+    ->assign( $key, $value )
+    // 显示模板
+    ->display( 'index.html' );
 </code>
 </pre>
-					可使用的标签如下（以标签符是{}为例子）
-					<h3 class="melon-h">常规标签</h3>
+                    可使用的标签如下（以标签符是{}为例子）
+                    <h3 class="melon-h">常规标签</h3>
 <pre>
 <code class="language-php">
-	{$var} 注：输出一个变量，可使用assign或assignItem方法注入这些变量，如果变量是数组，键名无需添加引号：{$arr[key]}
-	{if 条件} 内容 {/if}
-	{if 条件} 内容 {else} 内容 {/if}
-	{if 条件} 内容 {elseif 条件} 内容 {/if}
-	{foreach $arr $value} 内容 {/foreach}
-	{foreach $arr $key $value} 内容 {/foreach}
-	{print 变量或函数}  注：可以使用print标签对内容进行处理，比如 {print date( 'Y-m-d', 
-	{php php代码/}
-	{php} php代码 {/php}
-	{include 子模板路径}  注：可在模板中引入子模板，子模板路径可使用变量，但要使用双引号括起来：{include "$path/index.html"}
+    {$var} 注：输出一个变量，可使用assign或assignItem方法注入这些变量，如果变量是数组，键名无需添加引号：{$arr[key]}
+    {if 条件} 内容 {/if}
+    {if 条件} 内容 {else} 内容 {/if}
+    {if 条件} 内容 {elseif 条件} 内容 {/if}
+    {foreach $arr $value} 内容 {/foreach}
+    {foreach $arr $key $value} 内容 {/foreach}
+    {print 变量或函数}  注：可以使用print标签对内容进行处理，比如 {print date( 'Y-m-d', 
+    {php php代码/}
+    {php} php代码 {/php}
+    {include 子模板路径}  注：可在模板中引入子模板，子模板路径可使用变量，但要使用双引号括起来：{include "$path/index.html"}
 </code>
 </pre>
-					<h3 class="melon-h">模板继承</h3>
+                    <h3 class="melon-h">模板继承</h3>
 <pre>
 <code class="language-php">
-	{extend 继承模板路径/}
-	{block 块名称} 块内容 {/block}
-	如果你熟悉smarty中的继承，应该不难理解，使用方法基本类似
-	继承标签由extend和block标签共同完成
-	继承模板中的block会覆盖父模板中的同名block内容
-	如果没有覆盖（同名块）父模板某个block，则使用这个block中默认的内容
+    {extend 继承模板路径/}
+    {block 块名称} 块内容 {/block}
+    如果你熟悉smarty中的继承，应该不难理解，使用方法基本类似
+    继承标签由extend和block标签共同完成
+    继承模板中的block会覆盖父模板中的同名block内容
+    如果没有覆盖（同名块）父模板某个block，则使用这个block中默认的内容
 </code>
 </pre>
-					<h3 class="melon-h">标签扩展</h3>
+                    <h3 class="melon-h">标签扩展</h3>
 <pre>
 <code class="language-php">
-	// 使用方法
-	{tag:标签名 属性=值} 内容 {/tag}  注：可使用assignTag或assignTagItem方法添加
+    // 使用方法
+    {tag:标签名 属性=值} 内容 {/tag}  注：可使用assignTag或assignTagItem方法添加
 
-	// 添加扩展方法
-	// 首先声明一个获取某个列表数据的函数
-	function getList( $id, $limit ) {
-			// 返回一个列表数据
-	}
-	// 注入这个list标签
-	$template->assignTag( 'list', array(
-			'callable' => 'getList',
-			'args' => array( 'id' => 1, 'limit' => 10 )
-	) );
+    // 添加扩展方法
+    // 首先声明一个获取某个列表数据的函数
+    function getList( $id, $limit ) {
+            // 返回一个列表数据
+    }
+    // 注入这个list标签
+    $template->assignTag( 'list', array(
+            'callable' => 'getList', // callable可以是符合php is_callable函数规定的类型
+            'args' => array( 'id' => 1, 'limit' => 10 )
+    ) );
 
-	如果getList返回一个数组，在模板中就可以这样使用，程序会自动遍历这个数组：
-	{tag:list id=1}
-			{$data} //$data是getList返回的数组中的每个元素的值
-	{/tag:list}
-	参数可使用变量，同时也可以自定义遍历的元素值的名称：
-	{tag:list id=$id result=row}
-			{$row}
-	{/tag:list}
+    如果getList返回一个数组，在模板中就可以这样使用，程序会自动遍历这个数组：
+    {tag:list id=1}
+            {$data} //$data是getList返回的数组中的每个元素的值
+    {/tag:list}
+    参数可使用变量，同时也可以自定义遍历的元素值的名称：
+    {tag:list id=$id result=row}
+            {$row}
+    {/tag:list}
 
-	如果getList返回一个字符串，在模板中可以这样使用，程序会输出这个字符串：
-	{tag:list id=1 /}
+    如果getList返回一个字符串，在模板中可以这样使用，程序会输出这个字符串：
+    {tag:list id=1 /}
 </code>
 </pre>
-					另外，标签也可以互相嵌套，没有限制
-					</div>
-				</div>
-				
-				<div class="melon-item">
-					<a name="mark_trigger" class="melon-mark"></a>
-					<h2 class="melon-h">触发器</h2>
-					<div>
-						事件触发器，可以实现一些类似AOP的操作
+                    另外，标签也可以互相嵌套，没有限制
+                    </div>
+                </div>
+                
+                <div class="melon-item">
+                    <a name="mark_trigger" class="melon-mark"></a>
+                    <h2 class="melon-h">触发器</h2>
+                    <div>
+                        事件触发器，可以实现一些类似AOP的操作
 <pre>
 <code class="language-php">
     class Test {
@@ -1082,73 +1128,73 @@ $model->fetchAll( '*', '`id`=? AND `type`=?', array( '123', 'hot' ) );
 </code>
 </pre>
 
-					</div>
-					
-				</div>
-				
-				<div class="melon-item">
-					<a name="mark_function" class="melon-mark"></a>
-					<h2 class="melon-h">函数</h2>
-					<div>
-						因程序需要，创建了几个实用的函数，它们位于<b>Melon\Base\Func</b>命名空间下
+                    </div>
+                    
+                </div>
+                
+                <div class="melon-item">
+                    <a name="mark_function" class="melon-mark"></a>
+                    <h2 class="melon-h">函数</h2>
+                    <div>
+                        因程序需要，创建了几个实用的函数，它们位于<b>Melon\Base\Func</b>命名空间下
 <pre>
 <code class="language-php">
-	use Melon\Base\Func;
+    use Melon\Base\Func;
 
-	// 判断一个路径是否为绝对路径
-	echo Func\isAbsolutePath( 'F:\www' );
+    // 判断一个路径是否为绝对路径
+    echo Func\isAbsolutePath( 'F:\www' );
 
-	// 简化获取多维数组的值
-	echo Func\getValue( $arr, 'k1.k2.k3' ); // 获取$arr['k1']['k2']['k3']的值
+    // 简化获取多维数组的值
+    echo Func\getValue( $arr, 'k1.k2.k3' ); // 获取$arr['k1']['k2']['k3']的值
 
-	// 简单的替换变量模板，一般用于语言包替换
-	echo Func\varReplace( 'name', 'Melon', '我的名字是${name}' ); // 输出：我的名字是Melon
+    // 简单的替换变量模板，一般用于语言包替换
+    echo Func\varReplace( 'name', 'Melon', '我的名字是${name}' ); // 输出：我的名字是Melon
 </code>
 </pre>
-					</div>
-				</div>
-				
-				<div class="melon-item">
-					<a name="mark_app" class="melon-mark"></a>
-					<h2 class="melon-h">APP/MVC</h2>
-					APP模式以基础模式作为扩展，所以你应该先了解基础模式的<a href="#mark_initialization" class="melon-mark-link">初始化与配置</a>。APP模式主要有模块（Module）以及MVC功能。
-						<div class="melon-item clean-mg-top">
-							<a name="mark_app_initialization" class="melon-mark"></a>
-							<h3 class="melon-h">初始化与配置</h3>
-							<h4 class="melon-h">安装APP和MODULE</h4>
-							<div>
-								安装APP需要提供<b>install</b>参数，并执行<code>Melon::runApp()</code>，同时指定一个Module模块，程序在安装APP的时候自动安装它
+                    </div>
+                </div>
+                
+                <div class="melon-item">
+                    <a name="mark_app" class="melon-mark"></a>
+                    <h2 class="melon-h">APP/MVC</h2>
+                    APP模式以基础模式作为扩展，所以你应该先了解基础模式的<a href="#mark_initialization" class="melon-mark-link">初始化与配置</a>。APP模式主要有模块（Module）以及MVC功能。
+                        <div class="melon-item clean-mg-top">
+                            <a name="mark_app_initialization" class="melon-mark"></a>
+                            <h3 class="melon-h">初始化与配置</h3>
+                            <h4 class="melon-h">安装APP和MODULE</h4>
+                            <div>
+                                安装APP需要提供<b>install</b>参数，并执行<code>Melon::runApp()</code>，同时指定一个Module模块，程序在安装APP的时候自动安装它
 <pre>
 <code class="language-php">
-	Melon::init( array(
-		'type' => 'app',
-		'root' => __DIR__,
-		'appName' => 'MyApp',
-		'install' => 'app'
-	) );
-	Melon::runApp( 'MyModule' );
+    Melon::init( array(
+        'type' => 'app',
+        'root' => __DIR__,
+        'appName' => 'MyApp',
+        'install' => 'app'
+    ) );
+    Melon::runApp( 'MyModule' );
 </code>
 </pre>
-								运行脚本后，页面提示安装成功就可以了。需要注意的是安装成功及时删除<code>'install' => 'app'</code>这句，否则页面提示不能重复安装的信息。然后进入root目录，将看到安装成功后的<a href="#mark_app_tree" class="melon-mark-link">APP目录</a>，同时看到<b>MyModule</b>模块也被成功安装到<b>YourApp/Module/</b>目录下，显然模块是一个<a href="#mark_package" class="melon-mark-link">包</a>，具有包的特性<br /><br />
-								Module也是可以安装的，一个APP可有多个Module。安装它同样很简单，只要传入一个不存在的Module的名字，并传入<b>'install' => 'module'</b>参数
+                                运行脚本后，页面提示安装成功就可以了。需要注意的是安装成功及时删除<code>'install' => 'app'</code>这句，否则页面提示不能重复安装的信息。然后进入root目录，将看到安装成功后的<a href="#mark_app_tree" class="melon-mark-link">APP目录</a>，同时看到<b>MyModule</b>模块也被成功安装到<b>YourApp/Module/</b>目录下，显然模块是一个<a href="#mark_package" class="melon-mark-link">包</a>，具有包的特性<br /><br />
+                                Module也是可以安装的，一个APP可有多个Module。安装它同样很简单，只要传入一个不存在的Module的名字，并传入<b>'install' => 'module'</b>参数
 <pre>
 <code class="language-php">
-	Melon::init( array(
-		'type' => 'app',
-		'root' => __DIR__,
-		'appName' => 'MyApp',
-		'install' => 'module'
-	) );
-	Melon::runApp( 'MyModule_1' );
+    Melon::init( array(
+        'type' => 'app',
+        'root' => __DIR__,
+        'appName' => 'MyApp',
+        'install' => 'module'
+    ) );
+    Melon::runApp( 'MyModule_1' );
 </code>
 </pre>
-								刷新下，页面没有错误就是成功了，进入<b>MyApp/Module/</b>目录就可以看到这个新安装的Module。哦，别忘记删除<b>'install' => 'module'</b>这句。
-							</div>
-							
-							<h4 class="melon-h">主体类与环境变量</h4>
-							<div>
-								安装成功后，APP目录下存在一个<b>MyApp.php</b>文件，里面就声明了一个类，是继承<b>Melon</b>主体类的，程序会自动引入它。每个APP都有相应的主体类来用于扩展自身功能，这里面创建的必需都是静态方法，能像<b>Melon</b>一样易用<br /><br />
-								这时我们在<b>MyApp/_MyModule/Controller/Index.php</b>（这时环境变量已经完全）控制器下使用<b>MyApp</b>打印一下环境变量
+                                刷新下，页面没有错误就是成功了，进入<b>MyApp/Module/</b>目录就可以看到这个新安装的Module。哦，别忘记删除<b>'install' => 'module'</b>这句。
+                            </div>
+                            
+                            <h4 class="melon-h">主体类与环境变量</h4>
+                            <div>
+                                安装成功后，APP目录下存在一个<b>MyApp.php</b>文件，里面就声明了一个类，是继承<b>Melon</b>主体类的，程序会自动引入它。每个APP都有相应的主体类来用于扩展自身功能，这里面创建的必需都是静态方法，能像<b>Melon</b>一样易用<br /><br />
+                                这时我们在<b>MyApp/_MyModule/Controller/Index.php</b>（这时环境变量已经完全）控制器下使用<b>MyApp</b>打印一下环境变量
 <pre>
 <code class="language-php">
 // 入口执行Melon::runApp( 'MyModule' );
@@ -1159,53 +1205,53 @@ namespace MyApp\Module\_MyModule\Controller;
  * 控制器例子
  */
 class Index extends \Melon\App\Lib\Controller {
-	
-	public function index() {
-		// 打印环境变量
-		print_r( \MyApp::env() );
-		// 将得到基础模式之外的新环境变量
-		array (
-			'runType' => 'app',			// 运行模式
-			'appName' => 'MyApp',			// app名字
-			'className' => 'MyApp',			// 主体类名字
-			'appDir' => '',				// app目录
-			'moduleName' => 'MyModule',		// module名字
-			'routeConfig' => array (		// 路由配置
-				'404' => 'Data/404.html',		
-				'defaultController' => 'Index',
-				'defaultAction' => 'Index',
-				'global' => array (),
-			),
-			'controller' => 'Index',		// 当前运行的控制器
-			'action' => 'Index',			// 当前运行的控制器方法
-			'args' => array (			// URL参数
-			),
-		);
-	}
+    
+    public function index() {
+        // 打印环境变量
+        print_r( \MyApp::env() );
+        // 将得到基础模式之外的新环境变量
+        array (
+            'runType' => 'app',              // 运行模式
+            'appName' => 'MyApp',            // app名字
+            'className' => 'MyApp',          // 主体类名字
+            'appDir' => '',                  // app目录
+            'moduleName' => 'MyModule',      // module名字
+            'routeConfig' => array (         // 路由配置
+                '404' => 'Data/404.html',        
+                'defaultController' => 'Index',
+                'defaultAction' => 'Index',
+                'global' => array (),
+            ),
+            'controller' => 'Index',         // 当前运行的控制器
+            'action' => 'Index',             // 当前运行的控制器方法
+            'args' => array (                // URL参数
+            ),
+        );
+    }
 }
 </code>
 </pre>
-							</div>
-						
-							<a name="mark_app_tree" class="melon-mark"></a>
-							<h3 class="melon-h">目录结构</h3>
-							<div>
+                            </div>
+                        
+                            <a name="mark_app_tree" class="melon-mark"></a>
+                            <h3 class="melon-h">目录结构</h3>
+                            <div>
 <pre>
 <code class="language-php">
     Common    -----------------------------------    公共目录
-	
+    
     Conf    -------------------------------------    配置目录
         Base.php    -----------------------------    基础配置
         Route.php    ----------------------------    路由配置
-		
+        
     Data    -------------------------------------    数据存放
         404.html    -----------------------------    404页面
         errorPage.html    -----------------------    错误页面
-		
+        
         TplCache    -----------------------------    模板缓存
-		
+        
     Log    --------------------------------------    日志存放
-	
+    
     Module    -----------------------------------    模块
         _MyModule    ----------------------------    Mymodule目录
             Controller    -----------------------    控制器
@@ -1217,93 +1263,93 @@ class Index extends \Melon\App\Lib\Controller {
 
 </code>
 </pre>
-							</div>
-						</div>
-				</div>
-				
-				<div class="melon-item">
-					<a name="mark_app_controller" class="melon-mark"></a>
-					<h2 class="melon-h">控制器</h2>
-					<div>
-						一般情况下，控制器需继承<code>Melon\App\Lib\Controller</code>，它提供了四个属性：<b>$request</b>请求(Melon\Http\Request)、<b>$response</b>回应(Melon\Http\Response)、<b>$view</b>视图(Melon\Util\Template)、<b>$lang</b>语言(Melon\Lib\Lang)，请求与回应文档HTTP部分已经进行了说明，视图和语言下面会提到。这里举下简单的使用例子
+                            </div>
+                        </div>
+                </div>
+                
+                <div class="melon-item">
+                    <a name="mark_app_controller" class="melon-mark"></a>
+                    <h2 class="melon-h">控制器</h2>
+                    <div>
+                        一般情况下，控制器需继承<code>Melon\App\Lib\Controller</code>，它提供了四个属性：<b>$request</b>请求(Melon\Http\Request)、<b>$response</b>回应(Melon\Http\Response)、<b>$view</b>视图(Melon\Util\Template)、<b>$lang</b>语言(Melon\Lib\Lang)，请求与回应文档HTTP部分已经进行了说明，视图和语言下面会提到。这里举下简单的使用例子
 <pre>
 <code class="language-php">
 namespace MyApp\Module\_MyModule\Controller;
 
 class Index extends \Melon\App\Lib\Controller {
-	
-	public function index() {
-		
-		if( $this->request->isGet() ) {
-			
-			// 获取$_GET['username']
-			$username = $this->request->input( 'username' );
+    
+    public function index() {
+        
+        if( $this->request->isGet() ) {
+            
+            // 获取$_GET['username']
+            $username = $this->request->input( 'username' );
 
-			if( empty( $username ) ) {
-				$this->response->send( '请提供用户信息', 401, 'text/html' );
-				\MyApp::halt();
-			}
-			
-			// 注入变量
-			$this->view->assign( 'welcome', $username . '， 你好！欢迎来到Melon的世界' );
-			
-			// 显示View/Index/hello.html
-			$this->view->display( 'hello.html' );
-			
-			// 视图中body标签写上{$welcome}
-			// 输出：xxx你好！欢迎来到Melon的世界
-		}
-		
-	}
+            if( empty( $username ) ) {
+                $this->response->send( '请提供用户信息', 401, 'text/html' );
+                \MyApp::halt();
+            }
+            
+            // 注入变量
+            $this->view->assign( 'welcome', $username . '， 你好！欢迎来到Melon的世界' );
+            
+            // 显示View/Index/hello.html
+            $this->view->display( 'hello.html' );
+            
+            // 视图中body标签写上{$welcome}
+            // 输出：xxx你好！欢迎来到Melon的世界
+        }
+        
+    }
 }
 </code>
 </pre>
-					</div>
-				</div>
-				
-				<div class="melon-item">
-					<a name="mark_app_view" class="melon-mark"></a>
-					<h2 class="melon-h">视图</h2>
-					<div>
-						视图基于<a href="#mark_template" class="melon-mark-link">模板类</a>，在控制器使用$view属性可得到其实例，模板目录也被设定在当前Module的<b>View/当前控制器</b>目录下。值得注意的是，视图默认注入了<b>环境变量env</b>、<b>语言包变量lang</b>，以及<b>请求参数</b>（get、post等），可以直接在模板中{$env[key]}这样使用它们
+                    </div>
+                </div>
+                
+                <div class="melon-item">
+                    <a name="mark_app_view" class="melon-mark"></a>
+                    <h2 class="melon-h">视图</h2>
+                    <div>
+                        视图基于<a href="#mark_template" class="melon-mark-link">模板类</a>，在控制器使用$view属性可得到其实例，模板目录也被设定在当前Module的<b>View/当前控制器</b>目录下。值得注意的是，视图默认注入了<b>环境变量env</b>、<b>语言包变量lang</b>，以及<b>请求参数</b>（get、post等），可以直接在模板中{$env[key]}这样使用它们
 <pre>
 <code class="language-php">
 namespace MyApp\Module\_MyModule\Controller;
 
 class Index extends \Melon\App\Lib\Controller {
-	
-	public function index() {
-			
-		// 注入变量
-		$this->view->assign( 'welcome', 你好！欢迎来到Melon的世界' );
-		
-		// 可使用assignTag动态注入自定义标签，规则请看模板文档
-		// 注入alink标签
-		//$this->view->assignTag( 'alink', array(
-			'callable' => '\Melon\App\Lib\Func\alink',
-			'args' => array(
-				'ln' => '',
-				'comp' => true,
-			)
-		) );
+    
+    public function index() {
+            
+        // 注入变量
+        $this->view->assign( 'welcome', 你好！欢迎来到Melon的世界' );
+        
+        // 可使用assignTag动态注入自定义标签，规则请看模板文档
+        // 注入alink标签
+        //$this->view->assignTag( 'alink', array(
+            'callable' => '\Melon\App\Lib\Func\alink',
+            'args' => array(
+                'ln' => '',
+                'comp' => true,
+            )
+        ) );
 
-		// 显示View/Index/hello.html
-		$this->view->display( 'hello.html' );
+        // 显示View/Index/hello.html
+        $this->view->display( 'hello.html' );
 
-		// 视图中body标签写上{$welcome}
-		// 输出：欢迎来到Melon的世界
-	}
+        // 视图中body标签写上{$welcome}
+        // 输出：欢迎来到Melon的世界
+    }
 }
 </code>
 </pre>
-					</div>
-				</div>
-				
-				<div class="melon-item">
-					<a name="mark_app_model" class="melon-mark"></a>
-					<h2 class="melon-h">模型</h2>
-					<div>
-						模型可以使用框架提供的PDOModel（请看<a href="#mark_database" class="melon-mark-link">数据库接口</a>），扩展可直接继承<code>\Melon\App\Lib\PDOModel</code>，扩展类应该存放在Model目录下，如果要获取实例，可以直接new
+                    </div>
+                </div>
+                
+                <div class="melon-item">
+                    <a name="mark_app_model" class="melon-mark"></a>
+                    <h2 class="melon-h">模型</h2>
+                    <div>
+                        模型可以使用框架提供的PDOModel（请看<a href="#mark_database" class="melon-mark-link">数据库接口</a>），扩展可直接继承<code>\Melon\App\Lib\PDOModel</code>，扩展类应该存放在Model目录下，如果要获取实例，可以直接new
 <pre>
 <code class="language-php">
 namespace MyApp\Module\_MyModule\Controller;
@@ -1312,55 +1358,55 @@ namespace MyApp\Module\_MyModule\Controller;
 use MyApp\Module\_MyModule\Model;
 
 class Index extends \Melon\App\Lib\Controller {
-	
-	public function index() {
-		// 如果Model目录下存在Member.php模型
-		$model = new Model\Member();
-	}
+    
+    public function index() {
+        // 如果Model目录下存在Member.php模型
+        $model = new Model\Member();
+    }
 }
 </code>
 </pre>
-					</div>
-				</div>
-				
-				
-				<div class="melon-item">
-					<a name="mark_app_route" class="melon-mark"></a>
-					<h2 class="melon-h">路由与URL</h2>
-					<div>
-						路由配置文件在<b>MyApp/Conf/Route.php</b>下。
-								路由可配置三种模式，都是取得URL中的PATHINFO信息，由配置文件中的type值决定。
-								<ul class="melon-list">
-									<li>
-								1. incompletePathinfo，不完整的PATHINFO(带.php)，即 http://domain.com/index.php/index/login 这样的形式
-									</li>
-									<li>
-								2. completePathinfo，完整的PATHINFO(不带.php)，即 http://domain.com/index/login 
-									</li>
-									<li>
-								3. requestKey，通过请求参数来决定，例如 http://domain.com/index.php?p=/index/login ，这个参数p是可以设为其它值的，由配置文件中的requestKey值决定
-									</li>
-								</ul>
-							
-								程序取得PATHINFO后，以/号分割参数，第一个参数为<b>控制器</b>，第二个参数为<b>控制器方法</b>，后面的作为方法参数依次传入。<br /><br />
-								下面在配置文件中创建一些路由规则的示例（详细规则请看<a href="#mark_route" class="melon-mark-link"><b>路由</b></a>说明），这些规则都是对PATHINFO的值作匹配
+                    </div>
+                </div>
+                
+                
+                <div class="melon-item">
+                    <a name="mark_app_route" class="melon-mark"></a>
+                    <h2 class="melon-h">路由与URL</h2>
+                    <div>
+                        路由配置文件在<b>MyApp/Conf/Route.php</b>下。
+                                路由可配置三种模式，都是取得URL中的PATHINFO信息，由配置文件中的type值决定。
+                                <ul class="melon-list">
+                                    <li>
+                                1. incompletePathinfo，不完整的PATHINFO(带.php)，即 http://domain.com/index.php/index/login 这样的形式
+                                    </li>
+                                    <li>
+                                2. completePathinfo，完整的PATHINFO(不带.php)，即 http://domain.com/index/login 
+                                    </li>
+                                    <li>
+                                3. requestKey，通过请求参数来决定，例如 http://domain.com/index.php?p=/index/login ，这个参数p是可以设为其它值的，由配置文件中的requestKey值决定
+                                    </li>
+                                </ul>
+                            
+                                程序取得PATHINFO后，以/号分割参数，第一个参数为<b>控制器</b>，第二个参数为<b>控制器方法</b>，后面的作为方法参数依次传入。<br /><br />
+                                下面在配置文件中创建一些路由规则的示例（详细规则请看<a href="#mark_route" class="melon-mark-link"><b>路由</b></a>说明），这些规则都是对PATHINFO的值作匹配
 <pre>
 <code class="language-php">
-	// 匹配全局URL
-	'global' => array(
-		'/[type]/[id]' => '/category/[type]/[id]',
-		'/user/(\w+)' => '/user/id/$1'
-	),
-	// 匹配get方法请求URL
-	'get' => array(
-		'/comment/hot/[uid]' => '/bolg/comment/type/hot/user/[uid]'
-		...
-	),
-	// 匹配post请求URL
-	'post' => array( ... ),
+    // 匹配全局URL
+    'global' => array(
+        '/[type]/[id]' => '/category/[type]/[id]',
+        '/user/(\w+)' => '/user/id/$1'
+    ),
+    // 匹配get方法请求URL
+    'get' => array(
+        '/comment/hot/[uid]' => '/bolg/comment/type/hot/user/[uid]'
+        ...
+    ),
+    // 匹配post请求URL
+    'post' => array( ... ),
 </code>
 </pre><br /><br />
-								如果你想要通过URL动态调用模块，是可以的，你要在入口把runApp方法中的模块去掉
+                                如果你想要通过URL动态调用模块，是可以的，你要在入口把runApp方法中的模块去掉
 <pre>
 <code class="language-php">
 // 原来是这样
@@ -1370,453 +1416,453 @@ Melon::runApp( 'MyModule' );
 Melon::runApp();
 </code>
 </pre>
-							然后PATHINFO中第一个参数就是模块了，想要缺省的调用，可以在配置文件中配置<b>defaultModule</b>、<b>defaultController</b>、<b>defaultAction</b> 这三个值，这样你可以在PATHINFO中省略它们。例如
+                            然后PATHINFO中第一个参数就是模块了，想要缺省的调用，可以在配置文件中配置<b>defaultModule</b>、<b>defaultController</b>、<b>defaultAction</b> 这三个值，这样你可以在PATHINFO中省略它们。例如
 <pre>
 <code class="language-php">
-	'type' => 'requestKey',				// 将路由模式设为requestKey
-	'requestKey' => 'p',				// 将requestKey设为p
-	
-	'defaultModule' => 'MyModule',			// 默认模块
-	'defaultController' => 'Index',			// 默认控制器
-	'defaultAction' => 'Index',			// 默认方法
-	
-	/* 假设APP中存在模块MyModule，控制器Index，方法Index */
-	
-	// 访问 http://domain.com/index.php?p=/MyModule/Index/Index
-	// 1. 程序首先要决定模块的值，取到PATHINFO第一个参数MyModule，MyModule模块存在，设其为模块
-	// 2. 得到模块后，第二个参数Index为控制器
-	// 3. 得到控制器后，第三个参数Index为方法
-	
-	// 访问 http://domain.com/index.php?p=/Index/Index
-	// 1. 程序首先要决定模块的值，取到PATHINFO第一个参数Index，Index模块不存在，取defaultModule的值，即MyModule
-	// 2. 得到模块后，这个Index将视为控制器
-	// 3. 得到控制器后，第二个参数Index为方法
-	
-	// 访问 http://domain.com/index.php?p=/Login
-	// 1. 程序首先要决定模块的值，取到PATHINFO第一个参数Login，Login模块不存在，取defaultModule的值，即MyModule
-	// 2. 得到模块后，这个Login将视为控制器，但是Login控制器也不存在，这时程序会抛出异常。
-	// 所以第一个参数只能是模块或控制器，而不可能是方法，这样是出于代码逻辑和性能方面的考虑
-	
-	// 访问 http://domain.com/index.php?p= 或 http://domain.com/index.php
-	// 由于PATHINFO为空，所以全部取默认值
+    'type' => 'requestKey',                // 将路由模式设为requestKey
+    'requestKey' => 'p',                   // 将requestKey设为p
+    
+    'defaultModule' => 'MyModule',         // 默认模块
+    'defaultController' => 'Index',        // 默认控制器
+    'defaultAction' => 'Index',            // 默认方法
+    
+    /* 假设APP中存在模块MyModule，控制器Index，方法Index */
+    
+    // 访问 http://domain.com/index.php?p=/MyModule/Index/Index
+    // 1. 程序首先要决定模块的值，取到PATHINFO第一个参数MyModule，MyModule模块存在，设其为模块
+    // 2. 得到模块后，第二个参数Index为控制器
+    // 3. 得到控制器后，第三个参数Index为方法
+    
+    // 访问 http://domain.com/index.php?p=/Index/Index
+    // 1. 程序首先要决定模块的值，取到PATHINFO第一个参数Index，Index模块不存在，取defaultModule的值，即MyModule
+    // 2. 得到模块后，这个Index将视为控制器
+    // 3. 得到控制器后，第二个参数Index为方法
+    
+    // 访问 http://domain.com/index.php?p=/Login
+    // 1. 程序首先要决定模块的值，取到PATHINFO第一个参数Login，Login模块不存在，取defaultModule的值，即MyModule
+    // 2. 得到模块后，这个Login将视为控制器，但是Login控制器也不存在，这时程序会抛出异常。
+    // 所以第一个参数只能是模块或控制器，而不可能是方法，这样是出于代码逻辑和性能方面的考虑
+    
+    // 访问 http://domain.com/index.php?p= 或 http://domain.com/index.php
+    // 由于PATHINFO为空，所以全部取默认值
 </code>
 </pre>
-							再看一个带参数的例子
+                            再看一个带参数的例子
 <pre>
 <code class="language-php">
-	// 访问http://domain.com/index.php?p=/Index/Index/melon/123
-	// PATH INFO是/Index/Index/melon/123
-	// 即控制器为index，方法为index，第一个参数值为melon，第二个参数为123
+    // 访问http://domain.com/index.php?p=/Index/Index/melon/123
+    // PATH INFO是/Index/Index/melon/123
+    // 即控制器为index，方法为index，第一个参数值为melon，第二个参数为123
 
-	namespace MyApp\Module\_MyModule\Controller;
+    namespace MyApp\Module\_MyModule\Controller;
 
-	class Index extends \Melon\App\Lib\Controller {
+    class Index extends \Melon\App\Lib\Controller {
 
-		public function index( $name, $id ) {
-			echo $name; //melon
-			echo $id; //123
-		}
-	}
+        public function index( $name, $id ) {
+            echo $name; //melon
+            echo $id; //123
+        }
+    }
 </code>
 </pre>
-							<h3 class="melon-h">alink</h3>
-							<div>
-								alink(auto link)可以根据当前的路由配置生成对应规则的URL。<br /><br />
-								在控制器中使用alink函数或者location方法
+                            <h3 class="melon-h">alink</h3>
+                            <div>
+                                alink(auto link)可以根据当前的路由配置生成对应规则的URL。<br /><br />
+                                在控制器中使用alink函数或者location方法
 <pre>
 <code class="language-php">
-	class Index extends \Melon\App\Lib\Controller {
+    class Index extends \Melon\App\Lib\Controller {
 
-		public function index( $name, $id ) {
-			echo \Melon\App\Lib\Func\alink( '/Index/Index?param=xxx' ); // 可带GET参数
-			// 1. type为incompletePathinfo时，输出 http://domain.com/index.php/Index/Index?param=xxx
-			// 2. type为incompletePathinfo时，输出 http://domain.com/Index/Index?param=xxx
-			// 3. type为requestKey时，输出 http://domain.com/index.php?p=/Index/Index&param=xxx
-			
-			// 使用location直接跳转
-			$this->location( '/Index/Index?param=xxx', 1 ); // 注意第二个参数值要为真，否则location视其为正常连接
-		}
-	}
+        public function index( $name, $id ) {
+            echo \Melon\App\Lib\Func\alink( '/Index/Index?param=xxx' ); // 可带GET参数
+            // 1. type为incompletePathinfo时，输出 http://domain.com/index.php/Index/Index?param=xxx
+            // 2. type为incompletePathinfo时，输出 http://domain.com/Index/Index?param=xxx
+            // 3. type为requestKey时，输出 http://domain.com/index.php?p=/Index/Index&param=xxx
+            
+            // 使用location直接跳转
+            $this->location( '/Index/Index?param=xxx', 1 ); // 注意第二个参数值要为真，否则location视其为正常连接
+        }
+    }
 </code>
 </pre>
-								同样你可以在视图中使用alink标签，该标签基于模板引擎的动态扩展
+                                同样你可以在视图中使用alink标签，该标签基于模板引擎的动态扩展
 <pre>
 <code class="language-php">
-	{tag:alink ln="/Index/Index" /}
+    {tag:alink ln="/Index/Index" /}
 </code>
 </pre>
-							</div>
-							<h3 class="melon-h">自定义</h3>
-						如果你不想使用上面的所有规则怎么办呢，<b>Melon::runApp</b>提供了直接调用控制器方法的命令
+                            </div>
+                            <h3 class="melon-h">自定义</h3>
+                        如果你不想使用上面的所有规则怎么办呢，<b>Melon::runApp</b>提供了直接调用控制器方法的命令
 <pre>
 <code class="language-php">
-	Melon::init( array(
-		'type' => 'app',
-		'root' => __DIR__,
-		'appName' => 'MyApp',
-	) );
-	
-	// 此处也可以通过更多计算出控制器和方法
-	// 比如使用Melon::httpRoute
-	
-	$controler = $_GET['c'];
-	$action = $_GET['a'];
-	$args = $_GET['args'];
-	Melon::runApp( 'MyModule', $controler, $action, $args );
+    Melon::init( array(
+        'type' => 'app',
+        'root' => __DIR__,
+        'appName' => 'MyApp',
+    ) );
+    
+    // 此处也可以通过更多计算出控制器和方法
+    // 比如使用Melon::httpRoute
+    
+    $controler = $_GET['c'];
+    $action = $_GET['a'];
+    $args = $_GET['args'];
+    Melon::runApp( 'MyModule', $controler, $action, $args );
 </code>
 </pre>
-						这样就不必受到限制，随意定义自己的路由方式。
-					</div>
-				</div>
-				
-				
-				
-				<div class="melon-item">
-					<a name="mark_app_lang" class="melon-mark"></a>
-					<h2 class="melon-h">语言包（国际化）</h2>
-					<div>
-						语言可在控制器使用$lang属性可得到其实例，默认引入了<b>Lang/Comment.php</b>语言包。另外，它是扩展于<b>Melon/Util/Set</b>类的，所以它有很多容器的操作，也可以使用模板
+                        这样就不必受到限制，随意定义自己的路由方式。
+                    </div>
+                </div>
+                
+                
+                
+                <div class="melon-item">
+                    <a name="mark_app_lang" class="melon-mark"></a>
+                    <h2 class="melon-h">语言包（国际化）</h2>
+                    <div>
+                        语言可在控制器使用$lang属性可得到其实例，默认引入了<b>Lang/Comment.php</b>语言包。另外，它是扩展于<b>Melon/Util/Set</b>类的，所以它有很多容器的操作，也可以使用模板
 <pre>
 <code class="language-php">
-	/*
+    /*
 
-	Lang/Comment.php语言包下是这样：
-	return array(
-		'please_provide_userinfo' => '请提供用户信息',
-		'welcome' => '${username}，你好，欢迎来到${fooname}的世界'
-	);
-	 */
+    Lang/Comment.php语言包下是这样：
+    return array(
+        'please_provide_userinfo' => '请提供用户信息',
+        'welcome' => '${username}，你好，欢迎来到${fooname}的世界'
+    );
+     */
 
-	namespace MyApp\Module\_MyModule\Controller;
+    namespace MyApp\Module\_MyModule\Controller;
 
-	class Index extends \Melon\App\Lib\Controller {
+    class Index extends \Melon\App\Lib\Controller {
 
-		public function index() {
-			$username = $this->request->input( 'username' );
+        public function index() {
+            $username = $this->request->input( 'username' );
 
-			if( empty( $username ) ) {
-				// 直接取语言相应键名
-				$lang = $this->lang['please_provide_userinfo'];
-				$this->response->send( $lang, 401, 'text/html' );
-				\MyApp::halt();
-			}
+            if( empty( $username ) ) {
+                // 直接取语言相应键名
+                $lang = $this->lang['please_provide_userinfo'];
+                $this->response->send( $lang, 401, 'text/html' );
+                \MyApp::halt();
+            }
 
-			// 替换语言包的变量
-			$welcome = $this->lang->replace( 'welcome', array(
-				'username' => $username,
-				'fooname' => 'melon'
-			) );
-			// 注入变量
-			$this->view->assign( 'welcome', $welcome );
+            // 替换语言包的变量
+            $welcome = $this->lang->replace( 'welcome', array(
+                'username' => $username,
+                'fooname' => 'melon'
+            ) );
+            // 注入变量
+            $this->view->assign( 'welcome', $welcome );
 
-			$this->view->display( 'hello.html' );
-		}
-	}	
+            $this->view->display( 'hello.html' );
+        }
+    }    
 </code>
 </pre>
-						你也可以创建更多的语言包，比如<b>Custom.php</b>，使用包的函数很方便载入它
+                        你也可以创建更多的语言包，比如<b>Custom.php</b>，使用包的函数很方便载入它
 <pre>
 <code class="language-php">
-	// 怎么样，包的特性很帅吧！
-	$this->lang->setItems( \MyApp::packageAcquire( 'Lang/Custom.php' ) );
+    // 怎么样，包的特性很帅吧！
+    $this->lang->setItems( \MyApp::packageAcquire( 'Lang/Custom.php' ) );
 </code>
 </pre>
-					</div>
-				</div>
-				
-				<div class="melon-item">
-					<h2 class="melon-h">感谢</h2>
-					<div>首先非常感谢你的关注！我一直想写一个自己的框架，有人对我说过，自己写的框架能比得上zend、yii它们吗？其实对于程序员这个非常有创造性的职业来说，相信每个人都有过满脑子的想法，却总是懒散，或者犹豫不决，生怕自己浪费时间和精力。<br /><br />这其实是非常扼杀自己创造力的想法，我在写它之前，也不相信自己能做出什么，但上手之后，我的灵感满脑子的跑，茶饭不思，从来没有过这样感觉，从中也学习和巩固了各方面的知识。于是MelonFramework诞生了，虽然它有很多不足，但我会继续完善它。<br /><br />如果你有一些灵感，请马上打开你的编辑器，写下来吧！</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<script>
-		! function() {
-			// 设置简介部分的高度，不让低下文档露出来
-			var introductions = getByClass( 'melon-introduction' );
-			if( introductions && introductions[0] ) {
-				var height = getClientHeight();
-				introductions[0].style.height = ( height < 600 ? 600 : height ) + 'px';
-			}
+                    </div>
+                </div>
+                
+                <div class="melon-item">
+                    <h2 class="melon-h">感谢</h2>
+                    <div>首先非常感谢你的关注！我一直想写一个自己的框架，有人对我说过，自己写的框架能比得上zend、yii它们吗？其实对于程序员这个非常有创造性的职业来说，相信每个人都有过满脑子的想法，却总是懒散，或者犹豫不决，生怕自己浪费时间和精力。<br /><br />这其实是非常扼杀自己创造力的想法，我在写它之前，也不相信自己能做出什么，但上手之后，我的灵感满脑子的跑，茶饭不思，从来没有过这样感觉，从中也学习和巩固了各方面的知识。于是MelonFramework诞生了，虽然它有很多不足，但我会继续完善它。<br /><br />如果你有一些灵感，请马上打开你的编辑器，写下来吧！</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        ! function() {
+            // 设置简介部分的高度，不让低下文档露出来
+            var introductions = getByClass( 'melon-introduction' );
+            if( introductions && introductions[0] ) {
+                var height = getClientHeight();
+                introductions[0].style.height = ( height < 600 ? 600 : height ) + 'px';
+            }
 
-				// 菜单项元素列表
-			var menuList = getByTag( 'a', getByClass( 'melon-menu' )[0] ),
-				// 锚点元素列表
-				markList = getByClass( 'melon-mark' ),
-				// 锚点位置对象
-				markPos = {
-					listen: true, // 是否监听滚动条所处位置，自动高光对应菜单项
-					list: {}, // 记录所有锚点ID和位置的对象
-					// 初始化每个锚点的位置
-					init: function() {
-						each( markList, function() {
-							var top = getElementTop( this );
-							markPos.list[ this.name ] = top;
-						} );
-					}
-				};
+                // 菜单项元素列表
+            var menuList = getByTag( 'a', getByClass( 'melon-menu' )[0] ),
+                // 锚点元素列表
+                markList = getByClass( 'melon-mark' ),
+                // 锚点位置对象
+                markPos = {
+                    listen: true, // 是否监听滚动条所处位置，自动高光对应菜单项
+                    list: {}, // 记录所有锚点ID和位置的对象
+                    // 初始化每个锚点的位置
+                    init: function() {
+                        each( markList, function() {
+                            var top = getElementTop( this );
+                            markPos.list[ this.name ] = top;
+                        } );
+                    }
+                };
 
-			// 初始化锚点位置
-			markPos.init();
-			// 窗口改变时修正位置
-			window.onresize = function() {
-				markPos.init();
-			}
-			// 监听滚动条，跟踪菜单项位置
-			document.onscroll = function() {
-				if( ! markPos.listen ) {
-					return;
-				}
-				var top = getScrollTop();
-				var near = null;
-				// 获取距离当前位置最近，且小于当前位置的锚点
-				each( markPos.list, function( key ) {
-					// 减去100像素高度，提前高光菜单项显得更人性化
-					var pos = this.toString() - 100;
-					if( pos <= top ) {
-						if( ! near || ( near && ( top - pos < near.diff ) ) ) {
-							near = {
-								mark: '#' + key,
-								diff: top - pos
-							}
-						}
-					}
-				} );
-				if( near ) {
-					active( near.mark );
-				} else {
-					active( '#' );
-				}
-			}
+            // 初始化锚点位置
+            markPos.init();
+            // 窗口改变时修正位置
+            window.onresize = function() {
+                markPos.init();
+            }
+            // 监听滚动条，跟踪菜单项位置
+            document.onscroll = function() {
+                if( ! markPos.listen ) {
+                    return;
+                }
+                var top = getScrollTop();
+                var near = null;
+                // 获取距离当前位置最近，且小于当前位置的锚点
+                each( markPos.list, function( key ) {
+                    // 减去100像素高度，提前高光菜单项显得更人性化
+                    var pos = this.toString() - 100;
+                    if( pos <= top ) {
+                        if( ! near || ( near && ( top - pos < near.diff ) ) ) {
+                            near = {
+                                mark: '#' + key,
+                                diff: top - pos
+                            }
+                        }
+                    }
+                } );
+                if( near ) {
+                    active( near.mark );
+                } else {
+                    active( '#' );
+                }
+            }
 
-			// 定位初始菜单项
-			if( location.hash !== "" ) {
-				active( location.hash );
-			}
+            // 定位初始菜单项
+            if( location.hash !== "" ) {
+                active( location.hash );
+            }
 
-			// 绑定菜单点击事件
-			each( menuList, function() {
-				var self = this;
-				this.onclick = function() {
-					goto( getMark( self.href ) );
-					return false;
-				};
-			} );
+            // 绑定菜单点击事件
+            each( menuList, function() {
+                var self = this;
+                this.onclick = function() {
+                    goto( getMark( self.href ) );
+                    return false;
+                };
+            } );
 
-			// 绑定跳转事件
-			each( getByClass( 'melon-mark-link' ), function() {
-				this.onclick = function() {
-					goto( getMark( this.href ) );
-					return false;
-				}
-			} );
-
-
-			/************ 函数 ************/
-
-			// 高光指定菜单项
-			function active( mark ) {
-				each( menuList, function() {
-					var menuObj = this;
-					// 对应上了
-					if( mark !== '#' && getMark( menuObj.href ) === mark ) {
-						// 添加菜单样式
-						addClass( menuObj, 'menu-hover' );
-					} else {
-						removeClass( this, 'menu-hover' );
-					}
-				} );
-			}
-
-			// 跳转到指定锚点
-			function goto( mark ) {
-				active( mark );
-
-				// 滚动周期
-				var interval = 10;
-				// 如果是首页，直接滚回顶部吧
-				if( mark === '#' ) {
-					markPos.listen = false;
-					scollWindow( 0, interval, function() {
-						markPos.listen = true;
-						location.hash = mark;
-					} );
-					return;
-				}
-				// 遍历菜单得到对应锚点的项
-				each( menuList, function() {
-					var menuObj = this;
-					// 对应上了
-					if( getMark( menuObj.href ) === mark ) {
-						// 从标签列表得到锚点和它的位置
-						each( markPos.list, function( key ) {
-							var pos = this.toString();
-							if( '#' + key !== mark ) {
-								return;
-							}
-							// 让窗口滚动到这个位置
-							markPos.listen = false;
-							scollWindow( pos, interval, function() {
-								markPos.listen = true;
-								location.hash = mark;
-							} );
-						} );
-					}
-				} );
-			}
-
-			// 从字符串中截取锚点的值
-			function getMark( str ) {
-				var match = str.match( new RegExp( '#\\w*$' ) );
-				return match ? match[0] : false;
-			}
-
-			// 根据ID获取元素
-			function getById( id, main ) {
-				return ( main || document ).getElementById( id );
-			}
-
-			// 根据标签名获取元素
-			function getByTag( tag, main ) {
-				return ( main || document ).getElementsByTagName( tag );
-			}
-
-			// 根据class获取元素
-			function getByClass( cls, main ) {
-				return ( main || document ).getElementsByClassName( cls );
-			}
-
-			// 遍历数组或对象
-			function each( obj, callback ) {
-				if( Object.prototype.toString.call( obj ) == '[object Object]' ) {
-					for( var k in obj ) {
-						callback.call( obj[k], k );
-					}
-				} else {
-					for( var i = 0, len = obj.length; i < len; i++ ) {
-						callback.call( obj[i], i );
-					}
-				}
-			}
-
-			// 判断元素是否含有某个class
-			function hasClass( obj, cls ) {
-				return obj.className.match( new RegExp('(\\s|^)' + cls + '(\\s|$)') );
-			}
-
-			// 为元素添加一个class
-			function addClass( obj, cls ) {
-				if( ! hasClass( obj, cls ) ) obj.className += " " + cls;
-			}
-
-			// 删除元素的某个class
-			function removeClass( obj, cls ) {
-				if( hasClass( obj, cls ) ) {
-					var reg = new RegExp( '(\\s|^)' + cls + '(\\s|$)' );
-					obj.className = obj.className.replace(reg, ' ');
-				}
-			}
-
-			// 惯性滚动窗口，目前只支持y轴滚动
-			// 修改自《javascripot dom编程艺术》一书中的moveElement函数
-			function scollWindow( final_y, interval, callback ) {
-				if( window.movement ) {
-					clearTimeout( window.movement );
-				}
-				var ypos = parseInt( getScrollTop() );
-				var oldpos = ypos;
-				// 条件达成
-				if( ypos === final_y ) {
-					callback && callback();
-					return true;
-				}
-				if( ypos < final_y ) {
-					var dist = Math.ceil( ( final_y - ypos ) / 10 );
-					ypos = ypos + dist;
-				}
-				if( ypos > final_y ) {
-					var dist = Math.ceil( ( ypos - final_y ) / 10 );
-					ypos = ypos - dist;
-				}
-				window.scrollTo( 0, ypos );
-
-				// 滚到尽头，我简单的防止死循环
-				if( oldpos === parseInt( getScrollTop() ) ) {
-					callback && callback();
-					return true;
-				}
-
-				// 继续回调
-				window.movement = setTimeout( function() {
-					scollWindow( final_y, interval, callback );
-				}, interval );
-			}
+            // 绑定跳转事件
+            each( getByClass( 'melon-mark-link' ), function() {
+                this.onclick = function() {
+                    goto( getMark( this.href ) );
+                    return false;
+                }
+            } );
 
 
-			/************以下代码来自网上**************/
-			// 获取元素的绝对高度
-			function getElementTop( obj ){
-				var actualTop = obj.offsetTop;
-				var current = obj.offsetParent;
-				while( current !== null ){
-					actualTop += current.offsetTop;
-					current = current.offsetParent;
-				}
-				return actualTop;
-			}
+            /************ 函数 ************/
 
-			// 获取窗口当前的滚动高度
-			function getScrollTop() {
-				var scrollTop = 0;
-				if( document.documentElement && document.documentElement.scrollTop ) {
-					scrollTop = document.documentElement.scrollTop;
-				} else if( document.body ) {
-					scrollTop = document.body.scrollTop;
-				}
-				return scrollTop;
-			}
+            // 高光指定菜单项
+            function active( mark ) {
+                each( menuList, function() {
+                    var menuObj = this;
+                    // 对应上了
+                    if( mark !== '#' && getMark( menuObj.href ) === mark ) {
+                        // 添加菜单样式
+                        addClass( menuObj, 'menu-hover' );
+                    } else {
+                        removeClass( this, 'menu-hover' );
+                    }
+                } );
+            }
 
-			// 获取窗口的可视高度
-			function getClientHeight() {
-				var clientHeight = 0;
-				if (document.body.clientHeight && document.documentElement.clientHeight) {
-					var clientHeight = (document.body.clientHeight < document.documentElement.clientHeight) ? document.body.clientHeight : document.documentElement.clientHeight;
-				} else {
-					var clientHeight = (document.body.clientHeight > document.documentElement.clientHeight) ? document.body.clientHeight : document.documentElement.clientHeight;
-				}
-				return clientHeight;
-			}
-			
-		}();
-	</script>
-	
-	
-	<!--语法高亮-->
-	<link rel="stylesheet" href="http://yandex.st/highlightjs/8.0/styles/docco.min.css">
-	<script src="http://yandex.st/highlightjs/8.0/highlight.min.js"></script>
-	<script>
-		! function() {
-			hljs.initHighlightingOnLoad();
-			
-			// 高亮会改变页面的高度，影响菜单锚点的定位
-			hjOnInited( function() {
-				// 触发窗口调整，使锚点的定位自动修复
-				window.onresize();
-			} );
-			
-			// 高亮初始完成后
-			function hjOnInited( callback ) {
-				var pres = document.getElementsByTagName( 'pre' );
-				var code = pres[ pres.length - 1 ].getElementsByTagName( 'code' )[0];
-				var interval = setInterval( function() {
-					if( code.className.match( new RegExp('(\\s|^)hljs(\\s|$)') ) ) {
-						clearInterval( interval );
-						callback();
-					}
-				}, 10 );
-			}
-		}();
-	</script>
+            // 跳转到指定锚点
+            function goto( mark ) {
+                active( mark );
+
+                // 滚动周期
+                var interval = 10;
+                // 如果是首页，直接滚回顶部吧
+                if( mark === '#' ) {
+                    markPos.listen = false;
+                    scollWindow( 0, interval, function() {
+                        markPos.listen = true;
+                        location.hash = mark;
+                    } );
+                    return;
+                }
+                // 遍历菜单得到对应锚点的项
+                each( menuList, function() {
+                    var menuObj = this;
+                    // 对应上了
+                    if( getMark( menuObj.href ) === mark ) {
+                        // 从标签列表得到锚点和它的位置
+                        each( markPos.list, function( key ) {
+                            var pos = this.toString();
+                            if( '#' + key !== mark ) {
+                                return;
+                            }
+                            // 让窗口滚动到这个位置
+                            markPos.listen = false;
+                            scollWindow( pos, interval, function() {
+                                markPos.listen = true;
+                                location.hash = mark;
+                            } );
+                        } );
+                    }
+                } );
+            }
+
+            // 从字符串中截取锚点的值
+            function getMark( str ) {
+                var match = str.match( new RegExp( '#\\w*$' ) );
+                return match ? match[0] : false;
+            }
+
+            // 根据ID获取元素
+            function getById( id, main ) {
+                return ( main || document ).getElementById( id );
+            }
+
+            // 根据标签名获取元素
+            function getByTag( tag, main ) {
+                return ( main || document ).getElementsByTagName( tag );
+            }
+
+            // 根据class获取元素
+            function getByClass( cls, main ) {
+                return ( main || document ).getElementsByClassName( cls );
+            }
+
+            // 遍历数组或对象
+            function each( obj, callback ) {
+                if( Object.prototype.toString.call( obj ) == '[object Object]' ) {
+                    for( var k in obj ) {
+                        callback.call( obj[k], k );
+                    }
+                } else {
+                    for( var i = 0, len = obj.length; i < len; i++ ) {
+                        callback.call( obj[i], i );
+                    }
+                }
+            }
+
+            // 判断元素是否含有某个class
+            function hasClass( obj, cls ) {
+                return obj.className.match( new RegExp('(\\s|^)' + cls + '(\\s|$)') );
+            }
+
+            // 为元素添加一个class
+            function addClass( obj, cls ) {
+                if( ! hasClass( obj, cls ) ) obj.className += " " + cls;
+            }
+
+            // 删除元素的某个class
+            function removeClass( obj, cls ) {
+                if( hasClass( obj, cls ) ) {
+                    var reg = new RegExp( '(\\s|^)' + cls + '(\\s|$)' );
+                    obj.className = obj.className.replace(reg, ' ');
+                }
+            }
+
+            // 惯性滚动窗口，目前只支持y轴滚动
+            // 修改自《javascripot dom编程艺术》一书中的moveElement函数
+            function scollWindow( final_y, interval, callback ) {
+                if( window.movement ) {
+                    clearTimeout( window.movement );
+                }
+                var ypos = parseInt( getScrollTop() );
+                var oldpos = ypos;
+                // 条件达成
+                if( ypos === final_y ) {
+                    callback && callback();
+                    return true;
+                }
+                if( ypos < final_y ) {
+                    var dist = Math.ceil( ( final_y - ypos ) / 10 );
+                    ypos = ypos + dist;
+                }
+                if( ypos > final_y ) {
+                    var dist = Math.ceil( ( ypos - final_y ) / 10 );
+                    ypos = ypos - dist;
+                }
+                window.scrollTo( 0, ypos );
+
+                // 滚到尽头，我简单的防止死循环
+                if( oldpos === parseInt( getScrollTop() ) ) {
+                    callback && callback();
+                    return true;
+                }
+
+                // 继续回调
+                window.movement = setTimeout( function() {
+                    scollWindow( final_y, interval, callback );
+                }, interval );
+            }
+
+
+            /************以下代码来自网上**************/
+            // 获取元素的绝对高度
+            function getElementTop( obj ){
+                var actualTop = obj.offsetTop;
+                var current = obj.offsetParent;
+                while( current !== null ){
+                    actualTop += current.offsetTop;
+                    current = current.offsetParent;
+                }
+                return actualTop;
+            }
+
+            // 获取窗口当前的滚动高度
+            function getScrollTop() {
+                var scrollTop = 0;
+                if( document.documentElement && document.documentElement.scrollTop ) {
+                    scrollTop = document.documentElement.scrollTop;
+                } else if( document.body ) {
+                    scrollTop = document.body.scrollTop;
+                }
+                return scrollTop;
+            }
+
+            // 获取窗口的可视高度
+            function getClientHeight() {
+                var clientHeight = 0;
+                if (document.body.clientHeight && document.documentElement.clientHeight) {
+                    var clientHeight = (document.body.clientHeight < document.documentElement.clientHeight) ? document.body.clientHeight : document.documentElement.clientHeight;
+                } else {
+                    var clientHeight = (document.body.clientHeight > document.documentElement.clientHeight) ? document.body.clientHeight : document.documentElement.clientHeight;
+                }
+                return clientHeight;
+            }
+            
+        }();
+    </script>
+    
+    
+    <!--语法高亮-->
+    <link rel="stylesheet" href="http://yandex.st/highlightjs/8.0/styles/docco.min.css">
+    <script src="http://yandex.st/highlightjs/8.0/highlight.min.js"></script>
+    <script>
+        ! function() {
+            hljs.initHighlightingOnLoad();
+            
+            // 高亮会改变页面的高度，影响菜单锚点的定位
+            hjOnInited( function() {
+                // 触发窗口调整，使锚点的定位自动修复
+                window.onresize();
+            } );
+            
+            // 高亮初始完成后
+            function hjOnInited( callback ) {
+                var pres = document.getElementsByTagName( 'pre' );
+                var code = pres[ pres.length - 1 ].getElementsByTagName( 'code' )[0];
+                var interval = setInterval( function() {
+                    if( code.className.match( new RegExp('(\\s|^)hljs(\\s|$)') ) ) {
+                        clearInterval( interval );
+                        callback();
+                    }
+                }, 10 );
+            }
+        }();
+    </script>
 </body>
 </html>
