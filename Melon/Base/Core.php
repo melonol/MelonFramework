@@ -5,7 +5,7 @@
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link http://framework.melonol.com
  * @author Melon <admin@melonol.com>
- * @version 0.2.1
+ * @version 0.2.2
  */
 
 namespace Melon\Base;
@@ -49,7 +49,7 @@ class Core {
      * @var array 
      */
    public $env = array(
-        'version' => '0.2.1'
+        'version' => '0.2.2'
     );
     
     /**
