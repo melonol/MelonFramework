@@ -33,23 +33,23 @@ defined('IN_MELON') or die('Permission denied');
  * @return string
  */
 function alink( $link = '', $complete = true ) {
-	$url = '';
-	$routeType = \Melon::env( 'routeConfig.type' );
-	if( $complete ) {
-		$http = $_SERVER['SERVER_PORT'] == '443' ? 'https://' : 'http://';
-		$url = $http . $_SERVER['HTTP_HOST'];
-	}
-	if( $routeType === 'incompletePathinfo' ) {
-		$url .= $_SERVER['SCRIPT_NAME'] . '/' . ltrim( $link, '/' );
-	} elseif( $routeType === 'completePathinfo' ) {
-		$dir = str_replace( DIRECTORY_SEPARATOR, '/', dirname( $_SERVER['SCRIPT_NAME'] ) );
-		$url .= ( $dir === '/' ? '' : $dir ) . '/' . ltrim( $link, '/' );
-	} else {
-		$key = \Melon::env( 'routeConfig.requestKey' );
-		if( ! $key ) {
-			\Melon::throwException( '参数requestKey为空，无法正常跳转。请确认路由配置中配置了requestKey' );
-		}
-		$url .= $_SERVER['SCRIPT_NAME'] . '?' . $key . '=' . str_replace( '?', '&', $link );
-	}
-	return $url;
+    $url = '';
+    $routeType = \Melon::env( 'routeConfig.type' );
+    if( $complete ) {
+        $http = $_SERVER['SERVER_PORT'] == '443' ? 'https://' : 'http://';
+        $url = $http . $_SERVER['HTTP_HOST'];
+    }
+    if( $routeType === 'incompletePathinfo' ) {
+        $url .= $_SERVER['SCRIPT_NAME'] . '/' . ltrim( $link, '/' );
+    } elseif( $routeType === 'completePathinfo' ) {
+        $dir = str_replace( DIRECTORY_SEPARATOR, '/', dirname( $_SERVER['SCRIPT_NAME'] ) );
+        $url .= ( $dir === '/' ? '' : $dir ) . '/' . ltrim( $link, '/' );
+    } else {
+        $key = \Melon::env( 'routeConfig.requestKey' );
+        if( ! $key ) {
+            \Melon::throwException( '参数requestKey为空，无法正常跳转。请确认路由配置中配置了requestKey' );
+        }
+        $url .= $_SERVER['SCRIPT_NAME'] . '?' . $key . '=' . str_replace( '?', '&', $link );
+    }
+    return $url;
 }

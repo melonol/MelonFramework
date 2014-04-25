@@ -20,5 +20,5 @@ defined('IN_MELON') or die('Permission denied');
  * @author Melon
  */
 class RuntimeException extends \Exception {
-	
+    
 }

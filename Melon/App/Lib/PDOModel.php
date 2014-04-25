@@ -16,17 +16,17 @@ defined('IN_MELON') or die('Permission denied');
  * APP模型
  */
 class PDOModel extends \Melon\Database\PDO\Model {
-	
-	/**
-	 * 表名
-	 */
-	protected $_table;
+    
+    /**
+     * 表名
+     */
+    protected $_table;
 
-	public function __construct() {
-		$pdo = \Melon::db();
-		if( ! $pdo instanceof \PDO ) {
-			self::throwException( '请提供有效的PDO驱动实例' );
-		}
-		parent::__construct( \Melon::table( $this->_table ), $pdo );
-	}
+    public function __construct() {
+        $pdo = \Melon::db();
+        if( ! $pdo instanceof \PDO ) {
+            self::throwException( '请提供有效的PDO驱动实例' );
+        }
+        parent::__construct( \Melon::table( $this->_table ), $pdo );
+    }
 }

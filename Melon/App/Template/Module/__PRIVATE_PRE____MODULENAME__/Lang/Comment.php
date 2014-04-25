@@ -1,5 +1,5 @@
 <?php
 
 return array(
-	 // 'lang' => '语言'
+     // 'lang' => '语言'
 );
