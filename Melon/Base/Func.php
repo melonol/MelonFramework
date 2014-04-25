@@ -5,7 +5,7 @@
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link http://framework.melonol.com
  * @author Melon <admin@melonol.com>
- * @version 0.2.1
+ * @version 0.2.2
  */
 
 /**
@@ -21,16 +21,16 @@ namespace Melon\Base\Func;
  * @return boolean
  */
 function isAbsolutePath( $path = '' ) {
-	// 主流的系统我见过有两种绝对路径：
-	//	一种是以/号开头的，而另一种是字母和:号开头（猜猜看它们可能是什么系统？\偷笑）
-	// 还有就是phar
-	// 如果你还见过其它的形式，或者有更好的判断绝对路径的方法，请告诉我
-	$strFirst = ( isset( $path[0] ) ? $path[0] : '' );
-	$strSecond = ( isset( $path[1] ) ? $path[1] : '' );
-	$isAbsolute = ( $strFirst === '/' ||
-		( stripos( 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $strFirst ) !== false && $strSecond === ':' ) ||
-		( stripos( $path, 'PHAR://' ) === 0 ) );
-	return $isAbsolute;
+    // 主流的系统我见过有两种绝对路径：
+    //    一种是以/号开头的，而另一种是字母和:号开头（猜猜看它们可能是什么系统？\偷笑）
+    // 还有就是phar
+    // 如果你还见过其它的形式，或者有更好的判断绝对路径的方法，请告诉我
+    $strFirst = ( isset( $path[0] ) ? $path[0] : '' );
+    $strSecond = ( isset( $path[1] ) ? $path[1] : '' );
+    $isAbsolute = ( $strFirst === '/' ||
+        ( stripos( 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $strFirst ) !== false && $strSecond === ':' ) ||
+        ( stripos( $path, 'PHAR://' ) === 0 ) );
+    return $isAbsolute;
 }
 
 /**
@@ -39,13 +39,13 @@ function isAbsolutePath( $path = '' ) {
  * <pre>
  * 函数简化了常规的多维数组获取某个值的方式：
  * $arr = array(
- *	'l1' => array(
- *		'l2' => array(
- *			'l3' => array(
- *				'k' => 'v'
- *			)
- *		)
- *	)
+ *    'l1' => array(
+ *        'l2' => array(
+ *            'l3' => array(
+ *                'k' => 'v'
+ *            )
+ *        )
+ *    )
  * );
  * echo getValue( $arr, 'l1.l2.l3.k' ); // v
  * </pre>
@@ -56,23 +56,23 @@ function isAbsolutePath( $path = '' ) {
  * @return mixed 当元素不存在时返回null
  */
 function getValue( array & $arr , $key, $delimiter = '.' ) {
-	if( strpos( $key, $delimiter ) ) {
-		$value = null;
-		$level = 0;
-		foreach( explode( $delimiter, $key ) as $segmentKey ) {
-			if( $level > 0 && is_array( $value ) && isset( $value[ $segmentKey ] ) ) {
-				$value =& $value[ $segmentKey ];
-				$level++;
-			} elseif( $level === 0 && isset( $arr[ $segmentKey ] ) ) {
-				$value =& $arr[ $segmentKey ];
-				$level++;
-			} else {
-				return null;
-			}
-		}
-		return $value;
-	}
-	return ( isset( $arr[ $key ] ) ? $arr[ $key ] : null );
+    if( strpos( $key, $delimiter ) ) {
+        $value = null;
+        $level = 0;
+        foreach( explode( $delimiter, $key ) as $segmentKey ) {
+            if( $level > 0 && is_array( $value ) && isset( $value[ $segmentKey ] ) ) {
+                $value =& $value[ $segmentKey ];
+                $level++;
+            } elseif( $level === 0 && isset( $arr[ $segmentKey ] ) ) {
+                $value =& $arr[ $segmentKey ];
+                $level++;
+            } else {
+                return null;
+            }
+        }
+        return $value;
+    }
+    return ( isset( $arr[ $key ] ) ? $arr[ $key ] : null );
 }
 
 /**
@@ -88,10 +88,10 @@ function getValue( array & $arr , $key, $delimiter = '.' ) {
  * @return string 替换后的字符串
  */
 function varReplace( $search, $replace, $input ) {
-	$searchs = ( is_array( $search ) ? $search : array( $search ) );
-	$replaces = ( is_array( $replace ) ? $replace : array( $replace ) );
-	foreach( $searchs as &$value ) {
-		$value = '${' . $value . '}';
-	}
-	return str_replace( $searchs, $replaces, $input );
+    $searchs = ( is_array( $search ) ? $search : array( $search ) );
+    $replaces = ( is_array( $replace ) ? $replace : array( $replace ) );
+    foreach( $searchs as &$value ) {
+        $value = '${' . $value . '}';
+    }
+    return str_replace( $searchs, $replaces, $input );
 }
