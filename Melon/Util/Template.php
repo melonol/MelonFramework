@@ -274,6 +274,16 @@ class Template {
     }
     
     /**
+     * 清除标签两边的html注释符
+     * 
+     * @param string &$content
+     * @return string
+     */
+    protected function _cleanNote( $content ) {
+        return preg_replace( "/\<\!\-\-{$this->_beginTag}(.+?){$this->_endTag}\-\-\>/", "{$this->_beginTag}\$1{$this->_endTag}", $content );
+    }
+
+    /**
      * 编译模板
      * 
      * @param string $template 模板文件路径
@@ -282,8 +292,7 @@ class Template {
     protected function _compile( $template ) {
         $content = $this->_getContent( $template );
         
-        //清除标签的注释符
-        $content = preg_replace( "/\<\!\-\-{$this->_beginTag}(.+?){$this->_endTag}\-\-\>/", "{$this->_beginTag}\$1{$this->_endTag}", $content );
+        $content = $this->_cleanNote( $content );
         // 处理几个比较麻烦的标签
         // 先把内容继承过来
         $content = $this->_compileExtend( dirname( $template ), $content );
@@ -369,6 +378,7 @@ class Template {
         // 检查是否有声明继承
         $exp = "/^[\\s\\t\\r\\n]*{$b}extend\\s+(['\"]?)(.*?)(\\1)\\s*\\/?{$e}/is";
         $match = array();
+        $content = $this->_cleanNote( $content );
         if( preg_match( $exp, $content, $match ) ) {
             // 取得继承模板
             $template = $match[2];
