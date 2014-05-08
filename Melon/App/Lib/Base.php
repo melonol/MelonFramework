@@ -28,8 +28,15 @@ class Base extends \Melon {
         static $modules = array();
         if( ! isset( $modules[ $name ] ) ) {
             $class = '\\' . self::env( 'appName' ) . '\Module\\' . $name;
-            spl_autoload( $class );
+            $ready = true;
             if( ! class_exists( $class ) ) {
+                try {
+                    spl_autoload( $class );
+                } catch (Exception $ex) {
+                    $ready = false;
+                }
+            }
+            if( ! $ready ) {
                 self::throwException( "module {$name}不存在" );
             }
             $modules[ $name ] = new $class();
