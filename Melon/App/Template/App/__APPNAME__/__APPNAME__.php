@@ -5,6 +5,6 @@
  * 
  * 大胆写吧！
  */
-class __APPNAME__ extends Melon {
+class __APPNAME__ extends Melon\App\Lib\Base {
     
 }

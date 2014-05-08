@@ -4,6 +4,7 @@ return array(
     
     'charset' => 'utf-8',                            // 脚本编码
     'timezone' => null,                              // 时区
+    'lang' => 'Zh',                                  // 默认语言包
     
     'includePath' => array(),                        // 包含路径
     

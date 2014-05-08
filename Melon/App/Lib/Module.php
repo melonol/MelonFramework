@@ -19,7 +19,7 @@ defined('IN_MELON') or die('Permission denied');
  * 
  * APP的MVC模式主要逻辑是在这里实现的，由于它是一个接口，所以你很容易针对自身的业务需求做改变
  */
-abstract class Module {
+class Module {
     
     /**
      * 运行MVC
@@ -33,7 +33,12 @@ abstract class Module {
      * @param array $args 参数
      */
     public function execute( $controller, $action, array $args = array() ) {
-        $controllerObj = $this->getController( $controller );
+        // 兼容 <=0.2.2
+        if( method_exists( $this, 'getController' ) ) {
+            $controllerObj = $this->getController( $controller );
+        } else {
+            $controllerObj = $this->_controller( $controller );
+        }
         
         if( ! is_object( $controllerObj ) ) {
             trigger_error( "控制器{$controller}不存在", E_USER_ERROR );
@@ -47,8 +52,13 @@ abstract class Module {
         // 为控制器设置属性
         $controllerObj->request = \Melon::httpRequest();
         $controllerObj->response = \Melon::httpResponse();
-        $controllerObj->lang = new Lang( $this->getCommentLang() );
-        $controllerObj->view = $this->_getView( $controllerObj );
+        // 兼容 <=0.2.2
+        if( method_exists( $this, 'getCommentLang' ) ) {
+            $controllerObj->lang = $this->getCommentLang();
+        } else {
+            $controllerObj->lang = $this->lang();
+        }
+        $controllerObj->view = $this->_view( $controllerObj );
         
         $before = $after = array();
         $ucfirstOfAction = ucfirst( $action );
@@ -68,7 +78,7 @@ abstract class Module {
      * @param Object $controllerObj 控制器对象
      * @return \Melon\App\Lib\View
      */
-    private function _getView( $controllerObj ) {
+    protected function _view( $controllerObj ) {
         \Melon::load( __DIR__ . DIRECTORY_SEPARATOR . 'Func.php' );
         
         $view = new View( $controllerObj );
@@ -85,6 +95,19 @@ abstract class Module {
     }
     
     /**
+     * 
+     * 由于框架的载入脚本权限问题，需要模块自身去实例控制器
+     * 
+     * 为了兼容<=0.2.2，子类没默认实现，所以这里不使用抽象关键字进行声明
+     * 
+     * @param string $controller 控制器名字
+     * @return $controllerObj 控制器对象
+     */
+    protected function _controller( $controller ) {
+        \Melon::throwException( '你必需实现此接口' );
+    }
+    
+    /**
      * 输出404
      * 
      * @return void
@@ -96,18 +119,13 @@ abstract class Module {
     
     /**
      * 
-     * 由于框架的载入脚本权限问题，需要模块自身去实例控制器
-     * 
-     * @param string $controller 控制器名字
-     * @return $controllerObj 控制器对象
-     */
-    abstract public function getController( $controller );
-    
-    /**
-     * 
      * 由于框架的载入脚本权限问题，需要模块自身去加载公共语言包
+     * 
+     * 为了兼容<=0.2.2，子类没默认实现，所以这里不使用抽象关键字进行声明
      * 
      * @return $lang
      */
-    abstract public function getCommentLang();
+    public function lang() {
+        \Melon::throwException( '你必需实现此接口' );
+    }
 }
