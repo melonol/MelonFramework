@@ -202,7 +202,7 @@ class Route {
             }
         }
         if( $this->_type === self::TYPE_REQUEST_KEY || ( empty( $pathInfo ) && $this->_type === self::TYPE_AUTO ) ) {
-            $pathInfo = \Melon::httpRequest()->input( $this->_requestKey );
+            $pathInfo = \Melon::httpRequest()->input( $this->_requestKey, 'g' );
         }
         if( empty( $pathInfo ) ) {
             $pathInfo = '/';
