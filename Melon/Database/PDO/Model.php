@@ -79,15 +79,6 @@ class Model {
     }
     
     /**
-     * 返回当前模型的PDO对象
-     * 
-     * @return \PDO $pdo PDO实例对象
-     */
-    public function pdo() {
-        return $this->_pdo;
-    }
-    
-    /**
      * 打开调试
      * 
      * <pre>
@@ -194,6 +185,37 @@ class Model {
             return implode( ' AND ', $_where );
         }
         return $where;
+    }
+    
+    /**
+     * 执行一个查询语句，并返回查询结果
+     * 
+     * @param string $sql 查询语句
+     * @param array $bindParams [可选] 预处理绑定参数
+     * @return mixed
+     */
+    public function query( $sql, array $bindParams = array() ) {
+        $this->_debug( __FUNCTION__, $sql, $bindParams );
+        $statement = $this->_pdo->prepare( $sql );
+        if( $statement->execute( $bindParams ) ) {
+            return $statement->fetchAll();
+        }
+        return false;
+    }
+    
+    /**
+     * 执行一个会影响结果行数的语句，并返回最后新增数据的ID
+     * 
+     * @param string $sql 查询语句
+     * @param array $bindParams [可选] 预处理绑定参数
+     * @return mixed
+     */
+    public function exec( $sql, array $bindParams = array() ) {
+        $this->_debug( __FUNCTION__, $sql );
+        if( $this->_pdo->exec( $sql ) !== false ) {
+            return $this->_pdo->lastInsertId();
+        }
+        return false;
     }
 
     /**
