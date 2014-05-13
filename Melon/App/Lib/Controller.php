@@ -50,6 +50,13 @@ abstract class Controller {
     public $lang;
     
     /**
+     * 构造函数（废话）
+     */
+    public function __construct() {
+        ;
+    }
+    
+    /**
      * 跳转到指定连接
      * 
      * @param string $url
