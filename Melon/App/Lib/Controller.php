@@ -66,5 +66,15 @@ abstract class Controller {
     public function location( $url, $useAlink = false ) {
         $_url = ( $useAlink ? Func\alink( $url ) : $url );
         \Melon::httpResponse()->setStatus( 301 )->setHeader( 'location', $_url )->send();
+        \Melon::halt();
+    }
+    
+    /**
+     * 使用alink跳转到指定连接
+     * 
+     * @param string $alink
+     */
+    public function alocation( $alink ) {
+        $this->location( $alink, true );
     }
 }
