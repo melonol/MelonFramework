@@ -543,17 +543,17 @@ class Template {
                         }
                     }
                     // 别忘记去掉右边的逗号
-                    $exportArgs = rtrim( $exportArgs, ',' );
+                    $exportArgs = ',' . rtrim( $exportArgs, ',' );
                     // 标签可以通过'result'参数自定义返回结果的变量名
                     $resultName = ( isset( $args['result'] ) ? $args['result'] : $resultName );
                 }
             }
             // 单标签的话，直接输出执行结果
             if( substr( $match[0], -2, 1 ) === '/' ) {
-                return "<?php echo \$__melonTemplate->callTag('{$tagName}',{$exportArgs}); ?>";
+                return "<?php echo \$__melonTemplate->callTag('{$tagName}'{$exportArgs}); ?>";
             }
             // 否则就用遍历了
-            return "<?php foreach(\$__melonTemplate->callTag('{$tagName}',{$exportArgs}) as \${$resultName}) { ?>";
+            return "<?php foreach(\$__melonTemplate->callTag('{$tagName}'{$exportArgs}) as \${$resultName}) { ?>";
         }, $content );
         
         // 处理结束标签
@@ -570,7 +570,7 @@ class Template {
      * @param mixed $_ 回调函数更多参数
      * @return mixed 回调函数执行结果
      */
-    public function callTag( $tagName = '', $arg1 = null, $_ ) {
+    public function callTag( $tagName = '', $arg1 = null, $_ = null ) {
         if( ! isset( $this->_tags[ $tagName ] ) ) {
             \Melon::throwException( "没有定义{$tagName}模板标签" );
         }
