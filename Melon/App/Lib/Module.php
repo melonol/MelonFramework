@@ -49,17 +49,6 @@ class Module {
             $this->page404();
         }
         
-        // 为控制器设置属性
-        $controllerObj->request = \Melon::httpRequest();
-        $controllerObj->response = \Melon::httpResponse();
-        // 兼容 <=0.2.2
-        if( method_exists( $this, 'getCommentLang' ) ) {
-            $controllerObj->lang = $this->getCommentLang();
-        } else {
-            $controllerObj->lang = $this->lang();
-        }
-        $controllerObj->view = $this->_view( $controllerObj );
-        
         $before = $after = array();
         $ucfirstOfAction = ucfirst( $action );
         if( method_exists( $controllerObj, 'before' . $ucfirstOfAction ) ) {
@@ -68,30 +57,8 @@ class Module {
         if( method_exists( $controllerObj, 'after' . $ucfirstOfAction ) ) {
             $after[ $action ] = array( $controllerObj, 'after' . $ucfirstOfAction );
         }
-        $controlTrigger = \Melon::trigger( $controllerObj, $before, $after );
+        $controlTrigger = App::trigger( $controllerObj, $before, $after );
         call_user_func_array( array( $controlTrigger, $action ), $args );
-    }
-    
-    /**
-     * 获取视图实例
-     * 
-     * @param Object $controllerObj 控制器对象
-     * @return \Melon\App\Lib\View
-     */
-    protected function _view( $controllerObj ) {
-        \Melon::load( __DIR__ . DIRECTORY_SEPARATOR . 'Func.php' );
-        
-        $view = new View( $controllerObj );
-        
-        // 注入alink标签
-        $view->assignTag( 'alink', array(
-            'callable' => '\Melon\App\Lib\Func\alink',
-            'args' => array(
-                'ln' => '',
-                'comp' => true,
-            )
-        ) );
-        return $view;
     }
     
     /**
@@ -104,7 +71,7 @@ class Module {
      * @return $controllerObj 控制器对象
      */
     protected function _controller( $controller ) {
-        \Melon::throwException( '你必需实现此接口' );
+        App::throwException( '你必需实现此接口' );
     }
     
     /**
@@ -113,8 +80,8 @@ class Module {
      * @return void
      */
     public function page404() {
-        \Melon::load( \Melon::env( 'appDir' ) . DIRECTORY_SEPARATOR . \Melon::env( 'routeConfig.404' ) );
-        \Melon::halt();
+        App::load( App::env( 'appDir' ) . DIRECTORY_SEPARATOR . App::env( 'routeConfig.404' ) );
+        App::halt();
     }
     
     /**
@@ -126,6 +93,6 @@ class Module {
      * @return $lang
      */
     public function lang() {
-        \Melon::throwException( '你必需实现此接口' );
+        App::throwException( '你必需实现此接口' );
     }
 }

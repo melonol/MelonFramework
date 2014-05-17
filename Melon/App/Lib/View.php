@@ -40,10 +40,10 @@ class View {
         $this->_controller = $controller;
         
         // 视图设置好基本的目录，方便管理和使用
-        $this->_view = \Melon::template();
-        $this->_view->setTemplateDir( \Melon::env( 'appDir' ) . DIRECTORY_SEPARATOR . 'Module' .
-            DIRECTORY_SEPARATOR . \Melon::env( 'config.privatePre' ) . \Melon::env( 'moduleName' ) . DIRECTORY_SEPARATOR . 'View' . DIRECTORY_SEPARATOR . \Melon::env( 'controller' ) );
-        $this->_view->setCompileDir( \Melon::env( 'appDir' ) . DIRECTORY_SEPARATOR .
+        $this->_view = App::template();
+        $this->_view->setTemplateDir( App::env( 'appDir' ) . DIRECTORY_SEPARATOR . 'Module' .
+            DIRECTORY_SEPARATOR . App::env( 'config.privatePre' ) . App::env( 'moduleName' ) . DIRECTORY_SEPARATOR . 'View' . DIRECTORY_SEPARATOR . App::env( 'controller' ) );
+        $this->_view->setCompileDir( App::env( 'appDir' ) . DIRECTORY_SEPARATOR .
             'Data' . DIRECTORY_SEPARATOR . 'TplCache' );
     }
     
@@ -123,7 +123,7 @@ class View {
             $this->_view->assignItem( $this->_controller->request->inputs() );
         }
         // 注入环境变量
-        $this->_view->assign( 'env', \Melon::env() );
+        $this->_view->assign( 'env', App::env() );
         
         $this->_view->display( $template );
     }

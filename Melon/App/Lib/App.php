@@ -15,7 +15,7 @@ defined('IN_MELON') or die('Permission denied');
 /**
  * APP基础主体类
  */
-class Base extends \Melon {
+class App extends \Melon {
     
     /**
      * 获得一个模块实例，如果模块不存在则抛出异常
