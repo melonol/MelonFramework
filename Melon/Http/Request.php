@@ -5,7 +5,7 @@
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link http://framework.melonol.com
  * @author Melon <admin@melonol.com>
- * @version 0.2.2
+ * @version 0.2.3
  */
 
 namespace Melon\Http;
@@ -149,7 +149,31 @@ class Request {
         }
         return $authArgs;
     }
-
+    
+    /**
+     * 获取客户端IP
+     * 
+     * 这个方法来源于互联网
+     * 
+     * @return string
+     */
+    public function ip() {
+        $ip = $_SERVER['REMOTE_ADDR'];
+		if( isset( $_SERVER['HTTP_CLIENT_IP'] )
+                && preg_match( '/^([0-9]{1,3}\.){3}[0-9]{1,3}$/', $_SERVER['HTTP_CLIENT_IP'] ) ) {
+			$ip = $_SERVER['HTTP_CLIENT_IP'];
+		} elseif( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) &&
+            preg_match_all( '#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#s', $_SERVER['HTTP_X_FORWARDED_FOR'], $matches ) ) {
+			foreach ( $matches[0] as $xip ) {
+				if( ! preg_match( '#^(10|172\.16|192\.168)\.#', $xip ) ) {
+					$ip = $xip;
+					break;
+				}
+			}
+		}
+		return $ip;
+    }
+    
     /**
      * 设置请求数据，保存到类属性里面
      * 

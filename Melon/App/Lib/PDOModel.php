@@ -5,7 +5,7 @@
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link http://framework.melonol.com
  * @author Melon <admin@melonol.com>
- * @version 0.2.2
+ * @version 0.2.3
  */
 
 namespace Melon\App\Lib;
@@ -23,10 +23,10 @@ class PDOModel extends \Melon\Database\PDO\Model {
     protected $_table;
 
     public function __construct() {
-        $pdo = \Melon::db();
+        $pdo = App::db();
         if( ! $pdo instanceof \PDO ) {
             self::throwException( '请提供有效的PDO驱动实例' );
         }
-        parent::__construct( \Melon::table( $this->_table ), $pdo );
+        parent::__construct( App::table( $this->_table ), $pdo );
     }
 }
