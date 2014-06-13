@@ -49,7 +49,7 @@ class Core {
      * @var array 
      */
    public $env = array(
-        'version' => '0.2.2'
+        'version' => '0.2.3'
     );
     
     /**
