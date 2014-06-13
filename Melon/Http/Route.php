@@ -5,7 +5,7 @@
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link http://framework.melonol.com
  * @author Melon <admin@melonol.com>
- * @version 0.2.2
+ * @version 0.2.3
  */
 
 namespace Melon\Http;
@@ -202,7 +202,7 @@ class Route {
             }
         }
         if( $this->_type === self::TYPE_REQUEST_KEY || ( empty( $pathInfo ) && $this->_type === self::TYPE_AUTO ) ) {
-            $pathInfo = \Melon::httpRequest()->input( $this->_requestKey );
+            $pathInfo = \Melon::httpRequest()->input( $this->_requestKey, 'g' );
         }
         if( empty( $pathInfo ) ) {
             $pathInfo = '/';

@@ -5,10 +5,11 @@
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link http://framework.melonol.com
  * @author Melon <admin@melonol.com>
- * @version 0.2.2
+ * @version 0.2.3
  */
 
 namespace Melon\App\Lib\Func;
+use Melon\App\Lib\App;
 
 defined('IN_MELON') or die('Permission denied');
 
@@ -34,7 +35,7 @@ defined('IN_MELON') or die('Permission denied');
  */
 function alink( $link = '', $complete = true ) {
     $url = '';
-    $routeType = \Melon::env( 'routeConfig.type' );
+    $routeType = App::env( 'routeConfig.type' );
     if( $complete ) {
         $http = $_SERVER['SERVER_PORT'] == '443' ? 'https://' : 'http://';
         $url = $http . $_SERVER['HTTP_HOST'];
@@ -45,9 +46,9 @@ function alink( $link = '', $complete = true ) {
         $dir = str_replace( DIRECTORY_SEPARATOR, '/', dirname( $_SERVER['SCRIPT_NAME'] ) );
         $url .= ( $dir === '/' ? '' : $dir ) . '/' . ltrim( $link, '/' );
     } else {
-        $key = \Melon::env( 'routeConfig.requestKey' );
+        $key = App::env( 'routeConfig.requestKey' );
         if( ! $key ) {
-            \Melon::throwException( '参数requestKey为空，无法正常跳转。请确认路由配置中配置了requestKey' );
+            App::throwException( '参数requestKey为空，无法正常跳转。请确认路由配置中配置了requestKey' );
         }
         $url .= $_SERVER['SCRIPT_NAME'] . '?' . $key . '=' . str_replace( '?', '&', $link );
     }

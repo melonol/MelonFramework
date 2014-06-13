@@ -5,7 +5,7 @@
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link http://framework.melonol.com
  * @author Melon <admin@melonol.com>
- * @version 0.2.2
+ * @version 0.2.3
  */
 
 namespace Melon\App\Lib;
@@ -19,7 +19,7 @@ defined('IN_MELON') or die('Permission denied');
  * 
  * APP的MVC模式主要逻辑是在这里实现的，由于它是一个接口，所以你很容易针对自身的业务需求做改变
  */
-abstract class Module {
+class Module {
     
     /**
      * 运行MVC
@@ -33,7 +33,12 @@ abstract class Module {
      * @param array $args 参数
      */
     public function execute( $controller, $action, array $args = array() ) {
-        $controllerObj = $this->getController( $controller );
+        // 兼容 <=0.2.2
+        if( method_exists( $this, 'getController' ) ) {
+            $controllerObj = $this->getController( $controller );
+        } else {
+            $controllerObj = $this->_controller( $controller );
+        }
         
         if( ! is_object( $controllerObj ) ) {
             trigger_error( "控制器{$controller}不存在", E_USER_ERROR );
@@ -44,12 +49,6 @@ abstract class Module {
             $this->page404();
         }
         
-        // 为控制器设置属性
-        $controllerObj->request = \Melon::httpRequest();
-        $controllerObj->response = \Melon::httpResponse();
-        $controllerObj->lang = new Lang( $this->getCommentLang() );
-        $controllerObj->view = $this->_getView( $controllerObj );
-        
         $before = $after = array();
         $ucfirstOfAction = ucfirst( $action );
         if( method_exists( $controllerObj, 'before' . $ucfirstOfAction ) ) {
@@ -58,30 +57,21 @@ abstract class Module {
         if( method_exists( $controllerObj, 'after' . $ucfirstOfAction ) ) {
             $after[ $action ] = array( $controllerObj, 'after' . $ucfirstOfAction );
         }
-        $controlTrigger = \Melon::trigger( $controllerObj, $before, $after );
+        $controlTrigger = App::trigger( $controllerObj, $before, $after );
         call_user_func_array( array( $controlTrigger, $action ), $args );
     }
     
     /**
-     * 获取视图实例
      * 
-     * @param Object $controllerObj 控制器对象
-     * @return \Melon\App\Lib\View
+     * 由于框架的载入脚本权限问题，需要模块自身去实例控制器
+     * 
+     * 为了兼容<=0.2.2，子类没默认实现，所以这里不使用抽象关键字进行声明
+     * 
+     * @param string $controller 控制器名字
+     * @return $controllerObj 控制器对象
      */
-    private function _getView( $controllerObj ) {
-        \Melon::load( __DIR__ . DIRECTORY_SEPARATOR . 'Func.php' );
-        
-        $view = new View( $controllerObj );
-        
-        // 注入alink标签
-        $view->assignTag( 'alink', array(
-            'callable' => '\Melon\App\Lib\Func\alink',
-            'args' => array(
-                'ln' => '',
-                'comp' => true,
-            )
-        ) );
-        return $view;
+    protected function _controller( $controller ) {
+        App::throwException( '你必需实现此接口' );
     }
     
     /**
@@ -90,24 +80,19 @@ abstract class Module {
      * @return void
      */
     public function page404() {
-        \Melon::load( \Melon::env( 'appDir' ) . DIRECTORY_SEPARATOR . \Melon::env( 'routeConfig.404' ) );
-        \Melon::halt();
+        App::load( App::env( 'appDir' ) . DIRECTORY_SEPARATOR . App::env( 'routeConfig.404' ) );
+        App::halt();
     }
-    
-    /**
-     * 
-     * 由于框架的载入脚本权限问题，需要模块自身去实例控制器
-     * 
-     * @param string $controller 控制器名字
-     * @return $controllerObj 控制器对象
-     */
-    abstract public function getController( $controller );
     
     /**
      * 
      * 由于框架的载入脚本权限问题，需要模块自身去加载公共语言包
      * 
+     * 为了兼容<=0.2.2，子类没默认实现，所以这里不使用抽象关键字进行声明
+     * 
      * @return $lang
      */
-    abstract public function getCommentLang();
+    public function lang() {
+        App::throwException( '你必需实现此接口' );
+    }
 }

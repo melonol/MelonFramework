@@ -5,7 +5,7 @@
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link http://framework.melonol.com
  * @author Melon <admin@melonol.com>
- * @version 0.2.2
+ * @version 0.2.3
  */
 
 namespace Melon\Util;
@@ -274,6 +274,16 @@ class Template {
     }
     
     /**
+     * 清除标签两边的html注释符
+     * 
+     * @param string &$content
+     * @return string
+     */
+    protected function _cleanNote( $content ) {
+        return preg_replace( "/\<\!\-\-{$this->_beginTag}(.+?){$this->_endTag}\-\-\>/", "{$this->_beginTag}\$1{$this->_endTag}", $content );
+    }
+
+    /**
      * 编译模板
      * 
      * @param string $template 模板文件路径
@@ -282,8 +292,7 @@ class Template {
     protected function _compile( $template ) {
         $content = $this->_getContent( $template );
         
-        //清除标签的注释符
-        $content = preg_replace( "/\<\!\-\-{$this->_beginTag}(.+?){$this->_endTag}\-\-\>/", "{$this->_beginTag}\$1{$this->_endTag}", $content );
+        $content = $this->_cleanNote( $content );
         // 处理几个比较麻烦的标签
         // 先把内容继承过来
         $content = $this->_compileExtend( dirname( $template ), $content );
@@ -369,6 +378,7 @@ class Template {
         // 检查是否有声明继承
         $exp = "/^[\\s\\t\\r\\n]*{$b}extend\\s+(['\"]?)(.*?)(\\1)\\s*\\/?{$e}/is";
         $match = array();
+        $content = $this->_cleanNote( $content );
         if( preg_match( $exp, $content, $match ) ) {
             // 取得继承模板
             $template = $match[2];
@@ -533,17 +543,17 @@ class Template {
                         }
                     }
                     // 别忘记去掉右边的逗号
-                    $exportArgs = rtrim( $exportArgs, ',' );
+                    $exportArgs = ',' . rtrim( $exportArgs, ',' );
                     // 标签可以通过'result'参数自定义返回结果的变量名
                     $resultName = ( isset( $args['result'] ) ? $args['result'] : $resultName );
                 }
             }
             // 单标签的话，直接输出执行结果
             if( substr( $match[0], -2, 1 ) === '/' ) {
-                return "<?php echo \$__melonTemplate->callTag('{$tagName}',{$exportArgs}); ?>";
+                return "<?php echo \$__melonTemplate->callTag('{$tagName}'{$exportArgs}); ?>";
             }
             // 否则就用遍历了
-            return "<?php foreach(\$__melonTemplate->callTag('{$tagName}',{$exportArgs}) as \${$resultName}) { ?>";
+            return "<?php foreach(\$__melonTemplate->callTag('{$tagName}'{$exportArgs}) as \${$resultName}) { ?>";
         }, $content );
         
         // 处理结束标签
@@ -560,7 +570,7 @@ class Template {
      * @param mixed $_ 回调函数更多参数
      * @return mixed 回调函数执行结果
      */
-    public function callTag( $tagName = '', $arg1 = null, $_ ) {
+    public function callTag( $tagName = '', $arg1 = null, $_ = null ) {
         if( ! isset( $this->_tags[ $tagName ] ) ) {
             \Melon::throwException( "没有定义{$tagName}模板标签" );
         }
